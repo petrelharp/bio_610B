@@ -38,10 +38,10 @@ pdfs :
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
 	git checkout gh-pages
-	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display/ -type f)))
-	$(eval OLDFILES := $(filter-out .gitignore,$(shell git ls-files)))
-	$(eval STALEFILES := $(filter-out $(DISPLAYFILES),$(OLDFILES)))
-	$(eval BRANCH := $(shell git symbolic-ref -q HEAD))
+	$(eval DISPLAYFILES = $(patsubst display/%,%,$(shell find display/ -type f)))
+	$(eval OLDFILES = $(filter-out .gitignore,$(shell git ls-files)))
+	$(eval STALEFILES = $(filter-out $(DISPLAYFILES),$(OLDFILES)))
+	$(eval BRANCH = $(shell git symbolic-ref -q HEAD))
 	@echo 'on branch $(BRANCH)'
 	@echo 'new files -- $(DISPLAYFILES)'
 	@echo 'old files -- $(OLDFILES)'
@@ -102,12 +102,12 @@ $(DISPLAYDIR)/%.xml : %.tex
 	latexml $(LATEXMLFLAGS) --destination=$@ $<
 
 $(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
-	$(eval BIBS := $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
+	$(eval BIBS = $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
 	@if [ '$(BIBS)' ]; then \
 		echo 'making bibliography $(BIBS)'; \
 		make $(BIBS); \
 	fi
-	# $(eval FIGS := $(shell grep '\\includegraphics' $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.svg/'))
+	# $(eval FIGS = $(shell grep '\\includegraphics' $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.svg/'))
 	# -if [ '$(FIGS)' ]; then \
 	# 	echo 'making $(FIGS)'; \
 	# 	make $(FIGS); \
