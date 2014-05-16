@@ -21,7 +21,7 @@ PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES))
 XHTMLS = $(patsubst %.tex,$(DISPLAYDIR)/%.xhtml,$(TEXFILES))
 
 # hope their head isn't detached
-GITBRANCH = $(shell git symbolic-ref -q HEAD)
+GITBRANCH = $(shell git symbolic-ref -q --short HEAD)
 
 xhtmls :
 	make $(XHTMLS)
