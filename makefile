@@ -39,9 +39,9 @@ publish : xhtmls
 
 setup : 
 	git checkout --orphan gh-pages
-	-rm $(shell git ls-files -c)
-	touch README.md
-	git add README.md
+	-rm $(shell git ls-files -c | grep -v resources)
+	git rm --cached $(shell git ls-files --cached)
+	git add resources/*
 	git commit -m 'initialized gh-pages branch'
 	git checkout $(GITBRANCH)
 
