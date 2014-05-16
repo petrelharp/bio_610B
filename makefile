@@ -38,7 +38,7 @@ branch = git symbolic-ref -q HEAD
 
 echobranch : 
 	git checkout gh-pages
-	echo $(call branch)
+	echo $(shell $(branch))
 
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
