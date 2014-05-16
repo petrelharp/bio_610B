@@ -36,8 +36,7 @@ pdfs :
 
 echobranch : 
 	git checkout gh-pages
-	$(eval BRANCH = $$(shell git symbolic-ref -q HEAD))
-	@echo 'on branch $(BRANCH)'
+	$(info BRANCH = $(shell git symbolic-ref -q HEAD))
 
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
