@@ -40,8 +40,7 @@ publish : xhtmls
 setup : 
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c | grep -v resources)
-	git rm --cached $(shell git ls-files --cached)
-	git add resources/*
+	git rm --cached $(shell git ls-files --cached | grep -v resources)
 	git commit -m 'initialized gh-pages branch'
 	git checkout $(GITBRANCH)
 
