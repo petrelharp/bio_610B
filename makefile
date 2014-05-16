@@ -39,6 +39,11 @@ publish : xhtmls
 
 setup : 
 	git checkout --orphan gh-pages
+	-rm $(shell git ls-files -c)
+	touch README.md
+	git add README.md
+	git commit -m 'initialized gh-pages branch'
+	git checkout $(GITBRANCH)
 
 clean : 
 	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.*
