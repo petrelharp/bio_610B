@@ -43,7 +43,7 @@ publish : xhtmls
 	# remove files no longer in display
 	git rm $$(grep -vxF -f <(git ls-files) $$(find display/ -type f | sed -e 's_^display/__'))
 	# and add updated or new ones
-	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__')
+	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__')"
 	cp -r display/* .
 	git add $$(find display/ -type f | sed -e 's_^display/__')
 	git commit -a -m 'automatic update of html'
