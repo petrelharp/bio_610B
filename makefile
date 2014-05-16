@@ -26,7 +26,7 @@ PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES))
 XHTMLS = $(patsubst %.tex,$(DISPLAYDIR)/%.xhtml,$(TEXFILES))
 
 # hope their head isn't detached
-GITBRANCH = $(shell git symbolic-ref -q --short HEAD)
+GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
 
 xhtmls :
 	make $(XHTMLS)
@@ -34,29 +34,18 @@ xhtmls :
 pdfs :
 	make $(PDFS)
 
-branch = git symbolic-ref -q HEAD
-
-echobranch : 
-	git checkout gh-pages
-	echo $$($(branch))
 
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
 	git checkout gh-pages
-	$(eval DISPLAYFILES = $$(patsubst display/%,%,$$(shell find display/ -type f)))
-	$(eval OLDFILES = $$(filter-out .gitignore,$$(shell git ls-files)))
-	$(eval STALEFILES = $$(filter-out $$(DISPLAYFILES),$$(OLDFILES)))
-	$(eval BRANCH = $$(shell git symbolic-ref -q HEAD))
-	@echo 'on branch $(BRANCH)'
-	@echo 'new files -- $(DISPLAYFILES)'
-	@echo 'old files -- $(OLDFILES)'
-	@echo 'removing -- $(STALEFILES)'
+	@echo "removing -- $$(grep -vxF -f <(git ls-files) $$(find display/ -type f))"
 	# remove files no longer in display
-	git rm $(STALEFILES)
-	@echo 'adding  $(DISPLAYFILES)'
+	git rm $$(grep -vxF -f <(git ls-files) $$(find display/ -type f | sed -e 's_^display/__'))
+	# and add updated or new ones
+	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__')
 	cp -r display/* .
-	git add $(DISPLAYFILES)
+	git add $$(find display/ -type f | sed -e 's_^display/__')
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
