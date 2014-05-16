@@ -48,6 +48,8 @@ setup :
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c | grep -v resources)
 	git rm --cached $(shell git ls-files --cached | grep -v resources)
+	echo "display/" > .gitignore
+	git add .gitignore
 	git commit -m 'initialized gh-pages branch'
 	git checkout $(GITBRANCH)
 
