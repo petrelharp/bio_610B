@@ -39,11 +39,11 @@ pdfs :
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
 	git checkout gh-pages
-	@echo "removing -- $$(grep -vxF -f <(git ls-files) <(find display/ -type f))"
+	@echo "removing -- $$(grep -vxF -f <(git ls-files) <(find display/ -type f) | tr '\n' ' ')"
 	# remove files no longer in display
 	git rm $$(grep -vxF -f <(git ls-files) $$(find display/ -type f | sed -e 's_^display/__'))
 	# and add updated or new ones
-	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__')"
+	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__' | tr '\n' ' ')"
 	cp -r display/* .
 	git add $$(find display/ -type f | sed -e 's_^display/__')
 	git commit -a -m 'automatic update of html'
