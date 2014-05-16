@@ -5,7 +5,7 @@
 # git add (STUFF JUST ADDED)
 #
 
-.PHONY : clean publish pdfs
+.PHONY : clean publish pdfs setup xhtmls
 
 ###
 # names of files you want made and published to github (in gh-pages) should be in html-these-files.mk
@@ -39,8 +39,13 @@ pdfs :
 publish : xhtmls
 	git checkout gh-pages
 	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display/)))
+	$(eval OLDFILES := $(filter-out .gitignore,$(shell git ls-files)))
+	$(eval STALEFILES := $(filter-out $(DISPLAYFILES),$(OLDFILES)))
+	@echo 'new files -- $(DISPLAYFILES)'
+	@echo 'old files -- $(OLDFILES)'
+	@echo 'removing -- $(STALEFILES)'
 	# remove files no longer in display
-	git rm $(filter-out .gitignore $(DISPLAYFILES),$(shell git ls-files))
+	git rm $(STALEFILES)
 	@echo 'adding  $(DISPLAYFILES)'
 	cp -r display/* .
 	git add $(DISPLAYFILES)
