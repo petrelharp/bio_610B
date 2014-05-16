@@ -38,7 +38,8 @@ pdfs :
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
 	git checkout gh-pages
-	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display)))
+	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display/)))
+	@echo 'adding  $(DISPLAYFILES)'
 	# remove files no longer in display
 	git rm $(filter-out $(shell git ls-files), $(DISPLAYFILES))
 	cp -r display/* .
