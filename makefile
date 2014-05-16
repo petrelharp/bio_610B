@@ -7,6 +7,8 @@
 
 .PHONY : clean publish pdfs setup xhtmls
 
+SHELL = /bin/bash
+
 ###
 # names of files you want made and published to github (in gh-pages) should be in html-these-files.mk
 # which lives in the master branch and is automatically pushed over
@@ -38,23 +40,15 @@ pdfs :
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
-	echo 1
 	git checkout gh-pages
-	echo 2
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
-	echo 3
 	# remove files no longer in display
 	git rm $$(grep -vxF -f  <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files))
-	echo 4
 	# and add updated or new ones
 	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__' | tr '\n' ' ')"
-	echo 5
 	cp -r display/* .
-	echo 6
 	git add $$(find display/ -type f | sed -e 's_^display/__')
-	echo 7
 	git commit -a -m 'automatic update of html'
-	echo 8
 	git checkout $(GITBRANCH)
 
 # set up a clean gh-pages branch
