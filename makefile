@@ -48,7 +48,7 @@ publish : xhtmls
 	# and add updated or new ones
 	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__' | tr '\n' ' ')"
 	cp -r display/* .
-	UPFILES=add $$(find display/ -type f | sed -e 's_^display/__'); \
+	UPFILES=$$(find display/ -type f | sed -e 's_^display/__'); \
 		if [ ! -z $$UPFILES ]; then git add $$UPFILES; fi
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
