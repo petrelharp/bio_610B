@@ -37,6 +37,7 @@ publish : xhtmls
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
+# set up a clean gh-pages branch
 setup : 
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c | grep -v resources)
