@@ -43,11 +43,13 @@ publish : xhtmls
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
-	git rm $$(grep -vxF -f  <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files))
+	OLDFILES=$$(grep -vxF -f  <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files)); \
+			 if [ ! -z $$OLDFILES ]; then git rm $$OLDFILES; fi
 	# and add updated or new ones
 	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__' | tr '\n' ' ')"
 	cp -r display/* .
-	git add $$(find display/ -type f | sed -e 's_^display/__')
+	UPFILES=add $$(find display/ -type f | sed -e 's_^display/__'); \
+		if [ ! -z $$UPFILES ]; then git add $$UPFILES; fi
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
