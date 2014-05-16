@@ -39,6 +39,7 @@ publish : xhtmls
 
 # set up a clean gh-pages branch
 setup : 
+	if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c | grep -v resources)
 	git rm --cached $(shell git ls-files --cached | grep -v resources)
