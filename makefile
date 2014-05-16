@@ -12,6 +12,11 @@
 # which lives in the master branch and is automatically pushed over
 include config.mk
 
+###
+# stuff for compilers
+LATEXMLFLAGS = --preamble=resources/header.tex --postamble=resources/footer.tex 
+LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js
+
 MD_HTML = $(patsubst %.md,%.html,$(MDFILES))
 TEX_HTML = $(patsubst %.tex,%.html,$(TEXFILES))
 TEX_XHTML = $(patsubst %.tex,%.xhtml,$(TEXFILES))
@@ -47,8 +52,8 @@ setup :
 	git checkout $(GITBRANCH)
 
 clean : 
-	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.*
-	rm -f LaTeXML.cache
+	-rm -f $(shell git ls-files --other display/*)
+	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
 
 
 # make pdfs locally
@@ -71,39 +76,29 @@ $(DISPLAYDIR)/%.pdf : %.tex %.bbl
 ###
 # latexml stuff
 
+
+
 $(DISPLAYDIR)/%.html : %.md
 	pandoc -c resources/github-markdown.css -f markdown_github -o $@ $<
 
 $(DISPLAYDIR)/%.xml : %.bib
 	latexmlc --destination=$@ --bibtex $<
 
-$(DISPLAYDIR)/%.html : %.tex
-	$(eval BIBS := $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
-	echo 'making $(BIBS)'
-	rm -f LaTeXML.cache
-	latexmlc --format=html5 --bibliography=$(DISPLAYDIR)/coaltheory.xml --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js --destination=$@ $<
+$(DISPLAYDIR)/%.xml : %.tex
+	latexml $(LATEXMLFLAGS) --destination=$@ $<
 
-$(DISPLAYDIR)/%.xhtml : %.tex
+$(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
 	$(eval BIBS := $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
-	echo 'making $(BIBS)'
-	if [ '$(BIBS)' ]; then make $(BIBS); fi
-	$(eval FIGS := $(shell grep includegraphics $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.svg/'))
-	echo 'making $(FIGS)'
-	if [ '$(FIGS)' ]; then make $(FIGS); fi
-	latexmlc --format=xhtml --bibliography=$(BIBS) --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js --destination=$@ $<
-
-# $(DISPLAYDIR)/%.xml : %.tex
-# 	rm -f LaTeXML.cache
-# 	latexml --preamble=header.tex --postamble=tailer.tex --destination=$@ $<
-# 
-# $(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
-# 	$(eval BIBS := $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
-# 	echo 'making $(BIBS)'
-# 	if [ '$(BIBS)' ]; then make $(BIBS); fi
-# 	$(eval FIGS := $(shell grep includegraphics $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.svg/'))
-# 	echo 'making $(FIGS)'
-# 	if [ '$(FIGS)' ]; then make $(FIGS); fi
-# 	latexmlpost --bibliography=$(BIBS) --css=resources/plr-style.css --javascript=resources/LaTeXML-maybeMathjax.js --javascript=resources/adjust-svg.js --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --destination=$@ $<
+	if [ '$(BIBS)' ]; then \
+		echo 'making bibliography $(BIBS)'; \
+		make $(BIBS); \
+	fi
+	# $(eval FIGS := $(shell grep '\\includegraphics' $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.svg/'))
+	# -if [ '$(FIGS)' ]; then \
+	# 	echo 'making $(FIGS)'; \
+	# 	make $(FIGS); \
+	# fi
+	latexmlpost --format=xhtml $(foreach bib,$(BIBS),--bibliography=$(bib)) $(LATEXMLPOSTFLAGS) --destination=$@ $<
 
 
 ## 
