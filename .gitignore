@@ -1,0 +1,6 @@
+display/*
+*.out
+*.log
+*.aux
+*.bbl
+*.blg
