@@ -41,7 +41,7 @@ publish : xhtmls
 	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display/)))
 	@echo 'adding  $(DISPLAYFILES)'
 	# remove files no longer in display
-	git rm $(filter-out $(shell git ls-files), $(DISPLAYFILES))
+	git rm $(filter-out $(DISPLAYFILES),$(shell git ls-files))
 	cp -r display/* .
 	git add $(DISPLAYFILES)
 	git commit -a -m 'automatic update of html'
