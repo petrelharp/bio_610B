@@ -44,12 +44,12 @@ publish : xhtmls
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
 	OLDFILES=$$(grep -vxF -f  <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files)); \
-			 if [ ! -z $$OLDFILES ]; then git rm $$OLDFILES; fi
+			 if [ ! -z "$$OLDFILES" ]; then git rm $$OLDFILES; fi
 	# and add updated or new ones
 	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__' | tr '\n' ' ')"
 	cp -r display/* .
 	UPFILES=$$(find display/ -type f | sed -e 's_^display/__'); \
-		if [ ! -z $$UPFILES ]; then git add $$UPFILES; fi
+		if [ ! -z "$$UPFILES" ]; then git add $$UPFILES; fi
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
