@@ -39,6 +39,7 @@ pdfs :
 publish : xhtmls
 	git checkout gh-pages
 	cp -r display/* .
+	git add $(patsubst display/%,%,$(wildcard display/*))
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
