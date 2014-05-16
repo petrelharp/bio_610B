@@ -39,9 +39,9 @@ pdfs :
 publish : xhtmls
 	git checkout gh-pages
 	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display/)))
-	@echo 'adding  $(DISPLAYFILES)'
 	# remove files no longer in display
-	git rm $(filter-out $(DISPLAYFILES),$(shell git ls-files))
+	git rm $(filter-out .gitignore $(DISPLAYFILES),$(shell git ls-files))
+	@echo 'adding  $(DISPLAYFILES)'
 	cp -r display/* .
 	git add $(DISPLAYFILES)
 	git commit -a -m 'automatic update of html'
@@ -51,8 +51,8 @@ publish : xhtmls
 setup : 
 	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
 	git checkout --orphan gh-pages
-	-rm $(shell git ls-files -c | grep -v resources)
-	git rm --cached $(shell git ls-files --cached | grep -v resources)
+	-rm $(shell git ls-files -c)
+	git rm --cached $(shell git ls-files --cached)
 	echo "display/" > .gitignore
 	git add .gitignore
 	git commit -m 'initialized gh-pages branch'
