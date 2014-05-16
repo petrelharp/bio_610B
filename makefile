@@ -38,14 +38,17 @@ pdfs :
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
 	git checkout gh-pages
+	$(eval DISPLAYFILES := $(patsubst display/%,%,$(shell find display)))
+	# remove files no longer in display
+	git rm $(filter-out $(shell git ls-files), $(DISPLAYFILES))
 	cp -r display/* .
-	git add $(patsubst display/%,%,$(wildcard display/*))
+	git add $(DISPLAYFILES)
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
 # set up a clean gh-pages branch
 setup : 
-	if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
+	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c | grep -v resources)
 	git rm --cached $(shell git ls-files --cached | grep -v resources)
@@ -92,7 +95,7 @@ $(DISPLAYDIR)/%.xml : %.tex
 
 $(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
 	$(eval BIBS := $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
-	if [ '$(BIBS)' ]; then \
+	@if [ '$(BIBS)' ]; then \
 		echo 'making bibliography $(BIBS)'; \
 		make $(BIBS); \
 	fi
