@@ -41,7 +41,7 @@ publish : xhtmls
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(git ls-files) <(find display/ -type f) | tr '\n' ' ')"
 	# remove files no longer in display
-	git rm $$(grep -vxF -f <(git ls-files) <(find display/ -type f | sed -e 's_^display/__'))
+	git rm $$(grep -vxF -f  <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files))
 	# and add updated or new ones
 	@echo "adding -- $$(find display/ -type f | sed -e 's_^display/__' | tr '\n' ' ')"
 	cp -r display/* .
