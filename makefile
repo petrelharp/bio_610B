@@ -5,7 +5,7 @@
 # git add (STUFF JUST ADDED)
 #
 
-.PHONY : clean publish pdfs setup xhtmls
+.PHONY : clean publish pdfs setup xhtmls display
 
 SHELL = /bin/bash
 
@@ -29,6 +29,8 @@ XHTMLS = $(patsubst %.tex,$(DISPLAYDIR)/%.xhtml,$(TEXFILES))
 
 # hope their head isn't detached
 GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
+
+display : xhtmls
 
 xhtmls :
 	make $(XHTMLS)
@@ -92,7 +94,8 @@ $(DISPLAYDIR)/%.pdf : %.tex %.bbl
 
 
 $(DISPLAYDIR)/%.html : %.md
-	pandoc -c resources/github-markdown.css -f markdown_github -o $@ $<
+	cp resources/pandoc.css $(DISPLAYDIR)
+	pandoc -c pandoc.css -f markdown_github -o $@ $<
 
 $(DISPLAYDIR)/%.xml : %.bib
 	latexmlc --destination=$@ --bibtex $<

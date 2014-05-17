@@ -1,0 +1,50 @@
+skelml
+======
+
+This is a skeleton for a project that
+1. contains LaTeX and/or markdown files
+2. is checked into a git repository, and
+3. has products automatically compiled into xhtml/html and pushed to github pages.
+
+Workflow
+--------
+1. Edit LaTeX.
+2. Run
+```
+make display
+```
+3. Look at the output, which lives in `display/`; revise; repeat.
+4. When it all looks good, run
+```
+make publish
+```
+5. Next time you update your github repository, e.g. with
+```
+git push origin
+```
+the web page for your project will have nice, freshly updated html made from your latex and markdown documents.
+6. If you want pdfs, in `display/`, do
+```
+make pdfs
+```
+7. Occasionally, run
+```
+make clean
+```
+to keep things tidy.
+
+
+How to use it
+-------------
+1. [Download]() this.
+
+
+How it works:
+-------------
+1. `make display` runs [LaTeXML](http://dlmf.nist.gov/LaTeXML) on all `.tex` files, and [pandoc](http://johnmacfarlane.net/pandoc/) on all the `.md` files to create the html/xhtml in `display/`.
+2. The `gh-pages` branch keeps a copy of everything in the `display/` directory. `make publish` checks out `gh-pages`, and updates from `display/`, removing from the index all files no longer present.  This means anything in `display/` you check into git will '''not appear in gh-pages'''.
+
+
+Notes
+-----
+1. You could replace the "push to gh-pages" step with updating a static website, as [described here](http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/).
