@@ -16,7 +16,7 @@ include config.mk
 
 ###
 # stuff for compilers
-LATEXMLFLAGS = --preamble=resources/header.tex --postamble=resources/footer.tex 
+LATEXMLFLAGS = 
 LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js
 
 MD_HTML = $(patsubst %.md,%.html,$(MDFILES))
@@ -73,15 +73,11 @@ clean :
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	rm -f texput.*
-	while ( ( cat header.tex; echo '\input{$<}'; cat tailer.tex ) | pdflatex;  grep -q "Rerun to get cross" $*.log ) do true ; done
-	mv texput.pdf $@
+	while ( pdflatex $<;  grep -q "Rerun to get cross" $*.log ) do true ; done
 
 %.bbl : %.tex
-	rm -f texput.*
-	( cat header.tex; echo '\input{$<}'; cat tailer.tex ) | pdflatex
-	-bibtex texput
-	mv textput.bbl $@
+	pdflatex $<
+	-bibtex $*.aux
 
 
 ## TO-DO:
