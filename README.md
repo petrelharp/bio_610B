@@ -35,6 +35,16 @@ make clean
 to keep things tidy.
 
 
+
+Prerequisites
+-------------
+
+1. [LaTeXML](http://dlmf.nist.gov/LaTeXML) 
+2. [git](http://git-scm.com/)
+3. [github account](http://github.com) or else modify to push to your own web server; see below.
+
+
+
 How to use it
 -------------
 1. [Download](https://github.com/petrelharp/skelml/zipball/master) the source from this project, unzip it, and rename the resulting directory to whatever you want your project to be called.
@@ -55,6 +65,15 @@ Notes
 1. You could replace the "push to gh-pages" step with updating a static website, as [described here](http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/).
 
 
-Problems?
+Troubleshooting
 ---------
-1. Do *not* put spaces in the file names, please.
+1. Do *not* put spaces in the file names.  This will confuse `make` a whole lot.
+2. If you get the error
+```
+/bin/bash: latexml: command not found
+```
+then you need to either put the `latexml` executable in your `PATH`, or else add its full path to the `makefile`, e.g.
+```
+LATEXML = /path/to/latexml
+```
+and likewise for `latexmlc` and `latexmlpost`.

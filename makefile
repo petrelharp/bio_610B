@@ -8,6 +8,9 @@
 .PHONY : clean publish pdfs setup xhtmls display
 
 SHELL = /bin/bash
+LATEXML = $(shell which latexml)
+LATEXMLC = $(shell which latexmlc)
+LATEXMLPOST = $(shell which latexmlpost)
 
 ###
 # names of files you want made and published to github (in gh-pages) should be in html-these-files.mk
@@ -94,10 +97,10 @@ $(DISPLAYDIR)/%.html : %.md
 	pandoc -c pandoc.css -f markdown_github -o $@ $<
 
 $(DISPLAYDIR)/%.xml : %.bib
-	latexmlc --destination=$@ --bibtex $<
+	$(LATEXMLC) --destination=$@ --bibtex $<
 
 $(DISPLAYDIR)/%.xml : %.tex
-	latexml $(LATEXMLFLAGS) --destination=$@ $<
+	$(LATEXML) $(LATEXMLFLAGS) --destination=$@ $<
 
 $(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
 	$(eval BIBS = $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
@@ -110,7 +113,7 @@ $(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
 	# 	echo 'making $(FIGS)'; \
 	# 	make $(FIGS); \
 	# fi
-	latexmlpost --format=xhtml $(foreach bib,$(BIBS),--bibliography=$(bib)) $(LATEXMLPOSTFLAGS) --destination=$@ $<
+	$(LATEXMLPOST) --format=xhtml $(foreach bib,$(BIBS),--bibliography=$(bib)) $(LATEXMLPOSTFLAGS) --destination=$@ $<
 
 
 ## 
