@@ -15,20 +15,20 @@ make display
 ```
 3. Look at the output, which lives in `display/`; revise; repeat.
 4. Commit changes. (`git commit -a`)
-4. When it all looks good, run
+5. When it all looks good, run
 ```
 make publish
 ```
-5. Next time you update your github repository, e.g. with
+6. Next time you update your github repository, e.g. with
 ```
 git push origin
 ```
 the web page for your project will have nice, freshly updated html made from your latex and markdown documents.
-6. If you want pdfs, in `display/`, do
+7. If you want pdfs, in `display/`, do
 ```
 make pdfs
 ```
-7. Occasionally, run
+8. Occasionally, run
 ```
 make clean
 ```
@@ -39,8 +39,9 @@ How to use it
 -------------
 1. [Download](https://github.com/petrelharp/skelml/zipball/master) the source from this project, unzip it, and rename the resulting directory to whatever you want your project to be called.
 2. Initialize a git repository in that directory and add the files to the repository. (`git init .; git add $(git ls-files --other); git commit -a -m 'initial skeleton'`)
-3. Get some source files in there.  Add them to the repository (`git add`).
-4. Follow "Workflow" above.
+3. Run `make setup` to set up the `gh-pages` branch.
+4. Get some source files in there.  Add them to the repository (`git add`).
+5. Follow "Workflow" above.
 
 
 How it works:
@@ -52,3 +53,8 @@ How it works:
 Notes
 -----
 1. You could replace the "push to gh-pages" step with updating a static website, as [described here](http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/).
+
+
+Problems?
+---------
+1. Do *not* put spaces in the file names, please.
