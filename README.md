@@ -19,11 +19,16 @@ make display
 ```
 make publish
 ```
-6. Next time you update your github repository, e.g. with
+6. When you update your github repository, also update the gh-pages branch, e.g. by:
 ```
-git push origin
+git push origin --all
 ```
-the web page for your project will have nice, freshly updated html made from your latex and markdown documents.
+or, to be specific
+```
+git push origin master:master
+git push origin gh-pages:gh-pages
+```
+Then, the web page for your project will have nice, freshly updated html made from your latex and markdown documents.
 7. If you want pdfs, in `display/`, do
 ```
 make pdfs
