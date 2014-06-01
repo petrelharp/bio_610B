@@ -34,11 +34,9 @@ GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
 # this re-makes everything.  if this is too onerous, delete 'clean' here.
 # but beware, cruft will start to build up.
 display : clean
-	# this possibly overwrites display/index.html; but that's ok; it will be re-made anyhow
-	# but here is a solution if that's a problem
-	#  find . -maxdepth 1 -name "index.*" | grep -q . || make skelml.index
-	make skelml.index  # this creates index.html (see below)
 	make $(HTMLS)
+	# don't want to overwrite index.html if it is already there
+	find display -maxdepth 1 -name "index.html" | grep -q . || make skelml.index
 
 htmls :
 	make $(HTMLS)
