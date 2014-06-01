@@ -2,6 +2,7 @@ skelml
 ======
 
 This is a skeleton for a project that
+
 1. contains LaTeX and/or markdown files
 2. is checked into a git repository, and
 3. has products automatically compiled into xhtml/html and pushed to github pages.
@@ -86,3 +87,4 @@ and likewise for `latexmlc` and `latexmlpost`.
 To-do
 -----
 1. Should also automatically copy over tracked `.html`, etcetera files?
+2. Make it so we don't have to `clean` out all the latexml'ed temporary image files all the time?

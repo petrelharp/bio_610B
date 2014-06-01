@@ -5,7 +5,7 @@
 # git add (STUFF JUST ADDED)
 #
 
-.PHONY : clean publish pdfs setup xhtmls display skelml.index
+.PHONY : clean publish pdfs setup htmls display skelml.index
 
 SHELL = /bin/bash
 LATEXML = $(shell which latexml)
@@ -24,25 +24,24 @@ LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resource
 
 MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES))
 TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(TEXFILES))
-TEX_XHTML = $(patsubst %.tex,$(DISPLAYDIR)/%.xhtml,$(TEXFILES))
-WEBPAGES = $(MD_HTML) $(TEX_XHTML)
-# uncomment this is you want "plain" html also
-# WEBPAGES += $(TEX_HTML) 
+HTMLS = $(MD_HTML) $(TEX_HTML)
 
 PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES))
 
 # hope their head isn't detached
 GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
 
-display : 
-	# this possibly overwrites display/index.xhtml; but that's ok; it will be re-made anyhow
+# this re-makes everything.  if this is too onerous, delete 'clean' here.
+# but beware, cruft will start to build up.
+display : clean
+	# this possibly overwrites display/index.html; but that's ok; it will be re-made anyhow
 	# but here is a solution if that's a problem
 	#  find . -maxdepth 1 -name "index.*" | grep -q . || make skelml.index
-	make skelml.index  # this creates index.xhtml (see below)
-	make $(WEBPAGES)
+	make skelml.index  # this creates index.html (see below)
+	make $(HTMLS)
 
-xhtmls :
-	make $(XHTMLS)
+htmls :
+	make $(HTMLS)
 
 pdfs :
 	make $(PDFS)
@@ -50,7 +49,7 @@ pdfs :
 
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
-publish : xhtmls
+publish : htmls
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
@@ -89,10 +88,6 @@ $(DISPLAYDIR)/%.pdf : %.tex %.bbl
 	-bibtex $*.aux
 
 
-## TO-DO:
-# automatically figure out which things to tex up
-# remove intermediate .xml files
-
 ###
 # latexml stuff
 
@@ -108,7 +103,7 @@ $(DISPLAYDIR)/%.xml : %.bib
 $(DISPLAYDIR)/%.xml : %.tex
 	$(LATEXML) $(LATEXMLFLAGS) --destination=$@ $<
 
-$(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
+$(DISPLAYDIR)/%.html : $(DISPLAYDIR)/%.xml
 	$(eval BIBS = $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
 	@if [ '$(BIBS)' ]; then \
 		echo 'making bibliography $(BIBS)'; \
@@ -119,7 +114,7 @@ $(DISPLAYDIR)/%.xhtml : $(DISPLAYDIR)/%.xml
 	# 	echo 'making $(FIGS)'; \
 	# 	make $(FIGS); \
 	# fi
-	$(LATEXMLPOST) --format=xhtml $(foreach bib,$(BIBS),--bibliography=$(bib)) $(LATEXMLPOSTFLAGS) --destination=$@ $<
+	$(LATEXMLPOST) --format=html5 $(foreach bib,$(BIBS),--bibliography=$(bib)) $(LATEXMLPOSTFLAGS) --destination=$@ $<
 
 
 ## 
@@ -141,13 +136,13 @@ $(DISPLAYDIR)/%.png : %.pdf
 ##
 # automatic index.html creation
 
-# this is not a rule for index.xhtml since then if someone creates index.tex this will take precedence
+# this is not a rule for index.html since then if someone creates index.tex this will take precedence
 skelml.index :
-	echo '<?xml version="1.0"?> <html xmlns="http://www.w3.org/1999/xhtml"> <head> <title/> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >display/index.xhtml
-	echo '<h1>html files in this repository</h1><ul>' >> display/index.xhtml
-	for x in $$(echo display/*html | sed -e 's_\<display/__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> display/index.xhtml; done
-	echo '</ul><p>Create your own <code>index.md</code> file to make this look nicer.</p>' >> display/index.xhtml
-	echo '</body></html>' >> display/index.xhtml
+	echo '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title/> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >display/index.html
+	echo '<h1>html files in this repository</h1><ul>' >> display/index.html
+	for x in $$(echo display/*html | sed -e 's_\<display/__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> display/index.html; done
+	echo '</ul><p>Create your own <code>index.md</code> file to make this look nicer.</p>' >> display/index.html
+	echo '</body></html>' >> display/index.html
 
 
 
