@@ -68,7 +68,7 @@ How it works:
 Notes
 -----
 1. You could replace the "push to gh-pages" step with updating a static website, as [described here](http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/).
-
+2. This automatically creates an `index.xhtml` page for you; to make your own, just create an index.md or index.tex file.
 
 Troubleshooting
 ---------
@@ -85,4 +85,4 @@ and likewise for `latexmlc` and `latexmlpost`.
 
 To-do
 -----
-1. Automate creation of `index.html`.
+1. Should also automatically copy over tracked `.html`, etcetera files?
