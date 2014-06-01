@@ -22,18 +22,24 @@ include config.mk
 LATEXMLFLAGS = 
 LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js
 
-MD_HTML = $(patsubst %.md,%.html,$(MDFILES))
-TEX_HTML = $(patsubst %.tex,%.html,$(TEXFILES))
-TEX_XHTML = $(patsubst %.tex,%.xhtml,$(TEXFILES))
-WEBPAGES = $(MD_HTML) $(TEX_HTML) $(TEX_XHTML)
+MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES))
+TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(TEXFILES))
+TEX_XHTML = $(patsubst %.tex,$(DISPLAYDIR)/%.xhtml,$(TEXFILES))
+WEBPAGES = $(MD_HTML) $(TEX_XHTML)
+# uncomment this is you want "plain" html also
+# WEBPAGES += $(TEX_HTML) 
 
 PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES))
-XHTMLS = $(patsubst %.tex,$(DISPLAYDIR)/%.xhtml,$(TEXFILES))
 
 # hope their head isn't detached
 GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
 
-display : xhtmls
+display : 
+	# this possibly overwrites display/index.xhtml; but that's ok; it will be re-made anyhow
+	# but here is a solution if that's a problem
+	#  find . -maxdepth 1 -name "index.*" | grep -q . || make skelml.index
+	make skelml.index  # this creates index.xhtml (see below)
+	make $(WEBPAGES)
 
 xhtmls :
 	make $(XHTMLS)
@@ -45,10 +51,6 @@ pdfs :
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
-	# this possibly overwrites display/index.xhtml; but that's ok; it will be re-made anyhow
-	# but here is a solution if that's a problem
-	#  find . -maxdepth 1 -name "index.*" | grep -q . || make skelml.index
-	make skelml.index
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
@@ -139,6 +141,7 @@ $(DISPLAYDIR)/%.png : %.pdf
 ##
 # automatic index.html creation
 
+# this is not a rule for index.xhtml since then if someone creates index.tex this will take precedence
 skelml.index :
 	echo '<?xml version="1.0"?> <html xmlns="http://www.w3.org/1999/xhtml"> <head> <title/> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >display/index.xhtml
 	echo '<h1>html files in this repository</h1><ul>' >> display/index.xhtml
