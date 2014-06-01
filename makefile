@@ -49,7 +49,7 @@ pdfs :
 
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
-publish : htmls
+publish : display
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
@@ -137,7 +137,7 @@ $(DISPLAYDIR)/%.png : %.pdf
 # automatic index.html creation
 
 # this is not a rule for index.html since then if someone creates index.tex this will take precedence
-skelml.index :
+skelml.index ::
 	echo '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title></title> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >display/index.html
 	echo '<h1>html files in this repository</h1><ul>' >> display/index.html
 	for x in $$(echo display/*html | sed -e 's_\<display/__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> display/index.html; done
