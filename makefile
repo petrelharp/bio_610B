@@ -5,7 +5,7 @@
 # git add (STUFF JUST ADDED)
 #
 
-.PHONY : clean publish pdfs setup xhtmls display
+.PHONY : clean publish pdfs setup xhtmls display skelml.index
 
 SHELL = /bin/bash
 LATEXML = $(shell which latexml)
@@ -45,6 +45,10 @@ pdfs :
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : xhtmls
+	# this possibly overwrites display/index.xhtml; but that's ok; it will be re-made anyhow
+	# but here is a solution if that's a problem
+	#  find . -maxdepth 1 -name "index.*" | grep -q . || make skelml.index
+	make skelml.index
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
@@ -131,3 +135,16 @@ $(DISPLAYDIR)/%.svg : %.pdf
 
 $(DISPLAYDIR)/%.png : %.pdf
 	convert -density 300 $< -flatten $@
+
+##
+# automatic index.html creation
+
+skelml.index :
+	echo '<?xml version="1.0"?> <html xmlns="http://www.w3.org/1999/xhtml"> <head> <title/> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >display/index.xhtml
+	echo '<h1>html files in this repository</h1><ul>' >> display/index.xhtml
+	for x in $$(echo display/*html | sed -e 's_\<display/__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> display/index.xhtml; done
+	echo '</ul><p>Create your own <code>index.md</code> file to make this look nicer.</p>' >> display/index.xhtml
+	echo '</body></html>' >> display/index.xhtml
+
+
+

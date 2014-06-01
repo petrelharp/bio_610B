@@ -82,3 +82,7 @@ then you need to either put the `latexml` executable in your `PATH`, or else add
 LATEXML = /path/to/latexml
 ```
 and likewise for `latexmlc` and `latexmlpost`.
+
+To-do
+-----
+1. Automate creation of `index.html`.
