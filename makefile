@@ -21,6 +21,8 @@ include config.mk
 # stuff for compilers
 LATEXMLFLAGS = 
 LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js
+# uncomment this to split out chapters into separate documents
+# LATEXMLPOSTFLAGS += --split
 
 MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES))
 TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(TEXFILES))
@@ -103,7 +105,10 @@ $(DISPLAYDIR)/%.xml : %.tex
 	$(LATEXML) $(LATEXMLFLAGS) --destination=$@ $<
 
 $(DISPLAYDIR)/%.html : $(DISPLAYDIR)/%.xml
-	$(eval BIBS = $(shell grep '\\bibliography' $*.tex | sed -e 's/.*\\bibliography[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.xml/'))
+	$(eval BIBS = $(shell grep '\\bibliography{' $*.tex \
+		| sed -e 's/.*\\bibliography{\([^}]*\)\}.*/\1/' \
+		| tr ',' '\n' \
+		| sed -e 's/\(..*\)/$(DISPLAYDIR)\/\1.xml/'))
 	@if [ '$(BIBS)' ]; then \
 		echo 'making bibliography $(BIBS)'; \
 		make $(BIBS); \
