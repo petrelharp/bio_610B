@@ -64,6 +64,7 @@ publish : display
 # set up a clean gh-pages branch
 setup : 
 	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
+	-mkdir display
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c)
 	git rm --cached $(shell git ls-files --cached)
