@@ -82,7 +82,7 @@ clean :
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	while ( pdflatex $<;  grep -q "Rerun to get cross" $*.log ) do true ; done
+	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get cross" $*.log ) do true ; done
 
 %.bbl : %.tex
 	pdflatex $<
