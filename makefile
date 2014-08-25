@@ -70,8 +70,8 @@ setup :
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c)
 	git rm --cached $(shell git ls-files --cached)
-	echo "display/" > .gitignore
-	git add .gitignore
+	echo "display/" >> .gitignore
+	-git add .gitignore
 	git commit -m 'initialized gh-pages branch'
 	git checkout $(GITBRANCH)
 
