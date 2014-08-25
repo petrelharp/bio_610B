@@ -77,7 +77,7 @@ setup :
 
 clean : 
 	-rm -f $(shell git ls-files --other display/*)
-	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
+	-cd display; rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
 
 
 # make pdfs locally
