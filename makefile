@@ -77,15 +77,20 @@ setup :
 
 clean : 
 	-rm -f $(shell git ls-files --other display/*)
+	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
 	-cd display; rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
-
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get" $(DISPLAYDIR)/$*.log ) do true ; done
+	$(eval FIGS = $(shell grep '\\includegraphics' $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.pdf/'))
+	-if [ '$(FIGS)' ]; then \
+		echo 'making $(FIGS)'; \
+		make $(FIGS); \
+	fi
+	export TEXINPUTS=$(DISPLAYDIR):${TEXINPUTS}; while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get" $(DISPLAYDIR)/$*.log ) do true ; done
 
 %.bbl : %.tex
-	pdflatex -output-directory $(DISPLAYDIR) $<
+	-export TEXINPUTS=$(DISPLAYDIR):${TEXINPUTS}; pdflatex -interaction nonstopmode -output-directory $(DISPLAYDIR) $<
 	-bibtex $(DISPLAYDIR)/$*.aux
 
 
