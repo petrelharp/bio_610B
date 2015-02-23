@@ -46,8 +46,9 @@ Prerequisites
 -------------
 
 1. [LaTeXML](http://dlmf.nist.gov/LaTeXML) 
-2. [git](http://git-scm.com/)
-3. [github account](http://github.com) or else modify to push to your own web server; see below.
+2. [pandoc](https://github.com/jgm/pandoc)
+3. [git](http://git-scm.com/)
+4. [github account](http://github.com) or else modify to push to your own web server; see below.
 
 
 

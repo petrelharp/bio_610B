@@ -70,19 +70,19 @@ setup :
 	git checkout --orphan gh-pages
 	-rm $(shell git ls-files -c)
 	git rm --cached $(shell git ls-files --cached)
-	echo "display/" > .gitignore
-	git add .gitignore
+	echo "display/" >> .gitignore
+	-git add .gitignore
 	git commit -m 'initialized gh-pages branch'
 	git checkout $(GITBRANCH)
 
 clean : 
 	-rm -f $(shell git ls-files --other display/*)
-	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
+	-cd display; rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
 
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get cross" $*.log ) do true ; done
+	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get cross" $(DISPLAYDIR)/$*.log ) do true ; done
 
 %.bbl : %.tex
 	pdflatex $<
