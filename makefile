@@ -77,16 +77,17 @@ setup :
 
 clean : 
 	-rm -f $(shell git ls-files --other display/*)
+	-rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
 	-cd display; rm -f *.aux *.log *.bbl *.blg *.out *.toc *.nav *.snm *.vrb texput.* LaTeXML.cache
 
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get cross" $(DISPLAYDIR)/$*.log ) do true ; done
+	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get" $(DISPLAYDIR)/$*.log ) do true ; done
 
 %.bbl : %.tex
-	pdflatex $<
-	-bibtex $*.aux
+	pdflatex -output-directory $(DISPLAYDIR) $<
+	-bibtex $(DISPLAYDIR)/$*.aux
 
 
 ###
