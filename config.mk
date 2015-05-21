@@ -8,7 +8,11 @@
 # temporary directory to put pdfs, htmls, etc in:
 DISPLAYDIR = display
 
-## Include everything:
+## Exclude these:
+EXCLUDE_TEXFILES = 
+EXCLUDE_MDFILES = 
+
+## Include everything but the above
 TEXFILES = $(wildcard *.tex)
 MDFILES = $(wildcard *.md)
 
