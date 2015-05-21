@@ -82,11 +82,16 @@ clean :
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get cross" $(DISPLAYDIR)/$*.log ) do true ; done
+	$(eval FIGS = $(shell grep '\\includegraphics' $*.tex  | sed -e 's/^ *[^ %].*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.pdf/'))
+	-if [ '$(FIGS)' ]; then \
+		echo 'making $(FIGS)'; \
+		make $(FIGS); \
+	fi
+	export TEXINPUTS=$(DISPLAYDIR):${TEXINPUTS}; while ( pdflatex -output-directory $(DISPLAYDIR) $<;  grep -q "Rerun to get" $(DISPLAYDIR)/$*.log ) do true ; done
 
 %.bbl : %.tex
-	pdflatex $<
-	-bibtex $*.aux
+	-export TEXINPUTS=$(DISPLAYDIR):${TEXINPUTS}; pdflatex -interaction nonstopmode -output-directory $(DISPLAYDIR) $<
+	-bibtex $(DISPLAYDIR)/$*.aux
 
 
 ###
@@ -144,7 +149,7 @@ $(DISPLAYDIR)/%.png : %.pdf
 skelml.index ::
 	echo '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title></title> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >display/index.html
 	echo '<h1>html files in this repository</h1><ul>' >> display/index.html
-	for x in $$(echo display/*html | sed -e 's_\<display/__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> display/index.html; done
+	for x in $$(echo display/*html | sed -e 's/\<index.html\>//' | sed -e 's_\<display/__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> display/index.html; done
 	echo '</ul><p>Create your own <code>index.md</code> file to make this look nicer.</p>' >> display/index.html
 	echo '</body></html>' >> display/index.html
 
