@@ -82,7 +82,7 @@ clean :
 
 # make pdfs locally
 $(DISPLAYDIR)/%.pdf : %.tex %.bbl
-	$(eval FIGS = $(shell grep '\\includegraphics' $*.tex  | sed -e 's/^ *[^ %].*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.pdf/'))
+	$(eval FIGS = $(shell grep '\\includegraphics' $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.pdf/'))
 	-if [ '$(FIGS)' ]; then \
 		echo 'making $(FIGS)'; \
 		make $(FIGS); \
