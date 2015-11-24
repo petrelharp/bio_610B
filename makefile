@@ -24,11 +24,13 @@ LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resource
 # uncomment this to split out chapters into separate documents
 # LATEXMLPOSTFLAGS += --split
 
+PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=https:////cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+
 MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES))
 TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(TEXFILES))
 HTMLS = $(MD_HTML) $(TEX_HTML)
 
-PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES))
+PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES)) $(patsubst %.md,$(DISPLAYDIR)/%.pdf,$(MDFILES))
 
 # hope their head isn't detached
 GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
@@ -94,14 +96,18 @@ $(DISPLAYDIR)/%.pdf : %.tex %.bbl
 	-bibtex $(DISPLAYDIR)/$*.aux
 
 
+$(DISPLAYDIR)/%.pdf : %.md
+	pandoc -f markdown -o $@ $<
+
 ###
 # latexml stuff
 
 
 
 $(DISPLAYDIR)/%.html : %.md
-	cp resources/pandoc.css $(DISPLAYDIR)
-	pandoc -c pandoc.css -f markdown_github -o $@ $<
+	mkdir -p $(DISPLAYDIR)/resources
+	cp resources/pandoc.css $(DISPLAYDIR)/resources
+	pandoc $(PANDOC_HTML_OPTS) -f markdown -o $@ $<
 
 $(DISPLAYDIR)/%.xml : %.bib
 	$(LATEXMLC) --destination=$@ --bibtex $<
