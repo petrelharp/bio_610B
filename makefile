@@ -23,9 +23,17 @@ LATEXMLFLAGS =
 LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js
 # uncomment this to split out chapters into separate documents
 # LATEXMLPOSTFLAGS += --split
+LATEX_MACROS = macros.tex
 
 PANDOC_OPTS = -f markdown-latex_macros
 PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=https:////cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+PANDOC_PDF_OPTS = 
+ifeq ($(wildcard $(LATEX_MACROS)),)
+	# LATEX_MACROS doesn't exist
+else
+	PANDOC_HTML_OPTS += -H <(echo '\['; cat $(LATEX_MACROS); echo '\]')
+	PANDOC_PDF_OPTS += -H $(LATEX_MACROS)
+endif
 
 MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES))
 TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(TEXFILES))
@@ -98,7 +106,7 @@ $(DISPLAYDIR)/%.pdf : %.tex %.bbl
 
 
 $(DISPLAYDIR)/%.pdf : %.md
-	pandoc $(PANDOC_OPTS) -f markdown -o $@ $<
+	pandoc $(PANDOC_OPTS) $(PANDOC_PDF_OPTS) -f markdown -o $@ $<
 
 ###
 # latexml stuff
