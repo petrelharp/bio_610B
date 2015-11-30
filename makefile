@@ -25,8 +25,8 @@ LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resource
 # LATEXMLPOSTFLAGS += --split
 LATEX_MACROS = macros.tex
 
-PANDOC_OPTS = -f markdown-latex_macros
-PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=https:////cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+PANDOC_OPTS = 
+PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 PANDOC_PDF_OPTS = 
 ifeq ($(wildcard $(LATEX_MACROS)),)
 	# LATEX_MACROS doesn't exist
