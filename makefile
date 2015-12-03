@@ -61,6 +61,7 @@ pdfs :
 # update html in the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 publish : display
+	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
 	git checkout gh-pages
 	@echo "removing -- $$(grep -vxF -f <(echo .gitignore; find display/ -type f | sed -e 's_^display/__') <(git ls-files) | tr '\n' ' ')"
 	# remove files no longer in display
