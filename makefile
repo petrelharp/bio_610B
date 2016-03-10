@@ -36,10 +36,10 @@ else
 endif
 
 MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES))
-TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(TEXFILES))
+TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(filter-out $(EXCLUDE_TEXFILES), $(TEXFILES)))
 HTMLS = $(MD_HTML) $(TEX_HTML)
 
-PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(TEXFILES)) $(patsubst %.md,$(DISPLAYDIR)/%.pdf,$(MDFILES))
+PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(filter-out $(EXCLUDE_TEXFILES), $(TEXFILES))) $(patsubst %.md,$(DISPLAYDIR)/%.pdf,$(MDFILES))
 
 # hope their head isn't detached
 GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
