@@ -8,9 +8,6 @@
 .PHONY : clean publish pdfs setup htmls display skelml.index
 
 SHELL = /bin/bash
-LATEXML = $(shell which latexml)
-LATEXMLC = $(shell which latexmlc)
-LATEXMLPOST = $(shell which latexmlpost)
 
 ###
 # names of files you want made and published to github (in gh-pages) should be in html-these-files.mk
@@ -19,10 +16,6 @@ include config.mk
 
 ###
 # stuff for compilers
-LATEXMLFLAGS = 
-LATEXMLPOSTFLAGS = --javascript=resources/LaTeXML-maybeMathjax.js --css=resources/plr-style.css --stylesheet=resources/xsl/LaTeXML-all-xhtml.xsl --javascript=resources/adjust-svg.js
-# uncomment this to split out chapters into separate documents
-# LATEXMLPOSTFLAGS += --split
 LATEX_MACROS = macros.tex
 
 PANDOC_OPTS = 
@@ -109,37 +102,17 @@ $(DISPLAYDIR)/%.pdf : %.tex %.bbl
 $(DISPLAYDIR)/%.pdf : %.md
 	pandoc $(PANDOC_OPTS) $(PANDOC_PDF_OPTS) -f markdown -o $@ $<
 
+
 ###
-# latexml stuff
-
-
+# html stuff
 
 $(DISPLAYDIR)/%.html : %.md
 	mkdir -p $(DISPLAYDIR)/resources
 	cp resources/pandoc.css $(DISPLAYDIR)/resources
 	pandoc $(PANDOC_OPTS) $(PANDOC_HTML_OPTS) -f markdown -o $@ $<
 
-$(DISPLAYDIR)/%.xml : %.bib
-	$(LATEXMLC) --destination=$@ --bibtex $<
-
-$(DISPLAYDIR)/%.xml : %.tex
-	$(LATEXML) $(LATEXMLFLAGS) --destination=$@ $<
-
-$(DISPLAYDIR)/%.html : $(DISPLAYDIR)/%.xml
-	$(eval BIBS = $(shell grep '\\bibliography{' $*.tex \
-		| sed -e 's/.*\\bibliography{\([^}]*\)\}.*/\1/' \
-		| tr ',' '\n' \
-		| sed -e 's/\(..*\)/$(DISPLAYDIR)\/\1.xml/'))
-	@if [ '$(BIBS)' ]; then \
-		echo 'making bibliography $(BIBS)'; \
-		make $(BIBS); \
-	fi
-	# $(eval FIGS = $(shell grep '\\includegraphics' $*.tex  | sed -e 's/.*\\includegraphics[^{]*{\([^}]*\)\}.*/$(DISPLAYDIR)\/\1.svg/'))
-	# -if [ '$(FIGS)' ]; then \
-	# 	echo 'making $(FIGS)'; \
-	# 	make $(FIGS); \
-	# fi
-	$(LATEXMLPOST) --format=html5 $(foreach bib,$(BIBS),--bibliography=$(bib)) $(LATEXMLPOSTFLAGS) --destination=$@ $<
+$(DISPLAYDIR)/%.html : %.Rmd
+	Rscript -e "templater::render_template(\"$<\", output=\"$@\", change.rootdir=TRUE)"
 
 
 ## 
