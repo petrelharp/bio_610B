@@ -53,7 +53,7 @@ publish :
 	git checkout $(GITBRANCH)
 	@echo ""
 	@echo ""
-	@echo "Now on branch $$(git branch)"
+	@echo "Now on branch $$(git rev-parse --abbrev-ref HEAD)"
 
 # set up a clean gh-pages branch
 setup : 
