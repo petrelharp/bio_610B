@@ -1,6 +1,6 @@
 # Advanced Biological Statistics, Part II: Winter 2018
 
-Most information about the course is on the [course syllabus](syllabus.md).
+Most information about the course is on the [course syllabus](https://petrelharp.github.io/bio_610B/syllabus.html).
 
 ## Useful references and links
 
