@@ -51,6 +51,9 @@ publish :
 	git merge master
 	git diff --quiet || git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
+	@echo ""
+	@echo ""
+	@echo "Now on branch $$(git branch)"
 
 # set up a clean gh-pages branch
 setup : 
