@@ -1,91 +1,28 @@
-skelml
-======
+# Advanced Biological Statistics, Part II: Winter 2018
 
-This is a skeleton for a project that
+Most information about the course is on the [course syllabus](syllabus.md).
 
-1. contains LaTeX and/or markdown files
-2. is checked into a git repository, and
-3. has products automatically compiled into xhtml/html and pushed to github pages.
+## Useful references and links
 
-Workflow
---------
-1. Edit LaTeX.
-2. Run
-```
-make display
-```
-3. Look at the output, which lives in `display/`; revise; repeat.
-4. Commit changes. (`git commit -a`)
-5. When it all looks good, run
-```
-make publish
-```
-6. When you update your github repository, also update the gh-pages branch, e.g. by:
-```
-git push origin --all
-```
-or, to be specific
-```
-git push origin master:master
-git push origin gh-pages:gh-pages
-```
-Then, the web page for your project will have nice, freshly updated html made from your latex and markdown documents.
-7. If you want pdfs, in `display/`, do
-```
-make pdfs
-```
-8. Occasionally, run
-```
-make clean
-```
-to keep things tidy.
+### Stan
+
+* [Example models in Stan](https://github.com/stan-dev/example-models): 
+    each contains a Stan program, code for simulating data, real data, and model output and diagnostics
+
+* Vignette on [stanfit objects](https://cran.r-project.org/web/packages/rstan/vignettes/stanfit-objects.html)
+
+* Brief guide to [Stan's warnings](http://mc-stan.org/misc/warnings)
+
+### tidyverse
+
+* [ggplot2 quick reference](http://ggplot2.tidyverse.org/reference/)
 
 
+### Miscellanea
 
-Prerequisites
--------------
+* How to [print the source code](https://stackoverflow.com/questions/19226816/how-can-i-view-the-source-code-for-a-function/19226817#19226817) for functions that don't show it to you when you type their names. (tldr; `showMethods(fun); getMethod(fun, c(x='class1', y='class2'))`)
 
-1. [LaTeXML](http://dlmf.nist.gov/LaTeXML) 
-2. [pandoc](https://github.com/jgm/pandoc)
-3. [git](http://git-scm.com/)
-4. [github account](http://github.com) or else modify to push to your own web server; see below.
+### Rstudio
 
-
-
-How to use it
--------------
-1. [Download](https://github.com/petrelharp/skelml/zipball/master) the source from this project, unzip it, and rename the resulting directory to whatever you want your project to be called.
-2. Initialize a git repository in that directory and add the files to the repository. (`git init .; git add $(git ls-files --other); git commit -a -m 'initial skeleton'`)
-3. Run `make setup` to set up the `gh-pages` branch.
-4. Get some source files in there.  Add them to the repository (`git add`).
-5. Follow "Workflow" above.
-
-
-How it works:
--------------
-1. `make display` runs [LaTeXML](http://dlmf.nist.gov/LaTeXML) on all `.tex` files, and [pandoc](http://johnmacfarlane.net/pandoc/) on all the `.md` files to create the html/xhtml in `display/`.
-2. The `gh-pages` branch keeps a copy of everything in the `display/` directory. `make publish` checks out `gh-pages`, and updates from `display/`, removing from the index all files no longer present.  This means anything in `display/` you check into git will '''not appear in gh-pages'''.
-
-
-Notes
------
-1. You could replace the "push to gh-pages" step with updating a static website, as [described here](http://nicolasgallagher.com/simple-git-deployment-strategy-for-static-sites/).
-2. This automatically creates an `index.xhtml` page for you; to make your own, just create an index.md or index.tex file.
-
-Troubleshooting
----------
-1. Do *not* put spaces in the file names.  This will confuse `make` a whole lot.
-2. If you get the error
-```
-/bin/bash: latexml: command not found
-```
-then you need to either put the `latexml` executable in your `PATH`, or else add its full path to the `makefile`, e.g.
-```
-LATEXML = /path/to/latexml
-```
-and likewise for `latexmlc` and `latexmlpost`.
-
-To-do
------
-1. Should also automatically copy over tracked `.html`, etcetera files?
-2. Make it so we don't have to `clean` out all the latexml'ed temporary image files all the time?
+* Strongly recommended global configuration: 
+![media/rstudio_config_1.png]

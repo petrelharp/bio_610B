@@ -6,15 +6,16 @@
 # (like the commented example at the end).
 
 # temporary directory to put pdfs, htmls, etc in:
-DISPLAYDIR = display
+DISPLAYDIR = .
 
 ## Exclude these:
-EXCLUDE_TEXFILES = 
-EXCLUDE_MDFILES = 
+EXCLUDE_TEXFILES = macros.tex
+EXCLUDE_MDFILES = publish_notes.md test_document.Rmd
 
 ## Include everything but the above
 TEXFILES = $(wildcard *.tex)
 MDFILES = $(wildcard *.md)
+RMDFILES = $(wildcard *.Rmd)
 
 ## Or only specific files
 # MDFILES = outline.md

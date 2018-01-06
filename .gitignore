@@ -4,3 +4,5 @@ display/*
 *.aux
 *.bbl
 *.blg
+.Rproj.user
+.*.swp

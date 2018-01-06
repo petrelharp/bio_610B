@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="resources/pandoc.css" type="text/css" />
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  \[
+  %%
+  % Add your macros here; they'll be included in pdf and html output.
+  %%
+  
+  \newcommand{\R}{\mathbb{R}}    % reals
+  \newcommand{\E}{\mathbb{E}}    % expectation
+  \renewcommand{\P}{\mathbb{P}}  % probability
+  
+  \]
+</head>
+<body>
+<h1 id="advanced-biological-statistics-part-ii-bio-610-winter-2018">Advanced Biological Statistics, Part II: Bio 610, Winter 2018</h1>
+<ul>
+<li><strong>Class:</strong> 10-12, Tuesday/Thursday.</li>
+<li><strong>Office Hours:</strong> TBA</li>
+<li><strong>Instructor:</strong> Peter Ralph (plr@uoregon.edu)</li>
+<li><strong>Office:</strong> 6 Deady Hall.</li>
+</ul>
+<p>This course is an introduction to advanced methods in modern statistics, with an emphasis on applied biological data analysis. After taking this course, you will be able to invent, implement, and apply probabilistic models that describe the signal and noise inherent in real datasets. We will cover modern statistical techniques important for dealing with large, noisy datasets of many variables, including regularization, dimensionality reduction, and deconvolution. Mostly, we will work in the Bayesian hierarchical modeling framework, using <a href="http://mc-stan.org/">Stan</a> as interfaced through <a href="https://www.r-project.org/">R</a>. We will use almost no mathematical analysis (equations) for understanding and implementing these methods, relying instead on simulation and the properties of the various kinds of randomness.</p>
+<h2 id="textbooks-and-software">Textbook(s) and Software:</h2>
+<ul>
+<li><p>The main textbook is <a href="http://www.indiana.edu/~kruschke/DoingBayesianDataAnalysis/">Doing Bayesian Data Analysis : a tutorial with R, JAGS, and Stan</a>, 2nd edition, by John Kruschke; PDF available at <a href="http://www.sciencedirect.com/science/book/9780124058880">this link</a>, at least on campus (see <a href="https://alliance-primo.hosted.exlibrisgroup.com/UO:CP71230601620001451">uo library entry</a>).</p></li>
+<li><p>We will also refer to <a href="https://alliance-primo.hosted.exlibrisgroup.com/UO:CP71150990440001451">Experimental Design and Data Analysis for Biologists</a>, Quinn and Keough, 2002.</p></li>
+<li><p>The <a href="http://mc-stan.org/users/documentation/index.html">Stan User's Guide</a> will also be often useful.</p></li>
+</ul>
+<p><strong>Note:</strong> both <a href="http://mcmc-jags.sourceforge.net/">JAGS</a> and <a href="http://mc-stan.org/">Stan</a> do roughly the same job, and are very similar. Although Kruschke spends more time with JAGS (for historical reasons), we will only use Stan - so, you can skip the JAGS stuff, although you should make it up with the Stan manual.</p>
+<ul>
+<li><p>We will make constant use of <a href="https://www.r-project.org/">R</a>.</p></li>
+<li><p>You will also need <a href="http://mc-stan.org/">Stan</a> and it's R interface, <a href="http://mc-stan.org/users/interfaces/rstan">rstan</a>.</p></li>
+<li><p>To write reports, you need to be able to compile Rmarkdown documents, which uses <a href="https://yihui.name/knitr/">knitr</a> and <a href="https://pandoc.org/">pandoc</a> (note that Rstudio includes it's own version of pandoc).</p></li>
+<li><p>In class, I will use <a href="https://www.rstudio.com">Rstudio</a> for demonstrations, although you don't have to use it.</p></li>
+</ul>
+<p>To test your setup, you should be able to compile <a href="test_document.Rmd">this Rmarkdown document</a> into something that looks like <a href="test_document.html">this html file</a> (but: the formatting might differ).</p>
+<h2 id="assessment-and-grading">Assessment, and grading</h2>
+<p>The main course work will be a series of reports, some <em>short</em> and others <em>longer</em>. Short reports will be less than one page of text (more, with code), are mostly based on simulated data, and are designed to demonstrate you understand and can implement an important topic from that week. These will occur in weeks without a longer report due. The three longer reports will contain more narrative, describing and analyzing a real dataset that I will provide. All reports will be turned in as self-contained Rmarkdown documents, that I should be able to run myself.</p>
+<p>I will assign grades to each of you, independently, based on how well your course work demonstrates completion of course goals.<br />
+I will not assign grades for attendance, but class participation and group work will be important: please come. The relative weights of each category will be:</p>
+<ul>
+<li><em>short reports:</em> six, worth together 40%</li>
+<li><em>longer reports:</em> three, worth 20% each</li>
+</ul>
+<p>Preliminary drafts of longer reports will be handed in for feedback partway through.</p>
+<h2 id="accessibility">Accessibility</h2>
+<p>I take seriously my responsibility to create inclusive learning environments. Please notify me if there are aspects of the instruction or design of this course that result in barriers to your participation! You are also encouraged to contact the Accessible Education Center in 164 Oregon Hall at 541-346-1155 or uoaec@uoregon.edu.</p>
+<h1 id="schedule">Schedule</h1>
+<p>The tentative schedule (subject to adjustment, especially towards the end) is (<strong>K</strong> referes to Kruschke):</p>
+<dl>
+<dt>Week 1 (<em>1/8</em>)</dt>
+<dd><p>Recap of probability and likelihood; central limit theorem (<span class="math inline">\(\sqrt{n}\)</span>); Bayes' rule. The beta-binomial distribution: putting a prior on the probability of success. <strong>(K ch. 4, 5, 6)</strong></p>
+<p><strong>Short report:</strong> (due 1/15) <a href="hws/week_1.html">MLE for beta-binomial</a></p>
+</dd>
+<dt>Week 2 (<em>1/15</em>)</dt>
+<dd><p>Introduction to MCMC and Stan for sampling from posterior distributions, hierarchical models for binary responses, shrinkage. <strong>(K ch. 7, 9 and Intro to Stan)</strong></p>
+</dd>
+<dt>Week 3 (<em>1/22</em>)</dt>
+<dd><p>Assessing power, model choice, and using simulation: looking more at shrinkage, posterior predictive sampling, Bayes factors. Logistic regression: robustly, including categorical factors. <strong>(K ch 13 and 21, with a bit of chapters 10-12)</strong></p>
+</dd>
+<dt>Week 4 (<em>1/29</em>)</dt>
+<dd><p>Count data: using Poisson regression and hierarchical modeling to fit overdispersion. Model selection by crossvalidation. <strong>(K ch 24)</strong></p>
+</dd>
+<dt>Week 5 (<em>2/5</em>)</dt>
+<dd><p>Continuous (&quot;metric&quot;) data: groupwise means, univariate regression, robust regression by adjusting the noise distribution, multivariate regression and variable selection; the Horseshoe. <strong>(K ch 16, 17, 18)</strong></p>
+</dd>
+<dt>Week 6 (<em>2/12</em>)</dt>
+<dd><p>Friends of ANOVA: sources of variance. An in-depth applied example, cumulative. <strong>(K ch 19, 20)</strong></p>
+</dd>
+<dt>Week 7 <em>(2/19)</em></dt>
+<dd><p>Dimension reduction: overview of the goal and taxonomy of various approaches (PCA, CCA, t-sne, etc). Deconvolution. Regularization as a penalty and as a (Bayesian) prior. <strong>(Reference to Quinn &amp; Keough)</strong></p>
+</dd>
+<dt>Week 8 <em>(2/26)</em></dt>
+<dd><p>Clustering and categorization: softmax regression; applied example. <strong>(K ch 22)</strong></p>
+</dd>
+<dt>Week 9 <em>(3/5)</em></dt>
+<dd><p>Time series: modeling local dependency, smoothing. Conditional independence.</p>
+</dd>
+<dt>Week 10 <em>(3/12)</em></dt>
+<dd><p>Spatial and network covariance: sharing power between related locations.</p>
+</dd>
+</dl>
+</body>
+</html>

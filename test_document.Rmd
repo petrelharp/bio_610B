@@ -1,0 +1,49 @@
+---
+title: "This is a test."
+date: "`r date()`"
+author: "`r Sys.getenv('USERNAME')`"
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+fig.dim <- 6
+opts_chunk$set(fig.width=2*fig.dim,
+               fig.height=fig.dim,
+               fig.align='center')
+```
+
+The date today is `r date()`.
+Here is a plot of a spiral.
+```{r spiral_plot}
+tt <- seq(0, 20*pi, length.out=400)
+plot(1.01^seq_along(tt) * cos(tt), 1.01^seq_along(tt) * sin(tt), type='l')
+```
+
+Here we use Stan to infer the mean of an inverse Exponential.
+```{r stan_block}
+library(rstan)
+stan_block <- "
+data {
+    int N;
+    vector<lower=0>[N] x;
+}
+transformed data {
+    vector[N] y;
+    y = 1.0 ./ x;
+}
+parameters {
+    real<lower=0> beta;
+}
+transformed parameters {
+}
+model {
+    y ~ exponential(beta);
+}
+generated quantities {
+}
+"
+fit <- stan(model_code=stan_block,
+            data=list(x=1/rexp(100), N=100),
+            chains=2, iter=1000)
+summary(fit)
+```
