@@ -5,7 +5,7 @@
 # git add (STUFF JUST ADDED)
 #
 
-.PHONY : clean publish pdfs setup htmls display
+.PHONY : clean publish pdfs setup htmls upload
 
 SHELL = /bin/bash
 
@@ -42,6 +42,10 @@ htmls :
 
 pdfs :
 	make $(PDFS)
+
+# upload to github
+upload :
+	git push origin --all
 
 
 # update the gh-pages branch
