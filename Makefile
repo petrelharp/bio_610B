@@ -28,7 +28,7 @@ else
 	PANDOC_PDF_OPTS += -H $(LATEX_MACROS)
 endif
 
-MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(MDFILES)) $(patsubst %.Rmd,$(DISPLAYDIR)/%.html,$(RMDFILES))
+MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(filter-out $(EXCLUDE_MDFILES), $(MDFILES))) $(patsubst %.Rmd,$(DISPLAYDIR)/%.html,$(RMDFILES))
 TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(filter-out $(EXCLUDE_TEXFILES), $(TEXFILES)))
 HTMLS = $(MD_HTML) $(TEX_HTML)
 
