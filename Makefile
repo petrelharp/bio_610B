@@ -49,7 +49,7 @@ publish :
 	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
 	git checkout gh-pages
 	git merge master
-	git commit -a -m 'automatic update of html'
+	git diff --quiet && git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
 # set up a clean gh-pages branch
