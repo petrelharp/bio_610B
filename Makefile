@@ -32,7 +32,7 @@ else
 	MATHJAX = $(LOCAL_MATHJAX)
 endif
 
-PANDOC_OPTS =
+PANDOC_OPTS = --standalone
 PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML
 PANDOC_PDF_OPTS = 
 ifeq ($(wildcard $(LATEX_MACROS)),)
