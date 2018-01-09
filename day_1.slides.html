@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Peter Ralph">
+  <title>Prior distributions and uncertainty</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <style type="text/css">
+  
+  .reveal { font-size: 30px; }
+  
+  .reveal h1 { font-size: 1.5em; } 
+  
+  .reveal h2 { font-size: 1.2em; } 
+  
+  .reveal .slides { text-align: left; }
+  
+  .reveal .slides figure { text-align: center; }
+  
+  .reveal figcaption { display: none; }
+  
+  </style>
+  \[
+  %%
+  % Add your macros here; they'll be included in pdf and html output.
+  %%
+  
+  \newcommand{\R}{\mathbb{R}}    % reals
+  \newcommand{\E}{\mathbb{E}}    % expectation
+  \renewcommand{\P}{\mathbb{P}}  % probability
+  
+  \newcommand{\given}{\;\vert\;}
+  \]
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Prior distributions and uncertainty</h1>
+  <p class="author">Peter Ralph</p>
+  <p class="date">8 January 2018 – Advanced Biological Statistics</p>
+</section>
+
+<section id="today" class="slide level2">
+<h2>Today</h2>
+<ol start="0" type="1">
+<li><p>Course structure and introductions</p>
+<ul>
+<li>short survey</li>
+</ul></li>
+<li><p>Probability: review and notation</p></li>
+<li><p>Bayesian analysis</p></li>
+<li><p>Application: Beta distributed coins</p></li>
+</ol>
+</section>
+<section><section id="biased-coins" class="title-slide slide level1"><h1>Biased coins</h1></section><section id="a-motivating-example" class="slide level2">
+<h2>a motivating example</h2>
+<p>Suppose I have two trick coins:</p>
+<ul>
+<li>one (coin A) comes up heads 75% of the time, and</li>
+<li>the other (coin B) only 25% of the time.</li>
+</ul>
+<div class="fragment">
+<p>But, I lost one and I don’t know which! So, I flip it <strong>10 times</strong> and get <strong>6 heads</strong>. <em>Which is it, and how sure are you?</em></p>
+</div>
+</section><section id="possible-answers" class="slide level2">
+<h2>Possible answers:</h2>
+<ol type="1">
+<li><p>Er, probably coin #1?</p></li>
+<li><p>Well, <span class="math display">\[\begin{aligned}
+\P\{ \text{6 H in 10 flips} \given \text{coin A} \}
+&amp;= \binom{10}{6} (.75)^6 (.25)^4 \\
+&amp;= 0.146
+\end{aligned}\]</span> and <span class="math display">\[\begin{aligned}
+\P\{ \text{6 H in 10 flips} \given \text{coin B} \}
+&amp;= \binom{10}{6} (.25)^6 (.75)^4 \\
+&amp;= 0.016
+\end{aligned}\]</span> … so, probably coin A?</p></li>
+</ol>
+</section><section class="slide level2">
+
+<p>For a precise answer…</p>
+<ol start="3" type="1">
+<li><p><em>Before flipping</em>, each coin seems equally likely. Then</p>
+<p><span class="math display">\[\begin{aligned}
+ \P\{ \text{coin A} \given \text{6 H in 10 flips} \}
+ &amp;= \frac{
+ \frac{1}{2} \times 0.146
+ }{
+ \frac{1}{2} \times 0.146
+ +
+ \frac{1}{2} \times 0.016
+ } \\
+ &amp;= 0.9
+ \end{aligned}\]</span></p></li>
+</ol>
+</section></section>
+<section><section id="probability-review-and-notation" class="title-slide slide level1"><h1>Probability: review and notation</h1></section><section id="probability-rules" class="slide level2">
+<h2>Probability rules:</h2>
+<ol start="0" type="1">
+<li class="fragment"><p><em>Probabilities are proportions:</em> <span class="math inline">\(\hspace{2em} 0 \le \P\{A\} \le 1\)</span></p></li>
+<li class="fragment"><p><em>Everything:</em> <span class="math inline">\(\hspace{2em} \P\{ \Omega \} = 1\)</span></p></li>
+<li class="fragment"><p><em>Complements:</em> <span class="math inline">\(\hspace{2em} \P\{ \text{not } A\} = 1 - \P\{A\}\)</span></p></li>
+<li class="fragment"><p><em>Disjoint events:</em> If <span class="math inline">\(\hspace{2em} \P\{A \text{ and } B\} = 0\)</span> then <span class="math inline">\(\hspace{2em} \P\{A \text{ or } B\} = \P\{A\} + \P\{B\}\)</span>.</p></li>
+<li class="fragment"><p><em>Independence:</em> <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are independent iff <span class="math inline">\(\P\{A \text{ and } B\} = \P\{A\} \P\{B\}\)</span>.</p></li>
+<li class="fragment"><p><em>Conditional probability:</em> <span class="math display">\[\P\{A \given B\} = \frac{\P\{A \text{ and } B\}}{ \P\{B\} }\]</span></p></li>
+</ol>
+</section><section id="bayes-rule" class="slide level2">
+<h2>Bayes’ rule</h2>
+<p>A consequence is</p>
+<p><span class="math display">\[\P\{B \given A\} = \frac{\P\{B\} \P\{A \given B\}}{ \P\{A\} } .\]</span></p>
+<div class="fragment">
+<p>In “Bayesian statistics”:</p>
+<ul>
+<li class="fragment"><span class="math inline">\(B\)</span>: possible model</li>
+<li class="fragment"><span class="math inline">\(A\)</span>: data</li>
+<li class="fragment"><span class="math inline">\(\P\{B\}\)</span>: prior weight on model <span class="math inline">\(B\)</span></li>
+<li class="fragment"><span class="math inline">\(\P\{A \given B\}\)</span>: likelihood of data under <span class="math inline">\(B\)</span></li>
+<li class="fragment"><span class="math inline">\(\P\{B\} \P\{A \given B\}\)</span>: posterior weight on <span class="math inline">\(B\)</span></li>
+<li class="fragment"><span class="math inline">\(\P\{A\}\)</span>: total sum of posterior weights</li>
+</ul>
+</div>
+</section></section>
+<section><section id="group-problem" class="title-slide slide level1"><h1>Group problem</h1></section><section id="more-coins" class="slide level2">
+<h2>More coins</h2>
+<p>Suppose instead I had 9 coins, with probabilities 10%, 20%, …, 80%, 90%; as before I flipped on 10 times and got 6 heads. For each <span class="math inline">\(\theta\)</span> in <span class="math inline">\(0.1, 0.2, \ldots, 0.8, 0.9\)</span>, find <span class="math display">\[\begin{aligned}
+    \P\{\text{ coin has prob $\theta$ } \given \text{ 6 H in 10 flips } \}
+\end{aligned}\]</span> and plot these as a bar plot.</p>
+<p><em>Question:</em> which coin(s) is it, and how sure are you? (and, what do you mean when you say how sure you are)</p>
+<p><em>Time allowing,</em> do it again with 99 coins. And 999 coins. Does your answer change?</p>
+</section></section>
+<section><section id="breaking-it-down" class="title-slide slide level1"><h1>Breaking it down</h1></section><section id="uniform-prior" class="slide level2">
+<h2>Uniform prior</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/the_prior-1.png" title="plot of chunk the_prior" alt="plot of chunk the_prior" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="weak-prior" class="slide level2">
+<h2>Weak prior</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/weak_prior-1.png" title="plot of chunk weak_prior" alt="plot of chunk weak_prior" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="strong-prior" class="slide level2">
+<h2>Strong prior</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/strong_prior-1.png" title="plot of chunk strong_prior" alt="plot of chunk strong_prior" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="the-likelihod-6-h-in-10-flips" class="slide level2">
+<h2>The likelihod: 6 H in 10 flips</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/ten_flips-1.png" title="plot of chunk ten_flips" alt="plot of chunk ten_flips" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="the-likelihod-30-h-in-50-flips" class="slide level2">
+<h2>The likelihod: 30 H in 50 flips</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/fifty_flips-1.png" title="plot of chunk fifty_flips" alt="plot of chunk fifty_flips" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="the-likelihod-60-h-in-100-flips" class="slide level2">
+<h2>The likelihod: 60 H in 100 flips</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/100_flips-1.png" title="plot of chunk 100_flips" alt="plot of chunk 100_flips" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="the-likelihod-6000-h-in-10000-flips" class="slide level2">
+<h2>The likelihod: 6,000 H in 10,000 flips</h2>
+<div class="columns">
+<div class="column" style="width:20%;">
+<p>prior</p>
+<p><span class="math inline">\(\times\)</span></p>
+<p>likelihood</p>
+<p><span class="math inline">\(\propto\)</span></p>
+<p>posterior</p>
+</div><div class="column" style="width:80%;">
+<p><img src="figure/day_1/ten_thou_flips-1.png" title="plot of chunk ten_thou_flips" alt="plot of chunk ten_thou_flips" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section id="how-many-flips-to-know-for-sure" class="slide level2">
+<h2>How many flips to know “for sure”?</h2>
+<p>(until the data - the likelihood - overwhelms the prior)</p>
+<p><strong>((discussion))</strong></p>
+</section></section>
+<section><section id="stochastic-minute" class="title-slide slide level1"><h1>Stochastic Minute</h1></section><section id="the-beta-distribution" class="slide level2">
+<h2>The Beta Distribution</h2>
+<p>If <span class="math display">\[P \sim \text{Beta}(a,b)\]</span> then <span class="math inline">\(P\)</span> has <em>probability density</em> <span class="math display">\[p(\theta) = \frac{ \theta^{a-1} (1 - \theta)^{b-1} }{ B(a,b) } . \]</span></p>
+<ul>
+<li><p>Takes values between 0 and 1.</p></li>
+<li><p>If <span class="math inline">\(U_{(1)} &lt; U_{(2)} &lt; \cdots &lt; U_{(n)}\)</span> are sorted, independent <span class="math inline">\(\text{Unif}[0,1]\)</span> then <span class="math inline">\(U_{(k)} \sim \text{Beta}(k, n-k)\)</span>.</p></li>
+<li><p>Mean: <span class="math inline">\(a/(a+b)\)</span>.</p></li>
+<li><p>Larger <span class="math inline">\(a+b\)</span> is more tightly concentrated (like <span class="math inline">\(1/\sqrt{a+b}\)</span>)</p></li>
+</ul>
+</section></section>
+<section><section id="unknown-coins" class="title-slide slide level1"><h1>Unknown coins</h1></section><section id="motivating-example" class="slide level2">
+<h2>Motivating example</h2>
+<p>Now suppose we want to estimate the probability of heads for a coin <em>without</em> knowing the possible values. (or, a disease incidence, or error rate in an experiment, …)</p>
+<p>We flip it <span class="math inline">\(n\)</span> times and get <span class="math inline">\(z\)</span> Heads.</p>
+<p>The <em>likelihood</em> of this, given the prob-of-heads <span class="math inline">\(\theta\)</span>, is: <span class="math display">\[p(z \given \theta) = \binom{n}{z}\theta^z (1-\theta)^{n-z} . \]</span></p>
+<p>How to weight the possible <span class="math inline">\(\theta\)</span>? Need a flexible set of weighting functions, i.e., <strong>prior distributions</strong> on <span class="math inline">\([0,1]\)</span>.</p>
+<div class="fragment">
+<ul>
+<li><strong>Beta</strong> distributions.</li>
+</ul>
+</div>
+</section><section class="slide level2">
+
+<p>What would we use if:</p>
+<ul>
+<li><p>the coin is probably close to fair.</p></li>
+<li><p>the disease is probably quite rare.</p></li>
+<li><p>no idea whatsoever.</p></li>
+</ul>
+</section><section id="beta-binomial-bayesian-analysis" class="slide level2">
+<h2>Beta-Binomial Bayesian analysis</h2>
+<p>If <span class="math display">\[\begin{aligned}
+P &amp;\sim \text{Beta}(a,b) \\
+Z &amp;\sim \text{Binom}(n,P) ,
+\end{aligned}\]</span> then by Bayes’ rule: <span class="math display">\[\begin{aligned}
+ \P\{ P = \theta \given Z = z\}
+ &amp;=
+ \frac{\P\{Z = z \given P = \theta \} \P\{P = \theta\}}{\P\{Z = z\}} \\
+ &amp;= 
+ \frac{
+ \binom{n}{z}\theta^z (1-\theta)^{n-z}
+ \times
+ \frac{\theta^{a-1}(1-\theta)^{b-1}}{B(a,b)}
+ }{
+ \text{(something)}
+ } \\
+ &amp;=
+ \text{(something else)} \times \theta^{a + z - 1} (1-\theta)^{b + n - z - 1} .
+\end{aligned}\]</span></p>
+<div class="fragment">
+<p>Miraculously, <span class="math display">\[\begin{aligned}
+P \given Z = z \sim \text{Beta}(a+z, b+n-z) .
+\end{aligned}\]</span></p>
+</div>
+</section><section id="exercise-check-this." class="slide level2">
+<h2>Exercise: check this.</h2>
+<ol type="1">
+<li><p>Simulate <span class="math inline">\(10^6\)</span> coin <em>probabilities</em>, called <span class="math inline">\(\theta\)</span>, from Beta(5,5). (<code>rbeta</code>)</p></li>
+<li><p>For <em>each coin</em>, simulate 10 flips. (<code>rbinom</code>)</p></li>
+<li><p>Make a histogram of the true probabilities (values of <span class="math inline">\(\theta\)</span>) of <em>only</em> those coins having 3 of 10 heads.</p></li>
+<li><p>Compare the distribution to Beta(<span class="math inline">\(a\)</span>,<span class="math inline">\(b\)</span>) – with what <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>? (<code>dbeta</code>)</p></li>
+<li><p>Explain what happened.</p></li>
+</ol>
+</section></section>
+<section><section id="beta-binomial-example-analysis" class="title-slide slide level1"><h1>Beta-binomial: example analysis</h1></section><section id="discussdemonstrate" class="slide level2">
+<h2>Discuss/demonstrate:</h2>
+<p>We flip an odd-looking coin 100 times, and get 65 heads. What is it’s true* probability of heads?</p>
+<ol type="1">
+<li><p>True = ??</p></li>
+<li><p>What prior to use?</p></li>
+<li><p>Is it reasonable that <span class="math inline">\(\theta = 1/2\)</span>?</p></li>
+<li><p>Best guess at <span class="math inline">\(\theta\)</span>?</p></li>
+<li><p>How far off are we, probably?</p></li>
+<li><p>How much does the answer depend on the prior?</p></li>
+</ol>
+</section><section id="credible-interval" class="slide level2">
+<h2>Credible interval</h2>
+<p><strong>Definition:</strong> A 95% <em>credible interval</em> is a portion of parameter space having a total of 95% of the <em>posterior probability</em>.</p>
+<div class="fragment">
+<p>(same with other numbers for “95%”)</p>
+</div>
+</section><section id="interpretation-1" class="slide level2">
+<h2>Interpretation #1</h2>
+<p>If we construct a 95% credible interval for <span class="math inline">\(\theta\)</span> for each of many datasets; <em>and</em> the coin in each dataset has <span class="math inline">\(\theta\)</span> drawn independently from the prior, <em>then</em> the true <span class="math inline">\(\theta\)</span> will fall in its credible interval for 95% of the datasets.</p>
+</section><section id="interpretation-2" class="slide level2">
+<h2>Interpretation #2</h2>
+<p>If we construct a 95% credible interval for <span class="math inline">\(\theta\)</span> with a dataset, and the distribution of the coin’s true <span class="math inline">\(\theta\)</span> across many parallel universes is given by the prior, then the true <span class="math inline">\(\theta\)</span> will be in the credible interval in 95% of those universes.</p>
+</section><section id="interpretation-3" class="slide level2">
+<h2>Interpretation #3</h2>
+<p>Given my prior beliefs (prior distribution), the posterior distribution is the most rational<span class="math inline">\({}^*\)</span> way to update my beliefs to account for the data.</p>
+<div class="fragment">
+<p><span class="math inline">\({}^*\)</span> if you do this many times you will be wrong least often</p>
+</div>
+<div class="fragment">
+<p><span class="math inline">\({}^*\)</span> <strong>or</strong> you will be wrong in the fewest possible universes</p>
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'none', // none/fade/slide/convex/concave/zoom
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/math/math.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>

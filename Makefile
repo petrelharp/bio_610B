@@ -18,8 +18,16 @@ include config.mk
 # stuff for compilers
 LATEX_MACROS = macros.tex
 
-PANDOC_OPTS = 
-PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+# change this to the location of your local MathJax.js library
+LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
+ifeq ($(wildcard $(LOCAL_MATHJAX)),)
+	MATHJAX = https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js
+else
+	MATHJAX = $(LOCAL_MATHJAX)
+endif
+
+PANDOC_OPTS =
+PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML
 PANDOC_PDF_OPTS = 
 ifeq ($(wildcard $(LATEX_MACROS)),)
 	# LATEX_MACROS doesn't exist
