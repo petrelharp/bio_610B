@@ -18,6 +18,12 @@ include config.mk
 # stuff for compilers
 LATEX_MACROS = macros.tex
 
+.pandoc.$(LATEX_MACROS) : $(LATEX_MACROS)
+	(echo '\['; cat $(LATEX_MACROS); echo '\]') > $@
+
+setup : .pandoc.$(LATEX_MACROS)
+	@:
+
 # change this to the location of your local MathJax.js library
 LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
 ifeq ($(wildcard $(LOCAL_MATHJAX)),)
@@ -32,7 +38,7 @@ PANDOC_PDF_OPTS =
 ifeq ($(wildcard $(LATEX_MACROS)),)
 	# LATEX_MACROS doesn't exist
 else
-	PANDOC_HTML_OPTS += -H <(echo '\['; cat $(LATEX_MACROS); echo '\]')
+	PANDOC_HTML_OPTS += -H .pandoc.$(LATEX_MACROS)
 	PANDOC_PDF_OPTS += -H $(LATEX_MACROS)
 endif
 
@@ -67,21 +73,15 @@ publish :
 	@echo ""
 	@echo "Now on branch $$(git rev-parse --abbrev-ref HEAD)"
 
-# set up a clean gh-pages branch
-setup : 
-	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
-	git checkout -b gh-pages
-	git checkout $(GITBRANCH)
 
-
-$(DISPLAYDIR)/%.pdf : %.md
+$(DISPLAYDIR)/%.pdf : %.md setup
 	pandoc $(PANDOC_OPTS) $(PANDOC_PDF_OPTS) -f markdown -o $@ $<
 
 
 ###
 # html stuff
 
-$(DISPLAYDIR)/%.html : %.md
+$(DISPLAYDIR)/%.html : %.md setup
 	-mkdir -p $(DISPLAYDIR)/resources
 	-cp resources/pandoc.css $(DISPLAYDIR)/resources
 	pandoc $(PANDOC_OPTS) $(PANDOC_HTML_OPTS) -f markdown -o $@ $<
