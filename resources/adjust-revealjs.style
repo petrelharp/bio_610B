@@ -1,0 +1,17 @@
+<style type="text/css">
+
+.reveal { font-size: 30px; }
+
+.reveal h1 { font-size: 1.5em; } 
+
+.reveal h2 { font-size: 1.2em; } 
+
+.reveal .slides { text-align: left; }
+
+.reveal .slides figure { text-align: center; }
+
+.reveal figcaption { display: none; }
+
+</style>
+
+

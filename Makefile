@@ -1,28 +1,7 @@
-### To set up the gh-pages branch:
-# git checkout --orphan gh-pages
-# (REMOVE FILES LYING AROUND NOW)
-# cp directory-to-gh-pages-stuff/* .
-# git add (STUFF JUST ADDED)
-#
+SHELL := /bin/bash
+# use bash for <( ) syntax
 
-.PHONY : clean publish pdfs setup htmls upload
-
-SHELL = /bin/bash
-
-###
-# names of files you want made and published to github (in gh-pages) should be in html-these-files.mk
-# which lives in the master branch and is automatically pushed over
-include config.mk
-
-###
-# stuff for compilers
-LATEX_MACROS = macros.tex
-
-.pandoc.$(LATEX_MACROS) : $(LATEX_MACROS)
-	(echo '\['; cat $(LATEX_MACROS); echo '\]') > $@
-
-setup : .pandoc.$(LATEX_MACROS)
-	@:
+.PHONY : publish upload
 
 # change this to the location of your local MathJax.js library
 LOCAL_MATHJAX = /dont/use/local/mathjax/for/webpages
@@ -32,35 +11,57 @@ else
 	MATHJAX = $(LOCAL_MATHJAX)
 endif
 
-PANDOC_OPTS = --standalone
-PANDOC_HTML_OPTS = -c resources/pandoc.css --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML
-PANDOC_PDF_OPTS = 
+# may want to add "--self-contained" to the following
+PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone
+# optionally add in a latex file with macros
+LATEX_MACROS = macros.tex
 ifeq ($(wildcard $(LATEX_MACROS)),)
-	# LATEX_MACROS doesn't exist
+	# macros file isn't there
 else
-	PANDOC_HTML_OPTS += -H .pandoc.$(LATEX_MACROS)
-	PANDOC_PDF_OPTS += -H $(LATEX_MACROS)
+	PANDOC_OPTS += -H .pandoc.$(LATEX_MACROS)
 endif
 
-MD_HTML = $(patsubst %.md,$(DISPLAYDIR)/%.html,$(filter-out $(EXCLUDE_MDFILES), $(MDFILES))) $(patsubst %.Rmd,$(DISPLAYDIR)/%.html,$(RMDFILES))
-TEX_HTML = $(patsubst %.tex,$(DISPLAYDIR)/%.html,$(filter-out $(EXCLUDE_TEXFILES), $(TEXFILES)))
-HTMLS = $(MD_HTML) $(TEX_HTML)
+.pandoc.$(LATEX_MACROS) : $(LATEX_MACROS)
+	(echo '\['; cat $(LATEX_MACROS); echo '\]') > $@
 
-PDFS = $(patsubst %.tex,$(DISPLAYDIR)/%.pdf,$(filter-out $(EXCLUDE_TEXFILES), $(TEXFILES))) $(patsubst %.md,$(DISPLAYDIR)/%.pdf,$(MDFILES)) $(patsubst %.Rmd,$(DISPLAYDIR)/%.pdf,$(RMDFILES))
+setup : .pandoc.$(LATEX_MACROS)
+	@:
+
+# knitr by default tries to interpret ANY code chunk; I only want it to do the ones beginning with ```r.
+KNITR_PATTERNS = list( chunk.begin="^```+\\s*\\{[.]?(r[a-zA-Z]*.*)\\}\\s*$$", chunk.end="^```+\\s*$$", inline.code="`r +([^`]+)\\s*`")
+# or, uncomment for OSX:
+# KNITR_PATTERNS = list( chunk.begin="^```+\\\\s*\\\\{[.]?(r[a-zA-Z]*.*)\\\\}\\\\s*$$", chunk.end="^```+\\\\s*$$", inline.code="`r +([^`]+)\\\\s*`")
+
+%.html : %.Rmd
+	# cd $$(dirname $<); Rscript -e 'knitr::knit2html(basename("$<"),output=basename("$@"))'
+	# cd $$(dirname $<); Rscript -e 'rmarkdown::render(basename("$<"),output_file=basename("$@"))'
+	# Rscript -e 'templater::render_template("$<", output="$@", change.rootdir=TRUE)'
+	Rscript -e 'knitr::knit_patterns[["set"]]($(KNITR_PATTERNS)); templater::render_template("$<", output="$@", change.rootdir=TRUE, clean=FALSE)'
+
+%.html : %.md setup
+	pandoc -o $@ $(PANDOC_OPTS) $<
+
+%.md : %.Rmd
+	# cd $$(dirname $<); Rscript -e 'knitr::knit_patterns[["set"]]($(KNITR_PATTERNS)); knitr::knit(basename("$<"),output=basename("$@"))'
+	Rscript -e 'knitr::knit_patterns[["set"]]($(KNITR_PATTERNS)); templater::render_template("$<", output="$@", change.rootdir=TRUE)'
+
+
+## VARIOUS SLIDE METHODS
+REVEALJS_OPTS = -t revealjs -V theme=simple -V slideNumber=true -V transition=none -H resources/adjust-revealjs.style --slide-level 2
+SLIDES_OPTS = $(REVEALJS_OPTS)
+
+%.slides.html : %.md setup
+	pandoc -o $@ $(SLIDES_OPTS) $(PANDOC_OPTS) $<
+
+%.revealjs.html : %.md setup
+	pandoc -o $@ $(REVEALJS_OPTS) $(PANDOC_OPTS) $<
 
 # hope their head isn't detached
 GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
 
-htmls :
-	make $(HTMLS)
-
-pdfs :
-	make $(PDFS)
-
 # upload to github
 upload :
 	git push origin --all
-
 
 # update the gh-pages branch
 publish :
@@ -72,23 +73,6 @@ publish :
 	@echo ""
 	@echo ""
 	@echo "Now on branch $$(git rev-parse --abbrev-ref HEAD)"
-
-
-$(DISPLAYDIR)/%.pdf : %.md setup
-	pandoc $(PANDOC_OPTS) $(PANDOC_PDF_OPTS) -f markdown -o $@ $<
-
-
-###
-# html stuff
-
-$(DISPLAYDIR)/%.html : %.md setup
-	-mkdir -p $(DISPLAYDIR)/resources
-	-cp resources/pandoc.css $(DISPLAYDIR)/resources
-	pandoc $(PANDOC_OPTS) $(PANDOC_HTML_OPTS) -f markdown -o $@ $<
-
-$(DISPLAYDIR)/%.html : %.Rmd
-	Rscript -e "templater::render_template(\"$<\", output=\"$@\", change.rootdir=TRUE, clean=TRUE)"
-
 
 ## 
 # Graphics whatnot
