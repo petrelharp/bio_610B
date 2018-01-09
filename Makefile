@@ -25,7 +25,7 @@ setup : .pandoc.$(LATEX_MACROS)
 	@:
 
 # change this to the location of your local MathJax.js library
-LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
+LOCAL_MATHJAX = /dont/use/local/mathjax/for/webpages
 ifeq ($(wildcard $(LOCAL_MATHJAX)),)
 	MATHJAX = https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js
 else
