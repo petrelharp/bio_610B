@@ -82,7 +82,7 @@ The tentative schedule (subject to adjustment, especially towards the end) is
 
 Week 1 (*1/8*)
 
-: Recap of probability and likelihood;
+: [(slides)](day_1.slides.html) Recap of probability and likelihood;
     central limit theorem ($\sqrt{n}$);
     Bayes' rule.
     The beta-binomial distribution: putting a prior on the probability of success.
