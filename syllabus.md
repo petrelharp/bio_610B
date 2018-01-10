@@ -1,9 +1,9 @@
 # Advanced Biological Statistics, Part II: Bio 610, Winter 2018
 
 -  **Class:** 10-12, Tuesday/Thursday.
--  **Office Hours:** Wednesday and Friday 12-1
+-  **Office Hours:** Wednesday 12-1 and Friday 11-12 in 282 Onyx
 -  **Instructor:** Peter Ralph (plr@uoregon.edu)
--  **Office:** 6 Deady Hall.
+-  **Office:** 6 Deady Hall and/or 282 Onyx (email to arrange)
 
 
 This course is an introduction to advanced methods in modern statistics,
