@@ -6,3 +6,4 @@ display/*
 *.blg
 .Rproj.user
 .*.swp
+figure
