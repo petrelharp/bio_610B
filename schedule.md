@@ -1,3 +1,9 @@
+---
+title:  "Schedule :: Advanced Biological Statistics II: Bio 610, Winter 2018"
+author: "Peter Ralph"
+date: "9 January 2018"
+...
+
 # Course schedule
 
 The tentative schedule (subject to adjustment, especially towards the end) is

@@ -1,4 +1,9 @@
-# Advanced Biological Statistics, Part II: Bio 610, Winter 2018
+---
+title:  "Syllabus :: Advanced Biological Statistics II: Bio 610, Winter 2018"
+author: "Peter Ralph"
+date: "9 January 2018"
+...
+
 
 -  **Class:** 10-12, Tuesday/Thursday.
 -  **Office Hours:** Wednesday 12-1 and Friday 11-12 in 282 Onyx
@@ -77,3 +82,5 @@ or uoaec@uoregon.edu.
 ## Course schedule
 
 The schedule is available [here](schedule.html).
+
+$.$
