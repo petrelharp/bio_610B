@@ -14,7 +14,7 @@ else
 endif
 
 # may want to add "--self-contained" to the following
-PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone
+PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone --self-contained
 # optionally add in a latex file with macros
 LATEX_MACROS = macros.tex
 ifeq ($(wildcard $(LATEX_MACROS)),)
@@ -43,6 +43,9 @@ KNITR_PATTERNS = list( chunk.begin="^```+\\s*\\{[.]?(r[a-zA-Z]*.*)\\}\\s*$$", ch
 %.md : %.Rmd
 	# cd $$(dirname $<); Rscript -e 'knitr::knit_patterns[["set"]]($(KNITR_PATTERNS)); knitr::knit(basename("$<"),output=basename("$@"))'
 	Rscript -e 'knitr::knit_patterns[["set"]]($(KNITR_PATTERNS)); templater::render_template("$<", output="$@", change.rootdir=TRUE)'
+
+%.pdf : %.md
+	pandoc -o $@ -t latex $<
 
 
 ## VARIOUS SLIDE METHODS
