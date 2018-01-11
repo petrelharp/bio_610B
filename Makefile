@@ -94,3 +94,10 @@ $(DISPLAYDIR)/%.svg : %.pdf
 
 $(DISPLAYDIR)/%.png : %.pdf
 	convert -density 300 $< -flatten $@
+
+## things without mathjax
+
+syllabus.html : syllabus.md
+	pandoc -o $@ --standalone --self-contained $<
+
+
