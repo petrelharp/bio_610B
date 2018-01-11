@@ -376,6 +376,35 @@ plot(theta, posterior, type='b'); title("posterior", line=0.5)
 :::
 ::::::::::::::
 
+# Stochastic Minute
+
+## The Beta Distribution
+
+If $$P \sim \text{Beta}(a,b)$$
+then $P$ has *probability density*
+$$p(\theta) = \frac{ \theta^{a-1} (1 - \theta)^{b-1} }{ B(a,b) } . $$
+
+- Takes values between 0 and 1.
+
+- If $U_{(1)} < U_{(2)} < \cdots < U_{(n)}$ are sorted, independent $\text{Unif}[0,1]$
+  then $U_{(k)} \sim \text{Beta}(k, n-k+1)$.
+
+- Mean: $a/(a+b)$.
+
+- Larger $a+b$ is more tightly concentrated (like $1/\sqrt{a+b}$)
+
+
+# ((Thursday))
+
+## Today
+
+0. A look at the homework
+1. What's the question? (and how do we answer it?)
+2. Beta-binomial coins.
+3. Simulation exercise.
+4. Online analysis example.
+5. Reporting uncertainty.
+6. Normal approximation
 
 # A question
 
@@ -415,24 +444,6 @@ barplot(posterior, xlab='true prob of heads')
 :::
 ::::::::::::::
 
-
-
-# Stochastic Minute
-
-## The Beta Distribution
-
-If $$P \sim \text{Beta}(a,b)$$
-then $P$ has *probability density*
-$$p(\theta) = \frac{ \theta^{a-1} (1 - \theta)^{b-1} }{ B(a,b) } . $$
-
-- Takes values between 0 and 1.
-
-- If $U_{(1)} < U_{(2)} < \cdots < U_{(n)}$ are sorted, independent $\text{Unif}[0,1]$
-  then $U_{(k)} \sim \text{Beta}(k, n-k+1)$.
-
-- Mean: $a/(a+b)$.
-
-- Larger $a+b$ is more tightly concentrated (like $1/\sqrt{a+b}$)
 
 
 # Unknown coins
@@ -582,13 +593,13 @@ ${}^*$ **or** you will be wrong in the fewest possible universes
 ## But which credible interval?
 
 **Definition:** The "95\% highest density interval" is the 95\% credible interval
-with the highest posterior probability.
+with the highest posterior probability density at each point.
 
-```{r hdi_plot}
-# plot
-```
+. . .
 
-# The Central Limit Theorem
+((draw pictures))
+
+# The Central Limit Theorem (a.k.a. Normal approximation)
 
 ## How many flips to know within $\approx$ 1\%?
 
