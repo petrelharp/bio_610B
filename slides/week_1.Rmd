@@ -428,7 +428,7 @@ $$p(\theta) = \frac{ \theta^{a-1} (1 - \theta)^{b-1} }{ B(a,b) } . $$
 - Takes values between 0 and 1.
 
 - If $U_{(1)} < U_{(2)} < \cdots < U_{(n)}$ are sorted, independent $\text{Unif}[0,1]$
-  then $U_{(k)} \sim \text{Beta}(k, n-k)$.
+  then $U_{(k)} \sim \text{Beta}(k, n-k+1)$.
 
 - Mean: $a/(a+b)$.
 
