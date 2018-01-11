@@ -1,9 +1,12 @@
 SHELL := /bin/bash
 # use bash for <( ) syntax
 
-.PHONY : publish upload all
+.PHONY : publish upload all slides
 
-all : README.html syllabus.html schedule.html slides/week_1.slides.html
+all : README.html syllabus.html schedule.html slides
+
+slides :
+	$(MAKE) -C slides
 
 # change this to the location of your local MathJax.js library
 LOCAL_MATHJAX = /dont/use/local/mathjax/for/webpages

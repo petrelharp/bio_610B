@@ -43,21 +43,21 @@ So, I flip it **10 times** and get **6 heads**.
 
 ## Possible answers:
 
-1. Er, probably coin #1?
-
-2. Well,
-   $$\begin{aligned}
-   \P\{ \text{6 H in 10 flips} \given \text{coin A} \}
-   &= \binom{10}{6} (.75)^6 (.25)^4 \\
-   &= 0.146
-   \end{aligned}$$
-   and
-   $$\begin{aligned}
-   \P\{ \text{6 H in 10 flips} \given \text{coin B} \}
-   &= \binom{10}{6} (.25)^6 (.75)^4 \\
-   &= 0.016
-   \end{aligned}$$
-   ... so, probably coin A?
+> 1. Er, probably coin #1?
+> 
+> 2. Well,
+>    $$\begin{aligned}
+>    \P\{ \text{6 H in 10 flips} \given \text{coin A} \}
+>    &= \binom{10}{6} (.75)^6 (.25)^4 \\
+>    &= 0.146
+>    \end{aligned}$$
+>    and
+>    $$\begin{aligned}
+>    \P\{ \text{6 H in 10 flips} \given \text{coin B} \}
+>    &= \binom{10}{6} (.25)^6 (.75)^4 \\
+>    &= 0.016
+>    \end{aligned}$$
+>    ... so, probably coin A?
 
 ---------------
 
@@ -366,6 +366,7 @@ theta <- (1:9)/10
 prior <- rep(1/9, 9)
 likelihood <- dbinom(6000, size=10000, prob=theta)
 posterior <- prior*likelihood/sum(prior*likelihood)
+names(posterior) <- theta
 layout(1:3)
 par(mar=c(4,4,1.5,1)+.1, mgp=c(2.6,0.8,0))
 plot(theta, prior, type='b'); title("prior", line=0.5)
@@ -375,13 +376,45 @@ plot(theta, posterior, type='b'); title("posterior", line=0.5)
 :::
 ::::::::::::::
 
-----------------
 
-## How many flips to know "for sure"?
+# A question
 
-(until the data - the likelihood - overwhelms the prior)
+## What is the right answer to the "coin question"?
 
-**((discussion))**
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+Recall: there were ten possible values of $\theta$.
+
+
+Which coin is it, and how sure are you?
+
+
+*Possible types of answer:*
+
+1. "best guess"
+2. "range of values"
+3. "don't know"
+
+
+Give examples of when each type of answer is the right one.
+
+:::
+::: {.column width="40%"}
+
+
+```{r plot_pos}
+theta <- (1:9)/10
+prior <- rep(1/9, 9)
+likelihood <- dbinom(6, size=10, prob=theta)
+posterior <- prior*likelihood/sum(prior*likelihood)
+names(posterior) <- theta
+barplot(posterior, xlab='true prob of heads')
+```
+
+:::
+::::::::::::::
+
 
 
 # Stochastic Minute
@@ -482,7 +515,7 @@ P \given Z = z \sim \text{Beta}(a+z, b+n-z) .
 
 # Beta-binomial: example analysis
 
-## Discuss/demonstrate:
+## Discuss/demonstration:
 
 We flip an odd-looking coin 100 times,
 and get 65 heads.
@@ -500,9 +533,13 @@ What is it's true* probability of heads?
 
 6. How much does the answer depend on the prior?
 
-## Credible interval
+7. Does our procedure work on simulated data?
 
-**Definition:** A 95% *credible interval* is a portion of parameter space
+# Reporting uncertainty
+
+## Credible region
+
+**Definition:** A 95% *credible region* is a portion of parameter space
 having a total of 95% of the *posterior probability*.
 
 . . .
@@ -540,5 +577,63 @@ ${}^*$ if you do this many times you will be wrong least often
 . . .
 
 ${}^*$ **or** you will be wrong in the fewest possible universes
+
+
+## But which credible interval?
+
+**Definition:** The "95\% highest density interval" is the 95\% credible interval
+with the highest posterior probability.
+
+```{r hdi_plot}
+# plot
+```
+
+# The Central Limit Theorem
+
+## How many flips to know within $\approx$ 1\%?
+
+:::::::::::::: {.columns}
+::: {.column width="60%"}
+
+
+Flip a $\theta$-coin $n$ times, get $X$ heads, so
+
+$$ X \sim \text{Binom}(n, \theta) $$
+
+and if $P = X/n$, then
+
+$$ \sd[P] = \sqrt{\frac{\theta(1-\theta)}{n}} . $$
+
+
+**Also:**
+$$\begin{aligned}
+    P &\approx \Normal(\theta, \sd[P]) .
+\end{aligned}$$
+
+
+*(discussion)*
+
+:::
+::: {.column width="40%"}
+
+```{r plot_clt, echo=FALSE, fig.height=2*fig.dim, fig.width=1.5*fig.dim}
+layout(1:3)
+par(mar=c(2,2,4,1)+.1)
+xh <- hist(rbinom(1e6, size=100, prob=3/5)/100, breaks=((0:101)-0.5)/100, freq=FALSE,
+           main='100 flips', xlim=c(0,1), xlab='')
+lines(xh$mids, diff(pnorm(q=xh$breaks, mean=3/5, sd=sqrt(3*2)/50))/diff(xh$breaks),
+      col=adjustcolor('red',0.5), lwd=2)
+xh <- hist(rbinom(1e6, size=1e3, prob=3/5)/1e3, breaks=100, freq=FALSE,
+           main='1,000 flips', xlim=c(0,1), xlab='')
+lines(xh$mids, diff(pnorm(q=xh$breaks, mean=3/5, sd=sqrt(3*2/1e3)/5))/diff(xh$breaks),
+      col=adjustcolor('red',0.5), lwd=2)
+xh <- hist(rbinom(1e6, size=1e4, prob=3/5)/1e4, breaks=100, freq=FALSE,
+           main='10,000 flips', xlim=c(0,1), xlab='')
+lines(xh$mids, diff(pnorm(q=xh$breaks, mean=3/5, sd=sqrt(3*2/1e4)/5))/diff(xh$breaks),
+      col=adjustcolor('red',0.5), lwd=2)
+```
+
+:::
+::::::::::::::
 
 
