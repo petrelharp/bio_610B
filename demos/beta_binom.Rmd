@@ -1,0 +1,54 @@
+---
+title: "beta-binom_analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Question:** We flip an odd-looking coin 100 times, and get 65 heads. What is it’s true* probability of heads?
+
+## What is True?
+
+The long-run proportion of heads (if we flipped it a lot).
+
+## What prior to use?
+
+We'll use $\alpha = \beta = 1$ : a flat prior.
+
+## Analysis:
+
+We know that the posterior distribution on $P$, the true probability of heads,
+is Beta($\alpha + z$, $\beta + n - z$).
+Here $z=65$ and $n=100$.
+We'll make a plot of the density function.
+
+```{r bayes}
+z <- 65
+n <- 100
+prior_alpha <- 1
+prior_beta <- 1
+post_alpha <- prior_alpha + z
+post_beta <- prior_beta + n - z
+x <- seq(0, 1, length.out=1000)
+dens <- dbeta(x, shape1=post_alpha, shape2=post_beta)
+plot(x, dens, type='l',
+     xlab='prob of heads', ylab='posterior density')
+```
+
+## Is it reasonable that $\theta=1/2$?
+
+It looks like not: the posterior probability
+that $P \le 1/2$ is `r pbeta(1/2, shape1=post_alpha, shape2=post_beta)`.
+
+## Best guess at $\theta$?
+
+We'll take the maximum a posteriori estimate (MAP), which is
+`r (post_alpha - 1)/(post_alpha + post_beta - 2)`.
+
+## How far off are we, probably?
+
+How much does the answer depend on the prior?
+
+Does our procedure work on simulated data?
