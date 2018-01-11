@@ -17,7 +17,8 @@ Week 1 (*1/9*)
     The beta-binomial distribution: putting a prior on the probability of success.
     **(K ch. 4, 5, 6)**
 
-    **Short report:** (due 1/16) [MLE for beta-binomial](hws/week_1.html)
+    - **Short report:** (due 1/16) [MLE for beta-binomial](hws/week_1.html)
+    - **Demo:** (from 1/11) [Beta-binomial analysis](demos/beta_binom.html)
 
 Week 2 (*1/16*)
 
