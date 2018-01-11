@@ -413,7 +413,7 @@ $$p(\theta) = \frac{ \theta^{a-1} (1 - \theta)^{b-1} }{ B(a,b) } . $$
 :::::::::::::: {.columns}
 ::: {.column width="60%"}
 
-Recall: there were ten possible values of $\theta$.
+Recall: there were nine possible values of $\theta$.
 
 
 Which coin is it, and how sure are you?
@@ -438,7 +438,7 @@ prior <- rep(1/9, 9)
 likelihood <- dbinom(6, size=10, prob=theta)
 posterior <- prior*likelihood/sum(prior*likelihood)
 names(posterior) <- theta
-barplot(posterior, xlab='true prob of heads')
+barplot(posterior, xlab='true prob of heads', main='posterior probability')
 ```
 
 :::
@@ -504,7 +504,7 @@ $$\begin{aligned}
 
 . . .
 
-Miraculously,
+"Miraculously" *(the Beta is the conjugate prior for the Binomial)*,
 $$\begin{aligned}
 P \given Z = z \sim \text{Beta}(a+z, b+n-z) .
 \end{aligned}$$
