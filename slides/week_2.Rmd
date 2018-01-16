@@ -110,7 +110,7 @@ $$\begin{aligned}
     Z_i &\sim \Binom(N_i, \theta_i) \\
     \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
     \omega &\sim \Beta(A, B) \\
-    \kappa &\sim \Gamma(S, R)
+    \kappa &\sim \Gam(S, R)
 \end{aligned}$$
 
 *note:* The "mode" and "concentration" are related to the shape parameters by:
@@ -151,7 +151,7 @@ $$\begin{aligned}
     Z_i &\sim \Binom(N_i, \theta_i) \\
     \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
     \omega &\sim \Beta(A, B) \\
-    \kappa &\sim \Gamma(S, R)
+    \kappa &\sim \Gam(S, R)
 \end{aligned}$$
 
 **Goal:** find the posterior distribution of $\omega$, $\kappa$,
@@ -611,7 +611,7 @@ $$\begin{aligned}
 If $S \sim \Gam(\text{shape}=\alpha, \text{rate}=\lambda)$, then
 
 $$\begin{aligned}
-   \P\{ S \in dt \} = \frac{\alpha^\lambda}{\Gamma(\alpha)} t^{\alpha - 1} e^{-\lambda t} dt .
+   \P\{ S \in dt \} = \frac{\alpha^\lambda}{\Gam(\alpha)} t^{\alpha - 1} e^{-\lambda t} dt .
 \end{aligned}$$
 
 1. If $T_1, \ldots, T_k$ are independent $\Exp(\lambda)$, then
@@ -637,7 +637,7 @@ $$\begin{aligned}
     Z_i &\sim \Binom(N_i, \theta_i) \\
     \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
     \omega &\sim \Beta(1, 1) \\
-    \kappa &\sim \Gamma(0.1, 0.1)
+    \kappa &\sim \Gam(0.1, 0.1)
 \end{aligned}$$
 
 *note:* The "mode" and "concentration" are related to the shape parameters by:
