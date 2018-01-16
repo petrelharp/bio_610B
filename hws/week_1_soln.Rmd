@@ -1,0 +1,138 @@
+# Homework #0: The Case of the Mystery Coins: Solution
+
+First we read in the data, converting the strings of H/T
+to a number of Heads and a number of Tails.
+
+```{r read_data}
+datafile <- "coin_flips.txt"
+flip_text <- strsplit(scan(datafile, what=''), "")
+nflips <- sapply(flip_text, length)
+nheads <- sapply(flip_text, function (x) sum(x=="H"))
+ntails <- sapply(flip_text, function (x) sum(x=="T"))
+stopifnot(all(ntails == nflips - nheads))
+```
+
+There are `r length(nflips)` coins in the dataset,
+that were flipped between `r min(nflips)` and `r max(nflips)` times,
+with a median of `r median(nflips)` flips.
+The number of flips per coin breaks down as follows:
+```{r num_flips_tab}
+table(nflips)
+```
+
+The proportion of heads varies substantially:
+here is a plot of the proportion of heads against the number of flips,
+slightly jittered to avoid overplotting.
+```{r prop_heads}
+plot(jitter(nflips), jitter(nheads/nflips), xlab='number of flips',
+     ylab='proportion heads', pch=20)
+```
+The coins tend towards Heads, although they certainly don't all have the same
+probability of coming up heads: observe that one coin flipped 12 times had no heads,
+while another, also flipped 12 times, had 12 heads.
+
+
+From Wikipedia, the Beta-Binomial distribution (
+for the number of heads among $n$ flips of a coin
+whose probability of heads (which we denote $\theta$) has a Beta($\alpha$, $\beta$) distribution)
+is
+$$\begin{aligned}
+  p(k|n, \alpha, \beta) = \binom{n}{k} \frac{B(k + \alpha, n - k + \beta)}{B(\alpha, \beta)} ,
+\end{aligned}$$
+where $B()$ is the Beta function.
+That's the probability that a *particular* coin that was flipped $n$ times
+gets $k$ heads;
+we are assuming that the sequence of flips coming from *each* coin is an independent result
+of this random process, with common $\alpha$ and $\beta$ parameters
+determining the distribution of $\theta$ across the coins
+(i.e., how the probability of heads varies between coins).
+Using the R functions `lchoose()` and `lbeta()` for the logarithm of the "choose" function $\binom{n}{k}$
+and the Beta function, respectively,
+the log-likelihood of the data for a given set of `params = `$(\alpha, \beta)$ is
+
+
+```{r mle_fun}
+loglik <- function (params) {
+    sum( lchoose(nflips, nheads) +
+         lbeta(nheads + params[1], ntails + params[2]) -
+         lbeta(params[1], params[2]) )
+}
+```
+
+There are only two parameters, so to get a picture of the result
+we'll do a grid search.
+
+```{r mle}
+ngrid <- 51
+maxgrid <- 10
+alpha_vals <- beta_vals <- seq(0,maxgrid,length.out=ngrid)[-1]
+ab <- expand.grid(alpha=alpha_vals, beta=beta_vals)
+ll_mat <- apply(ab, 1, loglik)
+dim(ll_mat) <- c(length(alpha_vals), length(beta_vals))
+
+mle <- ab[which.max(ll_mat),]
+```
+
+The MLE obtained by this grid search is $\alpha = `r mle[1]`$ and $\beta = `r mle[2]`$,
+at which point the log-likelihood is `r max(ll_mat)`.
+
+The (log-)likelihood surface has a single peak,
+so after some adjusting of the parameters,
+we end up with the following picture:
+
+```{r ll_surf}
+image(alpha_vals, beta_vals, ll_mat)
+contour(alpha_vals, beta_vals, ll_mat, add=TRUE)
+contour(alpha_vals, beta_vals, ll_mat, add=TRUE, 
+        levels=pretty(ll_mat[which.max(ll_mat)] - 0:10))
+points(mle[1], mle[2], pch="*", cex=3)
+```
+
+We could use gradient descent (as in the R function `optim()` to get an estimate of $\alpha$ and $\beta$ with more digits after the decimal,
+but it is clear from the likelihood surface that this would be false precision:
+there is an elliptical region over which $\alpha$ ranges from about 2 to 4 and $\beta$ ranges from about 1 to 2 on which the log-likelihood differs from the MLE by only two units;
+any reasonable confidence interval would roughly agree with this region.
+
+In conclusion, our best guess at the distribution of true-probabilities-of-heads
+in my bag of coins is Beta(`r mle[1]`, `r mle[2]`), which looks like:
+```{r beta_plot}
+xx <- seq(0, 1, length.out=400)
+plot(xx, dbeta(xx, shape1=mle$alpha[1], shape2=mle$beta[1]), type='l',
+     xlab='probability of heads', ylab='density')
+lines(xx, dbeta(xx, shape1=3, shape2=2), col='red', lty=3)
+```
+The true values used to simulate these data werre $\alpha = 3$ and $\beta = 2$, shown in red on the graph -- not bad.
+
+## Outliers?
+
+Are *all* the coins consistent with this distribution of probabilities?
+To get an idea of this we can compute the "$z$-scores" for each coin:
+the difference of the observed value from the mean, divided by the SD.
+Again from Wikipedia, the mean of a Beta-binomial of $n$ flips is $n \alpha / (\alpha + \beta)$
+and the variance is $n \alpha \beta (\alpha + \beta + n) / ((\alpha + \beta)^2 (\alpha + \beta + 1))$.
+Surprising outcomes should have large values of $z$ (either positive or negative).
+
+
+```{r z_scores}
+alpha <- mle$alpha[1]
+beta <- mle$beta[1]
+means <- nflips * alpha / (alpha + beta)
+sds <- sqrt(nflips * alpha * beta * (alpha + beta + nflips) / ((alpha + beta)^2 * (alpha + beta + 1)))
+z <- (nheads - means) / sds
+```
+
+Here is a stem-and-leaf plot of the $z$-scores:
+```{r stem_z}
+biggest_z <- which.max(abs(z))
+stem(z)
+```
+
+The largest-in-absolute-value $z$-score is the `r biggest_z`th coin, with $z=`r z[biggest_z]`$,
+a coin flipped `r nflips[biggest_z]` times getting `r nheads[biggest_z]` heads.
+Is this surprising?
+Using the Beta-Binomial probability distribution again, the probability of getting so few heads
+with `r nflips[biggest_z]` flips is
+`r n <- nflips[biggest_z]; k <- nheads[biggest_z]; sum(choose(n,0:k) * beta(n+alpha, n-(0:k)+beta) / beta(alpha, beta))`.
+This certainly seems surprising -- does this coin have two tails and no heads?  More investigation is needed.
+
+
