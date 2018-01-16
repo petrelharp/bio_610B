@@ -27,6 +27,21 @@ set.seed(23)
 
 # Reporting uncertainty
 
+## How do we communicate results?
+
+If we want a *point estimate*:
+
+1. posterior mean,
+2. posterior median, or
+3. maximum *a posteriori* estimate ("MAP": highest posterior density).
+
+These all convey "where the posterior distribution is", more or less.
+
+. . .
+
+What about uncertainty?
+
+
 ## Credible region
 
 **Definition:** A 95% *credible region* is a portion of parameter space
@@ -76,7 +91,7 @@ with the highest posterior probability density at each point.
 
 . . .
 
-((draw pictures))
+((back to the simple example))
 
 
 # Hierarchical coins
@@ -114,6 +129,9 @@ What is different between:
 2. Pick one thousand random $\theta_i \sim \Beta(3,1)$ values.
    Flip one thousand coins, one for each $\theta_i$, 500 times each.
 
+In which case does knowing the outcome of one coin give you information
+about the likely behavior of other coins?
+
 --------------
 
 ```{r beta_or_binom, fig.height=1.5*fig.dim, fig.width=3*fig.dim}
@@ -141,7 +159,7 @@ and $\theta_1, \ldots, \theta_n$.
 
 . . .
 
-**Problem:** we can't do the integrals.
+**Problem:** we don't have a nice mathematical expression for this posterior distribution.
 
 
 # Markov Chain Monte Carlo
@@ -157,6 +175,7 @@ Given:
 
 
 "find"/ask questions of the posterior distribution on $\theta$,
+
 $$\begin{aligned}
     p(\theta \given D) = \frac{ p(D \given \theta) p(\theta) }{ p(D) } .
 \end{aligned}$$
@@ -181,12 +200,12 @@ Do we think that $\theta < 0.5$?
 
 *(before:)* 
 ```r
-pbeta(0.5, a, b)
+pbeta(0.5, post_a, post_b)
 ```
 
 *(now:)* 
 ```r
-mean(rbeta(1e6, a, b) < 0.5)
+mean(rbeta(1e6, post_a, post_b) < 0.5)
 ```
 
 
@@ -478,7 +497,7 @@ parameters {
 }
 model {
     Z ~ binomial(N, theta);
-    theta ~ beta(10, 10);
+    theta ~ beta(20, 20);
 }
 ```
 
@@ -501,7 +520,7 @@ parameters {
 }
 model {
     Z ~ binomial(N, theta);
-    theta ~ beta(10, 10);
+    theta ~ beta(20, 20);
 }
 "
 ```
@@ -509,7 +528,7 @@ model {
 
 ```{r run_rstan, cache=TRUE}
 library(rstan)
-fit <- stan(model_code=stan_block,   # text from above
+fit <- stan(model_code=stan_block,  # stan block from above
             data=list(N=10, Z=6),
             chains=3, iter=10000)
 
@@ -537,7 +556,7 @@ stan_trace(fit)
 Stan uses ggplot2.
 
 ```{r plot_rstan}
-stan_hist(fit)
+stan_hist(fit) + xlim(0,1)
 ```
 
 ---------------
@@ -655,7 +674,7 @@ What is *each coin's* probability of Heads?
   we would be very uncertain about each coin.
 
 - Together, they should tell us very accurately 
-  what the *likely* values of $\theta$ are.
+  what are *likely* values of $\theta$.
 
 - This information can improve the estimate of each separate $\theta$.
 
