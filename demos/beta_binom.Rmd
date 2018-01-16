@@ -49,6 +49,15 @@ We'll take the maximum a posteriori estimate (MAP), which is
 
 ## How far off are we, probably?
 
-How much does the answer depend on the prior?
+To communicate our uncertainty in that estimate,
+we'll compute a 95% "highest density" credible interval (HDI).
+We do this with the `HDInterval` package.
+```{r hdi}
+library(HDInterval)
+hdi <- hdi(qbeta, credMass=.95, shape1=post_alpha, shape2=post_beta)
+```
 
-Does our procedure work on simulated data?
+We can be 95% certain that the true $\theta$ is between
+`r hdi[1]` and `r hdi[2]`.
+
+

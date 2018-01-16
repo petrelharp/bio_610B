@@ -34,6 +34,25 @@ d.parent(".dropdown-menu").length&&(d=d.closest("li.dropdown").addClass("active"
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
 </script>
+\[%%
+% Add your macros here; they'll be included in pdf and html output.
+%%
+
+\newcommand{\R}{\mathbb{R}}    % reals
+\newcommand{\E}{\mathbb{E}}    % expectation
+\renewcommand{\P}{\mathbb{P}}  % probability
+\DeclareMathOperator{\sd}{sd}
+\DeclareMathOperator{\var}{var}
+\DeclareMathOperator{\Normal}{Normal}
+\DeclareMathOperator{\Poisson}{Poisson}
+\DeclareMathOperator{\Beta}{Beta}
+\DeclareMathOperator{\Binom}{Binomial}
+\DeclareMathOperator{\Gam}{Gamma}
+\DeclareMathOperator{\Exp}{Exponential}
+
+
+\newcommand{\given}{\;\vert\;}
+\]
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">pre .operator,
@@ -144,8 +163,10 @@ plot(x, dens, type='l',
 </section>
 <section id="how-far-off-are-we-probably" class="level2">
 <h2>How far off are we, probably?</h2>
-<p>How much does the answer depend on the prior?</p>
-<p>Does our procedure work on simulated data?</p>
+<p>To communicate our uncertainty in that estimate, we’ll compute a 95% “highest density” credible interval (HDI). We do this with the <code>HDInterval</code> package.</p>
+<pre class="r"><code>library(HDInterval)
+hdi &lt;- hdi(qbeta, credMass=.95, shape1=post_alpha, shape2=post_beta)</code></pre>
+<p>We can be 95% certain that the true <span class="math inline">\(\theta\)</span> is between 0.5542689 and 0.7382436.</p>
 </section>
 
 
