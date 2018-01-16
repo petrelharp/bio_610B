@@ -1,0 +1,667 @@
+---
+title: "Adding levels of randomness"
+author: "Peter Ralph"
+date: "15 January 2018 -- Advanced Biological Statistics"
+---
+
+```{r setup, include=FALSE}
+fig.dim <- 3
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+```
+
+## Outline
+
+1. Credible intervals
+
+    * applied to the Beta-Binomial example
+
+2. Hierarchical coins
+
+3. Introduction to MCMC
+
+4. Stan
+
+
+# Reporting uncertainty
+
+## Credible region
+
+**Definition:** A 95% *credible region* is a portion of parameter space
+having a total of 95% of the *posterior probability*.
+
+. . .
+
+(same with other numbers for "95%")
+
+## Interpretation \#1
+
+If we construct a 95% credible interval for $\theta$
+for each of many datasets;
+*and* the coin in each dataset has $\theta$ drawn independently from the prior,
+*then* the true $\theta$ will fall in its credible interval for 95% of the datasets.
+
+
+## Interpretation \#2
+
+If we construct a 95% credible interval for $\theta$ with a dataset,
+and the distribution of the coin's true $\theta$ across many parallel universes
+is given by the prior,
+then the true $\theta$ will be in the credible interval
+in 95% of those universes.
+
+
+
+## Interpretation \#3
+
+Given my prior beliefs (prior distribution),
+the posterior distribution is the most rational${}^*$ 
+way to update my beliefs to account for the data.
+
+. . .
+
+${}^*$ if you do this many times you will be wrong least often
+
+. . .
+
+${}^*$ **or** you will be wrong in the fewest possible universes
+
+
+## But which credible interval?
+
+**Definition:** The "95\% highest density interval" is the 95\% credible interval
+with the highest posterior probability density at each point.
+
+. . .
+
+((draw pictures))
+
+
+# Hierarchical coins
+
+## Motivating problem: more coins
+
+Suppose now we have data from $n$ different coins from the same source
+*(or, sequences, or ...)*
+
+Suppose now we have data from $n$ different coins from the same source.
+We don't assume they have the *same* $\theta$,
+but don't know what it's distribution is,
+so try to *learn* it.
+
+$$\begin{aligned}
+    Z_i &\sim \Binom(N_i, \theta_i) \\
+    \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
+    \omega &\sim \Beta(A, B) \\
+    \kappa &\sim \Gamma(S, R)
+\end{aligned}$$
+
+*note:* The "mode" and "concentration" are related to the shape parameters by:
+$\alpha = \omega (\kappa - 2) + 1$
+and
+$\beta = (1 - \omega) (\kappa - 2) + 1$.
+
+
+## Binomial versus Beta-Binomial
+
+What is different between:
+
+1. Pick a value of $\theta$ at random from $\Beta(3,1)$.
+   Flip one thousand $\theta$-coins, 500 times each.
+
+2. Pick one thousand random $\theta_i \sim \Beta(3,1)$ values.
+   Flip one thousand coins, one for each $\theta_i$, 500 times each.
+
+--------------
+
+```{r beta_or_binom, fig.height=1.5*fig.dim, fig.width=3*fig.dim}
+ncoins <- 1000
+nflips <- 100
+theta1 <- rbeta(1,3,1)
+binom_Z <- rbinom(ncoins, size=nflips, prob=theta1)
+theta2 <- rbeta(ncoins,3,1)
+bb_Z <- rbinom(ncoins, size=nflips, prob=theta2)
+hist(binom_Z, breaks=30, col=adjustcolor("blue", 0.5), main='', xlim=c(0,nflips), freq=FALSE, xlab='number of Heads')
+hist(bb_Z, breaks=30, col=adjustcolor("red", 0.5), add=TRUE, freq=FALSE)
+```
+
+## A problem
+
+$$\begin{aligned}
+    Z_i &\sim \Binom(N_i, \theta_i) \\
+    \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
+    \omega &\sim \Beta(A, B) \\
+    \kappa &\sim \Gamma(S, R)
+\end{aligned}$$
+
+**Goal:** find the posterior distribution of $\omega$, $\kappa$,
+and $\theta_1, \ldots, \theta_n$.
+
+. . .
+
+**Problem:** we can't do the integrals.
+
+
+# Markov Chain Monte Carlo
+
+## When you can't do the integrals: MCMC
+
+**Goal:** 
+Given:
+
+- a model with parameters $\theta$,
+- a prior distribution $p(\theta)$ on $\theta$, and
+- data, $D$,
+
+
+"find"/ask questions of the posterior distribution on $\theta$,
+$$\begin{aligned}
+    p(\theta \given D) = \frac{ p(D \given \theta) p(\theta) }{ p(D) } .
+\end{aligned}$$
+
+. . .
+
+**Problem:** usually we can't write down an expression for this
+(because of the "$p(D)$").
+
+. . .
+
+**Solution:**
+we'll make up a way to *draw random samples* from it.
+
+-------------
+
+**Toy example:** 
+
+*(return to beta-binomial coin example)*
+
+Do we think that $\theta < 0.5$?
+
+*(before:)* 
+```r
+pbeta(0.5, a, b)
+```
+
+*(now:)* 
+```r
+mean(rbeta(1e6, a, b) < 0.5)
+```
+
+
+## How? Markov chain Monte Carlo!
+
+i.e., "random-walk-based stochastic integration"
+
+
+**Example:**
+Gibbs sampling for uniform distribution on a region.
+*(picture)*
+
+
+## Overview of MCMC
+
+Produces a random sequence of samples $\theta_1, \theta_2, \ldots, \theta_N$.
+
+0. Begin somewhere (at $\theta_1$).
+
+At each step, starting at $\theta_k$:
+
+1. **Propose** a new location (nearby?): $\theta_k'$
+
+2. Decide whether to **accept** it.
+
+    - if so: set $\theta_{k+1} \leftarrow \theta_k'$
+    - if not: set $\theta_{k+1} \leftarrow \theta_k$
+
+3. Set $k \leftarrow k+1$; if $k=N$ then stop.
+
+. . .
+
+The magic comes from doing *proposals* and *acceptance* 
+so that the $\theta$'s are samples from the distribution we want.
+
+## Key concepts
+
+- Rules are chosen so that $p(\theta \given D)$ is the *stationary* distribution
+  (long-run average!) of the random walk (the "Markov chain").
+
+- The chain must *mix* fast enough so the distribution of visited states
+  *converges* to $p(\theta \given D)$.
+
+- Because of *autocorrelation*, $(\theta_1, \theta_2, \ldots, \theta_N)$ 
+  are not $N$ independent samples:
+  they are roughly equivalent to $N_\text{eff} < N$ independent samples.
+
+- For better *mixing*, acceptance probabilities should not be too high or too low.
+
+- Starting *several chains* far apart can help diagnose failure to mix:
+  Gelman's $r$ ("shrink") quantifies how different they are.
+
+
+## On your feet
+
+Three people, with randomness provided by others:
+
+1. Pick a random $\{N,S,E,W\}$.
+
+2. Take a step in that direction,
+
+    * *unless* you'd run into a wall or a table.
+
+. . .
+
+**Question:** What distribution will this sample from?
+
+. . .
+
+Do this for 10 iterations. Have the *chains mixed*?
+
+
+-------------------
+
+
+**Now:**
+
+1. Pick a random $\{N,S,E,W\}$.
+
+2. Take a $1+\Poisson(5)$ number of steps in that direction,
+
+    * *unless* you'd run into a wall or a table.
+
+. . .
+
+Does it mix faster?
+
+. . .
+
+Would $1 + \Poisson(50)$ steps be better?
+
+
+## How it works
+
+Imagine the walkers are on a hill, and:
+
+1. Pick a random $\{N,S,E,W\}$.
+
+2. If 
+
+    * the step is *uphill*, then take it.
+    * the step is *downhill*, then flip a $p$-coin;
+      if you get Heads, stay were you are.
+
+
+What would *this* do?
+
+. . .
+
+Thanks to *Metropolis-Hastings*,
+if "elevation" is $p(\theta \given D)$, 
+then setting $p = p(\theta' \given D) / p(\theta \given D)$
+makes the stationary distribution $p(\theta \given D)$. 
+
+
+
+# MC Stan
+
+## "Quick and easy" MCMC: Stan
+
+![Stanislaw Ulam](stan.jpeg){height=10em}
+
+
+## The skeletal Stan program
+
+```
+data {
+    // stuff you input
+}
+transformed data {
+    // stuff that's calculated from the data (just once, at the start)
+}
+parameters {
+    // stuff you want to learn the posterior distribution of
+}
+transformed parameters {
+    // stuff that's calculated from the parameters (at every step)
+}
+model {
+    // the action!
+}
+generated quantities {
+    // stuff you want computed also along the way
+}
+```
+
+# Beta-Binomial with Stan
+
+## First, in words:
+
+We've flipped a coin 10 times and got 6 Heads.
+We think the coin is close to fair, so put a $\Beta(20,20)$ prior on
+it's probability of heads,
+and want the posterior distribution.
+
+$$\begin{aligned}
+    Z &\sim \Binom(10, \theta) \\
+    \theta &\sim \Beta(20, 20) 
+\end{aligned}$$
+Sample from $$\theta \given Z = 6$$
+
+-------------
+
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+$$\begin{aligned}
+    Z &\sim \Binom(10, \theta) \\
+    \theta &\sim \Beta(20, 20) 
+\end{aligned}$$
+
+Sample from $$\theta \given Z = 6$$
+
+:::
+::: {.column width="50%"}
+
+
+```
+data {
+    // stuff you input
+}
+parameters {
+    // stuff you want to learn 
+    // the posterior distribution of
+}
+model {
+    // the action!
+}
+```
+
+
+:::
+::::::::::::::
+
+
+
+-------------
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+$$\begin{aligned}
+    Z &\sim \Binom(10, \theta) \\
+    \theta &\sim \Beta(20, 20) 
+\end{aligned}$$
+
+Sample from $$\theta \given Z = 6$$
+
+:::
+::: {.column width="50%"}
+
+```
+data {
+    int N;   // number of flips
+    int Z;   // number of heads
+}
+parameters {
+    // stuff you want to learn 
+    // the posterior distribution of
+}
+model {
+    // the action!
+}
+```
+
+:::
+::::::::::::::
+
+-------------
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+$$\begin{aligned}
+    Z &\sim \Binom(10, \theta) \\
+    \theta &\sim \Beta(20, 20) 
+\end{aligned}$$
+
+Sample from $$\theta \given Z = 6$$
+
+:::
+::: {.column width="50%"}
+
+
+```
+data {
+    int N;   // number of flips
+    int Z;   // number of heads
+}
+parameters {
+    // probability of heads
+    real<lower=0,upper=1> theta;  
+}
+model {
+    // the action!
+}
+```
+
+
+:::
+::::::::::::::
+
+
+-------------
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+$$\begin{aligned}
+    Z &\sim \Binom(10, \theta) \\
+    \theta &\sim \Beta(20, 20) 
+\end{aligned}$$
+
+Sample from $$\theta \given Z = 6$$
+
+:::
+::: {.column width="50%"}
+
+
+```
+data {
+    int N;   // number of flips
+    int Z;   // number of heads
+}
+parameters {
+    // probability of heads
+    real<lower=0,upper=1> theta;
+}
+model {
+    Z ~ binomial(N, theta);
+    theta ~ beta(10, 10);
+}
+```
+
+:::
+::::::::::::::
+
+
+## Running the MCMC: rstan
+
+```{r stan_setup, include=FALSE}
+library(rstan)
+stan_block <- "
+data {
+    int N;   // number of flips
+    int Z;   // number of heads
+}
+parameters {
+    // probability of heads
+    real<lower=0,upper=1> theta;
+}
+model {
+    Z ~ binomial(N, theta);
+    theta ~ beta(10, 10);
+}
+"
+```
+
+
+```{r run_rstan, cache=TRUE}
+library(rstan)
+fit <- stan(model_code=stan_block,   # text from above
+            data=list(N=10, Z=6),
+            chains=3, iter=10000)
+
+```
+
+---------------
+
+`lp__` is the log posterior density.
+Note `n_eff`.
+
+```{r print_rstan}
+print(fit)
+```
+
+---------------
+
+Fuzzy caterpillars are good.
+
+```{r trace_rstan}
+stan_trace(fit)
+```
+
+---------------
+
+Stan uses ggplot2.
+
+```{r plot_rstan}
+stan_hist(fit)
+```
+
+---------------
+
+What's the posterior probability that $\theta < 0.5$?
+
+```{r results_rstan}
+samples <- extract(fit)
+mean(samples$theta < 0.5)
+
+# compare to analytic solution
+pbeta(0.5, shape1=10+6, shape2=10+4)
+```
+
+
+## Your turn!
+
+
+We've flipped a coin 100 times and got 23 Heads.
+We don't want the prior to affect our results,
+so put a $\Beta(1,1)$ prior on
+it's probability of heads,
+and want the posterior distribution.
+
+**Question:** What's the posterior probability that $\theta < 0.15$?
+
+
+# Stochastic minute
+
+## Exponential, and Gamma
+
+If $T \sim \Exp(\text{rate}=\lambda)$, then
+
+$$\begin{aligned}
+   \P\{ T \in dt \} = \lambda e^{-\lambda t} dt .
+\end{aligned}$$
+
+1. $T$ can be any nonnegative real number.
+
+2. $T$ is *memoryless*: 
+   $$\begin{aligned}
+        \P\{ T > x + y \given T > x \} = \P\{ T > y \} .
+   \end{aligned}$$
+
+3. A machine produces $n$ widgets per second;
+   each widget has probability $\lambda/n$ of being broken.
+   The time until the first broken widget appears (in seconds)
+   is approximately $\sim \Exp(\lambda)$.
+
+---------------------
+
+If $S \sim \Gam(\text{shape}=\alpha, \text{rate}=\lambda)$, then
+
+$$\begin{aligned}
+   \P\{ S \in dt \} = \frac{\alpha^\lambda}{\Gamma(\alpha)} t^{\alpha - 1} e^{-\lambda t} dt .
+\end{aligned}$$
+
+1. If $T_1, \ldots, T_k$ are independent $\Exp(\lambda)$, then
+   $S = T_1 + \cdots + T_k$ is $\Gam(k, \lambda)$.
+
+
+2. A machine produces $n$ widgets per second;
+   each widget has probability $\lambda/n$ of being broken.
+   The time until the $k^\text{th}$ broken widget appears (in seconds)
+   is approximately $\sim \Gam(k, \lambda)$.
+
+
+# Hierarchical Coins with Stan
+
+##  Online example
+
+Suppose now we have data from $n$ different coins from the same source.
+We don't assume they have the *same* $\theta$,
+but don't know what it's distribution is,
+so try to *learn* it.
+
+$$\begin{aligned}
+    Z_i &\sim \Binom(N_i, \theta_i) \\
+    \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
+    \omega &\sim \Beta(1, 1) \\
+    \kappa &\sim \Gamma(0.1, 0.1)
+\end{aligned}$$
+
+*note:* The "mode" and "concentration" are related to the shape parameters by:
+$\alpha = \omega (\kappa - 2) + 1$
+and
+$\beta = (1 - \omega) (\kappa - 2) + 1$.
+
+
+## Outline
+
+1. Simulate fake data, where we know the real answer.
+
+2. Set up a model with Stan and sample from the posterior.
+
+3. How well can we estimate $\omega$ and $\kappa$?
+
+4. How well can we estimate each $\theta_i$?
+
+5. Compare to the MLE.
+
+6. How does sample size affect inference?
+
+
+# Sharing power
+
+## Example
+
+Suppose that I have a large pot of coins
+that are all similar to each other.
+I flip each one ten times, and record the number of Heads.
+What is *each coin's* probability of Heads?
+
+- Treated *separately*,
+  we would be very uncertain about each coin.
+
+- Together, they should tell us very accurately 
+  what the *likely* values of $\theta$ are.
+
+- This information can improve the estimate of each separate $\theta$.
+
+
+. . .
+
+In the **example**,
+
+7. How much does sharing power improve the estimation accuracy of each $\theta_i$?
