@@ -22,7 +22,7 @@ Week 1 (*1/9*)
 
 Week 2 (*1/16*)
 
-: Introduction to MCMC and Stan for sampling from posterior distributions,
+: [(slides)](slides/week_2.slides.html) Introduction to MCMC and Stan for sampling from posterior distributions,
     hierarchical models for binary responses, shrinkage.
     **(K ch. 7, 9 and Intro to Stan)** 
 
