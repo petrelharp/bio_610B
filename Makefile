@@ -20,7 +20,7 @@ else
 endif
 
 # may want to add "--self-contained" to the following
-PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone --self-contained
+PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone
 # optionally add in a latex file with macros
 LATEX_MACROS = macros.tex
 ifeq ($(wildcard $(LATEX_MACROS)),)
@@ -30,7 +30,7 @@ else
 endif
 
 .pandoc.$(LATEX_MACROS) : $(LATEX_MACROS)
-	(echo '\['; cat $(LATEX_MACROS); echo '\]') > $@
+	(echo '<div style="display: none">'; echo '\['; cat $(LATEX_MACROS); echo '\]'; echo '</div>') > $@
 
 # knitr by default tries to interpret ANY code chunk; I only want it to do the ones beginning with ```r.
 KNITR_PATTERNS = list( chunk.begin="^```+\\s*\\{[.]?(r[a-zA-Z]*.*)\\}\\s*$$", chunk.end="^```+\\s*$$", inline.code="`r +([^`]+)\\s*`")
