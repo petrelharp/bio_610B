@@ -10,6 +10,8 @@ knitr::opts_chunk$set(fig.width=2*fig.dim,
                       fig.height=fig.dim,
                       fig.align='center')
 set.seed(23)
+library(tidyverse)
+library(rstan)
 ```
 
 ## Outline
@@ -624,44 +626,135 @@ $$\begin{aligned}
    is approximately $\sim \Gam(k, \lambda)$.
 
 
-# Hierarchical Coins with Stan
+# "Hierarchical Coins" with Stan
 
-##  Online example
+## Baseball
 
-Suppose now we have data from $n$ different coins from the same source.
-We don't assume they have the *same* $\theta$,
-but don't know what it's distribution is,
-so try to *learn* it.
+We have [a dataset](../demos/BattingAverage.csv) of batting averages of baseball players,
+having
+
+1. name
+2. position
+3. number of "at bats"
+4. number of hits
+
+
+```{r basedata}
+batting <- read.csv("../demos/BattingAverage.csv", header=TRUE)
+head(batting)
+```
+
+------------------------
+
+The *overall* batting average of the `r nrow(batting)` players is `r sum(batting$Hits)/sum(batting$AtBats)`.
+
+Here is the average by position.
+```{r by_pos}
+batting %>% group_by(PriPos) %>% 
+    summarise(num=n(), BatAvg=sum(Hits)/sum(AtBats)) %>% 
+    select(PriPos, num, BatAvg)
+```
+
+## Questions?
+
+1. What's the overall batting average?
+
+2. Do some positions tend to be better batters?
+
+3. How much variation is there?
+
+
+## Everyone is the same
+
+```{r start, cache=TRUE}
+first_model <- "
+data {
+    int N;
+    int hits[N];
+    int at_bats[N];
+}
+parameters {
+    real<lower=0, upper=1> theta;
+}
+model {
+    hits ~ binomial(at_bats, theta);
+    theta ~ beta(1, 1);
+} "
+first_fit <- stan(model_code=first_model, chains=3, iter=1000,
+                  data=list(N=nrow(batting),
+                            hits=batting$Hits,
+                            at_bats=batting$AtBats))
+```
+
+-----------------
+
+```{r start_res}
+stan_hist(first_fit)
+```
+
+## Every pitcher is the same
+
+```{r pos_model, cache=TRUE}
+pos_model <- "
+data {
+    int N;
+    int hits[N];
+    int at_bats[N];
+    int npos; // number of positions
+    int position[N];
+}
+parameters {
+    real<lower=0, upper=1> theta[npos];
+}
+model {
+    real theta_vec[N];
+    for (k in 1:N) {
+        theta_vec[k] = theta[position[k]];
+    }
+    hits ~ binomial(at_bats, theta_vec);
+    theta ~ beta(1, 1);
+} "
+pos_fit <- stan(model_code=pos_model, chains=3, iter=1000,
+                  data=list(N=nrow(batting),
+                            hits=batting$Hits,
+                            at_bats=batting$AtBats,
+                            npos=nlevels(batting$PriPos),
+                            position=as.numeric(batting$PriPos)))
+```
+
+-----------------
+
+```{r pos_res, fig.width=3*fig.dim, fig.height=2*fig.dim}
+theta_samples <- extract(pos_fit)$theta
+layout(matrix(1:9, nrow=3))
+for (k in 1:ncol(theta_samples)) {
+    hist(theta_samples[,k], main=levels(batting$PriPos)[k], xlim=c(0.1, 0.3),
+         col=adjustcolor('red',0.6), xlab='batting avg', freq=FALSE)
+}
+```
+
+
+
+## Your turn : Every individual different
 
 $$\begin{aligned}
     Z_i &\sim \Binom(N_i, \theta_i) \\
-    \theta_i &\sim \Beta(\text{mode}=\omega, \text{conc}=\kappa) \\
-    \omega &\sim \Beta(1, 1) \\
-    \kappa &\sim \Gam(0.1, 0.1)
+    \theta_i &\sim \Beta(\omega_{p_i}, \kappa_{p_i}) \\
+    \omega_p &\sim \Beta(1, 1) \\
+    \kappa_p &\sim \Gam(0.1, 0.1) .
 \end{aligned}$$
 
-*note:* The "mode" and "concentration" are related to the shape parameters by:
-$\alpha = \omega (\kappa - 2) + 1$
-and
-$\beta = (1 - \omega) (\kappa - 2) + 1$.
+
+## What questions can we ask?
+
+1. 
+
+2. 
+
+3. 
 
 
-## Outline
-
-1. Simulate fake data, where we know the real answer.
-
-2. Set up a model with Stan and sample from the posterior.
-
-3. How well can we estimate $\omega$ and $\kappa$?
-
-4. How well can we estimate each $\theta_i$?
-
-5. Compare to the MLE.
-
-6. How does sample size affect inference?
-
-
-# Sharing power
+# Sharing power // Shrinkage
 
 ## Example
 
@@ -681,6 +774,5 @@ What is *each coin's* probability of Heads?
 
 . . .
 
-In the **example**,
 
-7. How much does sharing power improve the estimation accuracy of each $\theta_i$?
+How does shrinkage affect the baseball inference?
