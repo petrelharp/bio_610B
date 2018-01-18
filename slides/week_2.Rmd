@@ -772,13 +772,57 @@ vector[10] w[10];  // ten length 10 vectors
 ::::::::::::::
 
 
+------------
+
+```{r stan_model}
+pos_model <- "
+data {
+    int N;   // number of players
+    int hits[N];
+    int at_bats[N];
+    int npos; // number of positions
+    int position[N];
+}
+parameters {
+    real<lower=0, upper=1> theta[N];
+    real<lower=0, upper=1> omega[npos];
+    real<lower=0> kappa[npos];
+}
+model {
+    real alpha[N];
+    real beta[N];
+    for (i in 1:N) {
+        alpha[i] = omega[position[i]] * kappa[position[i]];
+        beta[i] = (1 - omega[position[i]]) * kappa[position[i]];
+    }
+    hits ~ binomial(at_bats, theta);
+    for (i in 1:N) {
+        theta[i] ~ beta(alpha[i], beta[i]);
+    }
+    omega ~ beta(1,1);
+    kappa ~ gamma(0.1,0.1);
+} "
+```
+
+---------------
+
+
+```{r run_stan, cache=TRUE}
+pos_fit <- stan(model_code=pos_model, chains=3, iter=1000,
+                  data=list(N=nrow(batting),
+                            hits=batting$Hits,
+                            at_bats=batting$AtBats,
+                            npos=nlevels(batting$PriPos),
+                            position=as.numeric(batting$PriPos)))
+```
+
+
+
+
+
 ## What questions can we ask?
 
-1. 
-
-2. 
-
-3. 
+(discussion / see Kruschke Ch. 9)
 
 
 # Sharing power // Shrinkage

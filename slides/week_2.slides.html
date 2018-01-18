@@ -2405,13 +2405,120 @@ vector[10] w[10];  // ten length 10 vectors</code></pre>
 </ul>
 </div>
 </div>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">pos_model &lt;-<span class="st"> &quot;</span></a>
+<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="st">data {</span></a>
+<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="st">    int N;   // number of players</span></a>
+<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="st">    int hits[N];</span></a>
+<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="st">    int at_bats[N];</span></a>
+<a class="sourceLine" id="cb32-6" data-line-number="6"><span class="st">    int npos; // number of positions</span></a>
+<a class="sourceLine" id="cb32-7" data-line-number="7"><span class="st">    int position[N];</span></a>
+<a class="sourceLine" id="cb32-8" data-line-number="8"><span class="st">}</span></a>
+<a class="sourceLine" id="cb32-9" data-line-number="9"><span class="st">parameters {</span></a>
+<a class="sourceLine" id="cb32-10" data-line-number="10"><span class="st">    real&lt;lower=0, upper=1&gt; theta[N];</span></a>
+<a class="sourceLine" id="cb32-11" data-line-number="11"><span class="st">    real&lt;lower=0, upper=1&gt; omega[npos];</span></a>
+<a class="sourceLine" id="cb32-12" data-line-number="12"><span class="st">    real&lt;lower=0&gt; kappa[npos];</span></a>
+<a class="sourceLine" id="cb32-13" data-line-number="13"><span class="st">}</span></a>
+<a class="sourceLine" id="cb32-14" data-line-number="14"><span class="st">model {</span></a>
+<a class="sourceLine" id="cb32-15" data-line-number="15"><span class="st">    real alpha[N];</span></a>
+<a class="sourceLine" id="cb32-16" data-line-number="16"><span class="st">    real beta[N];</span></a>
+<a class="sourceLine" id="cb32-17" data-line-number="17"><span class="st">    for (i in 1:N) {</span></a>
+<a class="sourceLine" id="cb32-18" data-line-number="18"><span class="st">        alpha[i] = omega[position[i]] * kappa[position[i]];</span></a>
+<a class="sourceLine" id="cb32-19" data-line-number="19"><span class="st">        beta[i] = (1 - omega[position[i]]) * kappa[position[i]];</span></a>
+<a class="sourceLine" id="cb32-20" data-line-number="20"><span class="st">    }</span></a>
+<a class="sourceLine" id="cb32-21" data-line-number="21"><span class="st">    hits ~ binomial(at_bats, theta);</span></a>
+<a class="sourceLine" id="cb32-22" data-line-number="22"><span class="st">    for (i in 1:N) {</span></a>
+<a class="sourceLine" id="cb32-23" data-line-number="23"><span class="st">        theta[i] ~ beta(alpha[i], beta[i]);</span></a>
+<a class="sourceLine" id="cb32-24" data-line-number="24"><span class="st">    }</span></a>
+<a class="sourceLine" id="cb32-25" data-line-number="25"><span class="st">    omega ~ beta(1,1);</span></a>
+<a class="sourceLine" id="cb32-26" data-line-number="26"><span class="st">    kappa ~ gamma(0.1,0.1);</span></a>
+<a class="sourceLine" id="cb32-27" data-line-number="27"><span class="st">} &quot;</span></a></code></pre></div>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">pos_fit &lt;-<span class="st"> </span><span class="kw">stan</span>(<span class="dt">model_code=</span>pos_model, <span class="dt">chains=</span><span class="dv">3</span>, <span class="dt">iter=</span><span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2">                  <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span><span class="kw">nrow</span>(batting),</a>
+<a class="sourceLine" id="cb33-3" data-line-number="3">                            <span class="dt">hits=</span>batting<span class="op">$</span>Hits,</a>
+<a class="sourceLine" id="cb33-4" data-line-number="4">                            <span class="dt">at_bats=</span>batting<span class="op">$</span>AtBats,</a>
+<a class="sourceLine" id="cb33-5" data-line-number="5">                            <span class="dt">npos=</span><span class="kw">nlevels</span>(batting<span class="op">$</span>PriPos),</a>
+<a class="sourceLine" id="cb33-6" data-line-number="6">                            <span class="dt">position=</span><span class="kw">as.numeric</span>(batting<span class="op">$</span>PriPos)))</a></code></pre></div>
+<pre><code>## 
+## SAMPLING FOR MODEL '2932a88214bc55d6ecc7d82d54192dca' NOW (CHAIN 1).
+## 
+## Gradient evaluation took 0.000907 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 9.07 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:   1 / 1000 [  0%]  (Warmup)
+## Iteration: 100 / 1000 [ 10%]  (Warmup)
+## Iteration: 200 / 1000 [ 20%]  (Warmup)
+## Iteration: 300 / 1000 [ 30%]  (Warmup)
+## Iteration: 400 / 1000 [ 40%]  (Warmup)
+## Iteration: 500 / 1000 [ 50%]  (Warmup)
+## Iteration: 501 / 1000 [ 50%]  (Sampling)
+## Iteration: 600 / 1000 [ 60%]  (Sampling)
+## Iteration: 700 / 1000 [ 70%]  (Sampling)
+## Iteration: 800 / 1000 [ 80%]  (Sampling)
+## Iteration: 900 / 1000 [ 90%]  (Sampling)
+## Iteration: 1000 / 1000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 48.7161 seconds (Warm-up)
+##                17.2383 seconds (Sampling)
+##                65.9545 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL '2932a88214bc55d6ecc7d82d54192dca' NOW (CHAIN 2).
+## 
+## Gradient evaluation took 0.000914 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 9.14 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:   1 / 1000 [  0%]  (Warmup)
+## Iteration: 100 / 1000 [ 10%]  (Warmup)
+## Iteration: 200 / 1000 [ 20%]  (Warmup)
+## Iteration: 300 / 1000 [ 30%]  (Warmup)
+## Iteration: 400 / 1000 [ 40%]  (Warmup)
+## Iteration: 500 / 1000 [ 50%]  (Warmup)
+## Iteration: 501 / 1000 [ 50%]  (Sampling)
+## Iteration: 600 / 1000 [ 60%]  (Sampling)
+## Iteration: 700 / 1000 [ 70%]  (Sampling)
+## Iteration: 800 / 1000 [ 80%]  (Sampling)
+## Iteration: 900 / 1000 [ 90%]  (Sampling)
+## Iteration: 1000 / 1000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 54.066 seconds (Warm-up)
+##                13.8432 seconds (Sampling)
+##                67.9092 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL '2932a88214bc55d6ecc7d82d54192dca' NOW (CHAIN 3).
+## 
+## Gradient evaluation took 0.000591 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 5.91 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:   1 / 1000 [  0%]  (Warmup)
+## Iteration: 100 / 1000 [ 10%]  (Warmup)
+## Iteration: 200 / 1000 [ 20%]  (Warmup)
+## Iteration: 300 / 1000 [ 30%]  (Warmup)
+## Iteration: 400 / 1000 [ 40%]  (Warmup)
+## Iteration: 500 / 1000 [ 50%]  (Warmup)
+## Iteration: 501 / 1000 [ 50%]  (Sampling)
+## Iteration: 600 / 1000 [ 60%]  (Sampling)
+## Iteration: 700 / 1000 [ 70%]  (Sampling)
+## Iteration: 800 / 1000 [ 80%]  (Sampling)
+## Iteration: 900 / 1000 [ 90%]  (Sampling)
+## Iteration: 1000 / 1000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 48.9429 seconds (Warm-up)
+##                13.0577 seconds (Sampling)
+##                62.0005 seconds (Total)</code></pre>
 </section><section id="what-questions-can-we-ask" class="slide level2">
 <h2>What questions can we ask?</h2>
-<ol type="1">
-<li></li>
-<li></li>
-<li></li>
-</ol>
+<p>(discussion / see Kruschke Ch. 9)</p>
 </section></section>
 <section><section id="sharing-power-shrinkage" class="title-slide slide level1"><h1>Sharing power // Shrinkage</h1></section><section id="example" class="slide level2">
 <h2>Example</h2>
