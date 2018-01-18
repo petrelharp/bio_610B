@@ -735,7 +735,12 @@ for (k in 1:ncol(theta_samples)) {
 
 
 
-## Your turn : Every individual different
+## Your turn : 
+
+Every individual different:
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
 
 $$\begin{aligned}
     Z_i &\sim \Binom(N_i, \theta_i) \\
@@ -743,6 +748,28 @@ $$\begin{aligned}
     \omega_p &\sim \Beta(1, 1) \\
     \kappa_p &\sim \Gam(0.1, 0.1) .
 \end{aligned}$$
+
+::::::::::::::
+::: {.column width="50%"}
+
+Variable types in Stan:
+```
+int x;       // an integer
+int y[10];   // ten integers
+real z;      // a number
+real z[2,5]; // a 2x5 array of numbers
+
+vector u[10];      // length 10 vector
+matrix v[10,10];   // 10x10 matrix
+vector[10] w[10];  // ten length 10 vectors
+```
+
+* don't forget the `;`
+* make sure R types match
+* read the error messages
+
+:::
+::::::::::::::
 
 
 ## What questions can we ask?
