@@ -21,7 +21,7 @@ but rather characterizing the error, and what it depends on.
 To keep the amount of data reasonable,
 I've extracted read count data from the mitochondria
 and from some mitochondria-sized regions of the nuclear DNA (on Chromosome 21).
-These are available in these four files:
+These are available in these files:
 
 - [Altai Neanderthal](data/altai.counts.gz)
 - [Denisovan](data/denisova.counts.gz)
