@@ -20,7 +20,7 @@ else
 endif
 
 # may want to add "--self-contained" to the following
-PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone
+PANDOC_OPTS = --mathjax=$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML --standalone --self-contained
 # optionally add in a latex file with macros
 LATEX_MACROS = macros.tex
 ifeq ($(wildcard $(LATEX_MACROS)),)
