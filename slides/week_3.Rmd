@@ -36,7 +36,7 @@ options(mc.cores = parallel::detectCores())
 
 
 :::::::::::::: {.columns}
-::: {.column width="50%"}
+::: {.column width="60%"}
 
 $$\begin{aligned}
     Z_i &\sim \Binom(N_i, \theta_i) \\
@@ -46,7 +46,7 @@ $$\begin{aligned}
 \end{aligned}$$
 
 ::::::::::::::
-::: {.column width="50%"}
+::: {.column width="40%"}
 
 
 ```{r stan_model}
@@ -60,21 +60,19 @@ data {
 }
 parameters {
     real<lower=0, upper=1> theta[N];
-    real<lower=0, upper=1> omega[npos];
+    real<lower=0, upper=1> mu[npos];
     real<lower=0> kappa[npos];
 }
 model {
-    real alpha[N];
-    real beta[N];
-    for (i in 1:N) {
-        alpha[i] = omega[position[i]] * kappa[position[i]];
-        beta[i] = (1 - omega[position[i]]) * kappa[position[i]];
-    }
+    real alpha;
+    real beta;
     hits ~ binomial(at_bats, theta);
     for (i in 1:N) {
-        theta[i] ~ beta(alpha[i], beta[i]);
+        alpha = mu[position[i]] * kappa[position[i]];
+        beta = (1 - mu[position[i]]) * kappa[position[i]];
+        theta[i] ~ beta(alpha, beta);
     }
-    omega ~ beta(1,1);
+    mu ~ beta(1,1);
     kappa ~ gamma(0.1,0.1);
 } "
 ```
@@ -91,16 +89,16 @@ model {
 batting <- read.csv("BattingAverage.csv", header=TRUE)
 system.time(pos_fit <- stan(model_code=pos_model, chains=3, iter=100,
                             data=list(N=nrow(batting),
-                               hits=batting$Hits,
-                               at_bats=batting$AtBats,
-                               npos=nlevels(batting$PriPos),
-                               position=as.numeric(batting$PriPos))))
+                                      hits=batting$Hits,
+                                      at_bats=batting$AtBats,
+                                      npos=nlevels(batting$PriPos),
+                                      position=as.numeric(batting$PriPos))))
 ```
 
 ## Diagnostics
 
 ```{r print_fit}
-print(pos_fit, pars=c("omega", "kappa"))
+print(pos_fit, pars=c("mu", "kappa"))
 ```
 
 ----------------
@@ -108,7 +106,7 @@ print(pos_fit, pars=c("omega", "kappa"))
 Is it mixing?
 
 ```{r plot_trace}
-stan_trace(pos_fit, pars="omega")
+stan_trace(pos_fit, pars="mu")
 ```
 
 
@@ -118,16 +116,16 @@ stan_trace(pos_fit, pars="omega")
 system.time(pos_fit <- stan(model_code=pos_model, chains=3, iter=1000,
                             control=list(max_treedepth=15),
                             data=list(N=nrow(batting),
-                               hits=batting$Hits,
-                               at_bats=batting$AtBats,
-                               npos=nlevels(batting$PriPos),
-                               position=as.numeric(batting$PriPos))))
+                                      hits=batting$Hits,
+                                      at_bats=batting$AtBats,
+                                      npos=nlevels(batting$PriPos),
+                                      position=as.numeric(batting$PriPos))))
 ```
 
 -------------
 
 ```{r print_fit_again}
-print(pos_fit, pars=c("omega", "kappa"))
+print(pos_fit, pars=c("mu", "kappa"))
 ```
 
 
@@ -136,7 +134,7 @@ print(pos_fit, pars=c("omega", "kappa"))
 Is it mixing?
 
 ```{r plot_trace_again}
-stan_trace(pos_fit, pars="omega")
+stan_trace(pos_fit, pars="mu")
 ```
 
 -------------
@@ -148,20 +146,20 @@ stan_trace(pos_fit, pars="kappa")
 ## Let's look at the results!
 
 ```{r first_hist}
-stan_hist(pos_fit, pars="omega", bins=30) + xlim(0, 0.4)
+stan_hist(pos_fit, pars="mu", bins=30) + xlim(0, 0.4)
 ```
 
 -----------
 
 I like labels.
 
-```{r plot_omega}
+```{r plot_mu}
 param_samples <- extract(pos_fit)
 layout(matrix(1:9, ncol=3))
 par(mar=c(4,3,1,1)+.1)
 for (k in 1:9) {
-    hist(param_samples$omega[,k], main=levels(batting$PriPos)[k],
-         xlim=c(0, 0.4), xlab='batting average', ylab=expression(omega))
+    hist(param_samples$mu[,k], main=levels(batting$PriPos)[k],
+         xlim=c(0, 0.4), xlab='batting average', ylab=expression(mu))
 }
 ```
 
@@ -182,7 +180,7 @@ for (k in 1:9) {
 About
 $$\begin{aligned}
     \theta_i &: \text{individual $i$ batting averages} \\
-    \omega_p &: \text{position $p$ mean batting averages} \\
+    \mu &: \text{position $p$ mean batting averages} \\
     \kappa_p &: \text{position $p$ variability of batting averages}
 \end{aligned}$$
 
@@ -226,6 +224,22 @@ that looks like the baseball data.
 3. How wide are credible intervals, typically?
 
     This is (one kind of) **statistical power.** 
+
+
+# Posterior predictive sampling
+
+## How to choose parameter values for simulation?
+
+It depends, but one good choice is
+*from the posterior distribution* -
+then you can see how the model behaves
+with data close to the real data.
+
+This is known as **posterior predictive sampling**.
+
+---------------------------
+
+![Kruschke figure 13.2: posterior predictive sampilng](post_pred_kruschke.png)
 
 
 # Stochastic minute
@@ -311,7 +325,7 @@ How does the information about their position affect our inference about their b
 batting$post_med <- matrixStats::colMedians(param_samples$theta)
 batting$post_Q1 <- matrixStats::colQuantiles(param_samples$theta, probs=0.25)
 batting$post_Q3 <- matrixStats::colQuantiles(param_samples$theta, probs=0.75)
-pos_means <- colMeans(param_samples$omega)
+pos_means <- colMeans(param_samples$mu)
 names(pos_means) <- levels(batting$PriPos)
 pos_means
 ```

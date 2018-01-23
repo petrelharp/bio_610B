@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Peter Ralph">
+  <title>Simulation, power, and logistic regression</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <style type="text/css">
+  
+  .reveal { font-size: 30px; }
+  
+  .reveal h1 { font-size: 1.5em; } 
+  
+  .reveal h2 { font-size: 1.2em; } 
+  
+  .reveal .slides { text-align: left; }
+  
+  .reveal .slides figure { text-align: center; }
+  
+  .reveal figcaption { display: none; }
+  
+  </style>
+  <div style="display: none">
+  \[
+  %%
+  % Add your macros here; they'll be included in pdf and html output.
+  %%
+  
+  \newcommand{\R}{\mathbb{R}}    % reals
+  \newcommand{\E}{\mathbb{E}}    % expectation
+  \renewcommand{\P}{\mathbb{P}}  % probability
+  \DeclareMathOperator{\sd}{sd}
+  \DeclareMathOperator{\var}{var}
+  \DeclareMathOperator{\Normal}{Normal}
+  \DeclareMathOperator{\Poisson}{Poisson}
+  \DeclareMathOperator{\Beta}{Beta}
+  \DeclareMathOperator{\Binom}{Binomial}
+  \DeclareMathOperator{\Gam}{Gamma}
+  \DeclareMathOperator{\Exp}{Exponential}
+  
+  
+  \newcommand{\given}{\;\vert\;}
+  \]
+  </div>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Simulation, power, and logistic regression</h1>
+  <p class="author">Peter Ralph</p>
+  <p class="date">22 January 2018 – Advanced Biological Statistics</p>
+</section>
+
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ol type="1">
+<li><p>Uses of simulation</p></li>
+<li><p>… applied to the hierarchical model.</p></li>
+<li><p>Posterior predictive sampling.</p></li>
+<li><p>Shrinkage: sharing information</p></li>
+<li><p>Predicting binary outcomes from quantitative variables: Bayesian logistic regression</p></li>
+</ol>
+</section>
+<section><section id="back-to-baseball" class="title-slide slide level1"><h1>Back to baseball</h1></section><section id="from-last-time" class="slide level2">
+<h2>From last time:</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><span class="math display">\[\begin{aligned}
+    Z_i &amp;\sim \Binom(N_i, \theta_i) \\
+    \theta_i &amp;\sim \Beta(\mu_{p_i} \kappa_{p_i}, (1-\mu_{p_i})\kappa_{p_i}) \\
+    \mu &amp;\sim \Beta(1, 1) \\
+    \kappa_p &amp;\sim \Gam(0.1, 0.1) .
+\end{aligned}\]</span></p>
+</div><div class="column" style="width:50%;">
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">pos_model &lt;-<span class="st"> &quot;</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="st">data {</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="st">    int N;   // number of players</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="st">    int hits[N];</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="st">    int at_bats[N];</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="st">    int npos; // number of positions</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="st">    int position[N];</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="st">}</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="st">parameters {</span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="st">    real&lt;lower=0, upper=1&gt; theta[N];</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="st">    real&lt;lower=0, upper=1&gt; omega[npos];</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="st">    real&lt;lower=0&gt; kappa[npos];</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="st">}</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="st">model {</span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="st">    real alpha[N];</span></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="st">    real beta[N];</span></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="st">    for (i in 1:N) {</span></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="st">        alpha[i] = omega[position[i]] * kappa[position[i]];</span></a>
+<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="st">        beta[i] = (1 - omega[position[i]]) * kappa[position[i]];</span></a>
+<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="st">    }</span></a>
+<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="st">    hits ~ binomial(at_bats, theta);</span></a>
+<a class="sourceLine" id="cb1-22" data-line-number="22"><span class="st">    for (i in 1:N) {</span></a>
+<a class="sourceLine" id="cb1-23" data-line-number="23"><span class="st">        theta[i] ~ beta(alpha[i], beta[i]);</span></a>
+<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="st">    }</span></a>
+<a class="sourceLine" id="cb1-25" data-line-number="25"><span class="st">    omega ~ beta(1,1);</span></a>
+<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="st">    kappa ~ gamma(0.1,0.1);</span></a>
+<a class="sourceLine" id="cb1-27" data-line-number="27"><span class="st">} &quot;</span></a></code></pre></div>
+</div>
+</div>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">batting &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;BattingAverage.csv&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">system.time</span>(pos_fit &lt;-<span class="st"> </span><span class="kw">stan</span>(<span class="dt">model_code=</span>pos_model, <span class="dt">chains=</span><span class="dv">3</span>, <span class="dt">iter=</span><span class="dv">100</span>,</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">                            <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span><span class="kw">nrow</span>(batting),</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">                               <span class="dt">hits=</span>batting<span class="op">$</span>Hits,</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">                               <span class="dt">at_bats=</span>batting<span class="op">$</span>AtBats,</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">                               <span class="dt">npos=</span><span class="kw">nlevels</span>(batting<span class="op">$</span>PriPos),</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">                               <span class="dt">position=</span><span class="kw">as.numeric</span>(batting<span class="op">$</span>PriPos))))</a></code></pre></div>
+<pre><code>##    user  system elapsed 
+##  80.356   1.003  65.087</code></pre>
+</section><section id="diagnostics" class="slide level2">
+<h2>Diagnostics</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">print</span>(pos_fit, <span class="dt">pars=</span><span class="kw">c</span>(<span class="st">&quot;omega&quot;</span>, <span class="st">&quot;kappa&quot;</span>))</a></code></pre></div>
+<pre><code>## Inference for Stan model: 2932a88214bc55d6ecc7d82d54192dca.
+## 3 chains, each with iter=100; warmup=50; thin=1; 
+## post-warmup draws per chain=50, total post-warmup draws=150.
+## 
+##            mean se_mean    sd  2.5%    25%    50%    75%  97.5% n_eff Rhat
+## omega[1]   0.25    0.00  0.01  0.24   0.25   0.25   0.26   0.26   150 0.99
+## omega[2]   0.25    0.00  0.01  0.24   0.25   0.25   0.25   0.26   150 1.01
+## omega[3]   0.26    0.00  0.01  0.24   0.25   0.26   0.26   0.27   150 0.99
+## omega[4]   0.24    0.00  0.01  0.23   0.24   0.24   0.24   0.25   150 1.00
+## omega[5]   0.26    0.00  0.01  0.25   0.25   0.26   0.26   0.27   150 1.01
+## omega[6]   0.25    0.00  0.01  0.24   0.25   0.25   0.25   0.26   150 0.98
+## omega[7]   0.13    0.00  0.01  0.12   0.13   0.13   0.13   0.15    32 1.09
+## omega[8]   0.26    0.00  0.01  0.25   0.25   0.26   0.26   0.27   150 1.00
+## omega[9]   0.25    0.00  0.01  0.23   0.24   0.25   0.25   0.26   143 0.99
+## kappa[1] 108.37    1.88 23.05 67.67  93.56 107.63 122.63 158.14   150 1.04
+## kappa[2] 104.02    1.76 21.53 67.90  88.54 100.81 118.35 158.38   150 0.99
+## kappa[3] 100.08    1.77 21.70 60.05  85.40  99.20 112.81 148.72   150 0.99
+## kappa[4]  93.96    2.68 18.69 60.14  80.98  93.51 105.65 134.80    49 1.04
+## kappa[5] 100.10    2.87 23.01 66.84  85.37  95.12 113.20 157.17    64 1.00
+## kappa[6] 109.72    1.85 20.04 74.22  97.73 108.44 121.05 151.00   117 0.99
+## kappa[7]  58.73    7.73 15.33 36.00  47.45  58.14  67.02  93.41     4 1.24
+## kappa[8] 117.57    2.09 25.64 74.24 100.18 114.65 132.04 170.47   150 1.03
+## kappa[9]  90.86    2.18 24.45 53.10  72.15  89.07 102.94 147.77   125 1.02
+## 
+## Samples were drawn using NUTS(diag_e) at Mon Jan 22 22:22:42 2018.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+</section><section class="slide level2">
+
+<p>Is it mixing?</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">stan_trace</span>(pos_fit, <span class="dt">pars=</span><span class="st">&quot;omega&quot;</span>)</a></code></pre></div>
+<p><img src="figure/week_3/plot_trace-1.png" title="plot of chunk plot_trace" alt="plot of chunk plot_trace" style="display: block; margin: auto;" /></p>
+</section><section id="run-longer" class="slide level2">
+<h2>Run longer!</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">system.time</span>(pos_fit &lt;-<span class="st"> </span><span class="kw">stan</span>(<span class="dt">model_code=</span>pos_model, <span class="dt">chains=</span><span class="dv">3</span>, <span class="dt">iter=</span><span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">                            <span class="dt">control=</span><span class="kw">list</span>(<span class="dt">max_treedepth=</span><span class="dv">15</span>),</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">                            <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span><span class="kw">nrow</span>(batting),</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">                               <span class="dt">hits=</span>batting<span class="op">$</span>Hits,</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">                               <span class="dt">at_bats=</span>batting<span class="op">$</span>AtBats,</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">                               <span class="dt">npos=</span><span class="kw">nlevels</span>(batting<span class="op">$</span>PriPos),</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">                               <span class="dt">position=</span><span class="kw">as.numeric</span>(batting<span class="op">$</span>PriPos))))</a></code></pre></div>
+<pre><code>## recompiling to avoid crashing R session</code></pre>
+<pre><code>##    user  system elapsed 
+## 634.574   1.164 499.815</code></pre>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">print</span>(pos_fit, <span class="dt">pars=</span><span class="kw">c</span>(<span class="st">&quot;omega&quot;</span>, <span class="st">&quot;kappa&quot;</span>))</a></code></pre></div>
+<pre><code>## Inference for Stan model: 2932a88214bc55d6ecc7d82d54192dca.
+## 3 chains, each with iter=1000; warmup=500; thin=1; 
+## post-warmup draws per chain=500, total post-warmup draws=1500.
+## 
+##            mean se_mean    sd  2.5%    25%    50%    75%  97.5% n_eff Rhat
+## omega[1]   0.25    0.00  0.01  0.24   0.25   0.25   0.26   0.26  1069 1.00
+## omega[2]   0.25    0.00  0.01  0.24   0.24   0.25   0.25   0.26   848 1.00
+## omega[3]   0.26    0.00  0.01  0.24   0.25   0.26   0.26   0.27  1032 1.00
+## omega[4]   0.24    0.00  0.01  0.23   0.23   0.24   0.24   0.25   622 1.00
+## omega[5]   0.26    0.00  0.01  0.24   0.25   0.26   0.26   0.27   725 1.00
+## omega[6]   0.25    0.00  0.01  0.24   0.25   0.25   0.25   0.26   725 1.00
+## omega[7]   0.13    0.00  0.01  0.12   0.12   0.13   0.13   0.14   155 1.01
+## omega[8]   0.26    0.00  0.01  0.25   0.25   0.26   0.26   0.27  1134 1.01
+## omega[9]   0.25    0.00  0.01  0.23   0.24   0.25   0.25   0.26   902 1.00
+## kappa[1] 111.46    0.80 22.73 72.21  95.14 109.91 126.23 159.03   801 1.00
+## kappa[2] 104.10    0.83 24.31 63.39  86.72 101.64 118.19 160.01   859 1.00
+## kappa[3]  98.40    0.69 21.63 62.82  82.72  96.13 112.30 144.99   974 1.01
+## kappa[4]  95.30    0.84 20.67 60.16  80.97  93.37 107.86 140.67   601 1.00
+## kappa[5] 101.80    0.84 22.88 61.50  85.47 100.64 116.86 148.69   742 1.00
+## kappa[6] 106.34    0.78 21.32 69.56  91.43 104.68 118.46 155.97   743 1.01
+## kappa[7]  56.29    1.16 13.21 35.00  46.82  54.85  64.32  85.75   129 1.01
+## kappa[8] 119.73    1.00 27.64 73.47 100.23 118.23 135.95 180.19   761 1.00
+## kappa[9]  95.69    0.91 22.74 59.07  79.80  93.10 109.56 148.44   619 1.00
+## 
+## Samples were drawn using NUTS(diag_e) at Mon Jan 22 22:31:04 2018.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+</section><section class="slide level2">
+
+<p>Is it mixing?</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">stan_trace</span>(pos_fit, <span class="dt">pars=</span><span class="st">&quot;omega&quot;</span>)</a></code></pre></div>
+<p><img src="figure/week_3/plot_trace_again-1.png" title="plot of chunk plot_trace_again" alt="plot of chunk plot_trace_again" style="display: block; margin: auto;" /></p>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">stan_trace</span>(pos_fit, <span class="dt">pars=</span><span class="st">&quot;kappa&quot;</span>)</a></code></pre></div>
+<p><img src="figure/week_3/plot_kappa_again-1.png" title="plot of chunk plot_kappa_again" alt="plot of chunk plot_kappa_again" style="display: block; margin: auto;" /></p>
+</section><section id="lets-look-at-the-results" class="slide level2">
+<h2>Let’s look at the results!</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">stan_hist</span>(pos_fit, <span class="dt">pars=</span><span class="st">&quot;omega&quot;</span>, <span class="dt">bins=</span><span class="dv">30</span>) <span class="op">+</span><span class="st"> </span><span class="kw">xlim</span>(<span class="dv">0</span>, <span class="fl">0.4</span>)</a></code></pre></div>
+<p><img src="figure/week_3/first_hist-1.png" title="plot of chunk first_hist" alt="plot of chunk first_hist" style="display: block; margin: auto;" /></p>
+</section><section class="slide level2">
+
+<p>I like labels.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">param_samples &lt;-<span class="st"> </span><span class="kw">extract</span>(pos_fit)</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dt">ncol=</span><span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>)<span class="op">+</span>.<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">9</span>) {</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">    <span class="kw">hist</span>(param_samples<span class="op">$</span>omega[,k], <span class="dt">main=</span><span class="kw">levels</span>(batting<span class="op">$</span>PriPos)[k],</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">         <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.4</span>), <span class="dt">xlab=</span><span class="st">&#39;batting average&#39;</span>, <span class="dt">ylab=</span><span class="kw">expression</span>(omega))</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">}</a></code></pre></div>
+<p><img src="figure/week_3/plot_omega-1.png" title="plot of chunk plot_omega" alt="plot of chunk plot_omega" style="display: block; margin: auto;" /></p>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dt">ncol=</span><span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>)<span class="op">+</span>.<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">9</span>) {</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4">    <span class="kw">hist</span>(param_samples<span class="op">$</span>kappa[,k], <span class="dt">main=</span><span class="kw">levels</span>(batting<span class="op">$</span>PriPos)[k],</a>
+<a class="sourceLine" id="cb16-5" data-line-number="5">         <span class="dt">xlab=</span><span class="st">&#39;batting average&#39;</span>, <span class="dt">ylab=</span><span class="kw">expression</span>(kappa))</a>
+<a class="sourceLine" id="cb16-6" data-line-number="6">}</a></code></pre></div>
+<p><img src="figure/week_3/plot_kappa-1.png" title="plot of chunk plot_kappa" alt="plot of chunk plot_kappa" style="display: block; margin: auto;" /></p>
+</section><section id="what-else-do-you-want-to-know" class="slide level2">
+<h2>What else do you want to know?</h2>
+<p>About <span class="math display">\[\begin{aligned}
+    \theta_i &amp;: \text{individual $i$ batting averages} \\
+    \omega_p &amp;: \text{position $p$ mean batting averages} \\
+    \kappa_p &amp;: \text{position $p$ variability of batting averages}
+\end{aligned}\]</span></p>
+<p><strong>(demonstration)</strong></p>
+</section></section>
+<section><section id="simulation" class="title-slide slide level1"><h1>Simulation</h1></section><section id="wouldnt-it-be-nice-if-we-knew-the-truth" class="slide level2">
+<h2>Wouldn’t it be nice if we knew the truth?</h2>
+<div class="fragment">
+<p><strong>Discuss:</strong></p>
+<p>Write down (on whiteboards) a procedure to simulate data that looks like the baseball data.</p>
+</div>
+<div class="fragment">
+<p><strong>(demonstration)</strong></p>
+</div>
+</section><section id="general-questions-with-simulated-data" class="slide level2">
+<h2>General questions with simulated data</h2>
+<ol type="1">
+<li>Does my statistical inference method work?</li>
+</ol>
+<div class="fragment">
+<ol start="2" type="1">
+<li><p>Do the credible intervals contain the true value?</p>
+<p>(i.e., Is the method “well-calibrated”?)</p>
+<p><em>They usually should.</em></p></li>
+</ol>
+</div>
+<div class="fragment">
+<ol start="3" type="1">
+<li><p>How wide are credible intervals, typically?</p>
+<p>This is (one kind of) <strong>statistical power.</strong></p></li>
+</ol>
+</div>
+</section></section>
+<section><section id="stochastic-minute" class="title-slide slide level1"><h1>Stochastic minute</h1></section><section id="exponential-and-gamma" class="slide level2">
+<h2>Exponential, and Gamma</h2>
+<p>If <span class="math inline">\(T \sim \Exp(\text{rate}=\lambda)\)</span>, then</p>
+<p><span class="math display">\[\begin{aligned}
+   \P\{ T \in dt \} = \lambda e^{-\lambda t} dt .
+\end{aligned}\]</span></p>
+<ol type="1">
+<li><p><span class="math inline">\(T\)</span> can be any nonnegative real number.</p></li>
+<li><p><span class="math inline">\(T\)</span> is <em>memoryless</em>: <span class="math display">\[\begin{aligned}
+     \P\{ T &gt; x + y \given T &gt; x \} = \P\{ T &gt; y \} .
+\end{aligned}\]</span></p></li>
+<li><p>A machine produces <span class="math inline">\(n\)</span> widgets per second; each widget has probability <span class="math inline">\(\lambda/n\)</span> of being broken. The time until the first broken widget appears (in seconds) is approximately <span class="math inline">\(\sim \Exp(\lambda)\)</span>.</p></li>
+</ol>
+</section><section class="slide level2">
+
+<p>If <span class="math inline">\(S \sim \Gam(\text{shape}=\alpha, \text{rate}=\lambda)\)</span>, then</p>
+<p><span class="math display">\[\begin{aligned}
+   \P\{ S \in dt \} = \frac{\alpha^\lambda}{\Gam(\alpha)} t^{\alpha - 1} e^{-\lambda t} dt .
+\end{aligned}\]</span></p>
+<ol type="1">
+<li><p>If <span class="math inline">\(T_1, \ldots, T_k\)</span> are independent <span class="math inline">\(\Exp(\lambda)\)</span>, then <span class="math inline">\(S = T_1 + \cdots + T_k\)</span> is <span class="math inline">\(\Gam(k, \lambda)\)</span>.</p></li>
+<li><p>A machine produces <span class="math inline">\(n\)</span> widgets per second; each widget has probability <span class="math inline">\(\lambda/n\)</span> of being broken. The time until the <span class="math inline">\(k^\text{th}\)</span> broken widget appears (in seconds) is approximately <span class="math inline">\(\sim \Gam(k, \lambda)\)</span>.</p></li>
+</ol>
+</section><section id="your-turn" class="slide level2">
+<h2>Your turn</h2>
+<ol type="1">
+<li><p>Simulate data.</p></li>
+<li><p>Run Stan (just do <code>iter=1000</code>).</p></li>
+<li><p>Look at the results:</p>
+<ul>
+<li><code>stan_trace()</code></li>
+<li><code>stan_hist()</code></li>
+<li><code>extract()</code></li>
+</ul></li>
+</ol>
+</section></section>
+<section><section id="sharing-power-shrinkage" class="title-slide slide level1"><h1>Sharing power // Shrinkage</h1></section><section id="example" class="slide level2">
+<h2>Example</h2>
+<p>Suppose that I have a large pot of coins that are all similar to each other. I flip each one ten times, and record the number of Heads. What is <em>each coin’s</em> probability of Heads?</p>
+<ul>
+<li><p>Treated <em>separately</em>, we would be very uncertain about each coin.</p></li>
+<li><p>Together, they should tell us very accurately what are <em>likely</em> values of <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p>This information can improve the estimate of each separate <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p>The more similar the coins are, the more information we gain.</p></li>
+</ul>
+</section><section id="shrinkage-and-baseball" class="slide level2">
+<h2>Shrinkage and baseball</h2>
+<p>Some players were at bat very few times. How does the information about their position affect our inference about their batting averages?</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">batting<span class="op">$</span>post_med &lt;-<span class="st"> </span>matrixStats<span class="op">::</span><span class="kw">colMedians</span>(param_samples<span class="op">$</span>theta)</a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">batting<span class="op">$</span>post_Q1 &lt;-<span class="st"> </span>matrixStats<span class="op">::</span><span class="kw">colQuantiles</span>(param_samples<span class="op">$</span>theta, <span class="dt">probs=</span><span class="fl">0.25</span>)</a>
+<a class="sourceLine" id="cb17-3" data-line-number="3">batting<span class="op">$</span>post_Q3 &lt;-<span class="st"> </span>matrixStats<span class="op">::</span><span class="kw">colQuantiles</span>(param_samples<span class="op">$</span>theta, <span class="dt">probs=</span><span class="fl">0.75</span>)</a>
+<a class="sourceLine" id="cb17-4" data-line-number="4">pos_means &lt;-<span class="st"> </span><span class="kw">colMeans</span>(param_samples<span class="op">$</span>omega)</a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="kw">names</span>(pos_means) &lt;-<span class="st"> </span><span class="kw">levels</span>(batting<span class="op">$</span>PriPos)</a>
+<a class="sourceLine" id="cb17-6" data-line-number="6">pos_means</a></code></pre></div>
+<pre><code>##     1st Base     2nd Base     3rd Base      Catcher Center Field 
+##    0.2524944    0.2486243    0.2560179    0.2390597    0.2577180 
+##   Left Field      Pitcher  Right Field    Shortstop 
+##    0.2490896    0.1289117    0.2586441    0.2473216</code></pre>
+</section><section class="slide level2">
+
+<p>Pitchers had posterior mean <span class="math inline">\(\mu\)</span> of 0.1289117</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">with</span>(<span class="kw">subset</span>(batting[<span class="kw">order</span>(batting<span class="op">$</span>post_med),], PriPos<span class="op">==</span><span class="st">&quot;Pitcher&quot;</span>), {</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">     <span class="kw">plot</span>(Hits <span class="op">/</span><span class="st"> </span>AtBats, <span class="dt">main=</span><span class="st">&quot;Pitchers&quot;</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.4</span>),</a>
+<a class="sourceLine" id="cb19-3" data-line-number="3">         <span class="dt">xlab=</span><span class="st">&#39;player&#39;</span>, <span class="dt">ylab=</span><span class="st">&quot;posterior median theta&quot;</span>);</a>
+<a class="sourceLine" id="cb19-4" data-line-number="4">     <span class="kw">segments</span>(<span class="dt">x0=</span><span class="kw">seq_along</span>(Hits), <span class="dt">y0=</span>post_Q1, <span class="dt">y1=</span>post_Q3,</a>
+<a class="sourceLine" id="cb19-5" data-line-number="5">         <span class="dt">col=</span><span class="kw">adjustcolor</span>(<span class="st">&#39;red&#39;</span>,<span class="fl">0.5</span>));</a>
+<a class="sourceLine" id="cb19-6" data-line-number="6">     <span class="kw">points</span>(post_med, <span class="dt">pch=</span><span class="dv">20</span>) })</a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="kw">abline</span>(<span class="dt">h=</span>pos_means[<span class="st">&quot;Pitcher&quot;</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="kw">adjustcolor</span>(<span class="st">&quot;blue&quot;</span>, <span class="fl">0.5</span>))</a></code></pre></div>
+<p><img src="figure/week_3/pitchers-1.png" title="plot of chunk pitchers" alt="plot of chunk pitchers" style="display: block; margin: auto;" /></p>
+</section><section class="slide level2">
+
+<p>Catchers had posterior mean <span class="math inline">\(\mu\)</span> of 0.2390597</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">with</span>(<span class="kw">subset</span>(batting[<span class="kw">order</span>(batting<span class="op">$</span>post_med),], PriPos<span class="op">==</span><span class="st">&quot;Catcher&quot;</span>), {</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">     <span class="kw">plot</span>(Hits <span class="op">/</span><span class="st"> </span>AtBats, <span class="dt">main=</span><span class="st">&quot;Catchers&quot;</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.4</span>),</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">         <span class="dt">xlab=</span><span class="st">&#39;player&#39;</span>, <span class="dt">ylab=</span><span class="st">&quot;posterior median theta&quot;</span>);</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">     <span class="kw">segments</span>(<span class="dt">x0=</span><span class="kw">seq_along</span>(Hits), <span class="dt">y0=</span>post_Q1, <span class="dt">y1=</span>post_Q3,</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">         <span class="dt">col=</span><span class="kw">adjustcolor</span>(<span class="st">&#39;red&#39;</span>,<span class="fl">0.5</span>));</a>
+<a class="sourceLine" id="cb20-6" data-line-number="6">     <span class="kw">points</span>(post_med, <span class="dt">pch=</span><span class="dv">20</span>) })</a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="kw">abline</span>(<span class="dt">h=</span>pos_means[<span class="st">&quot;Catcher&quot;</span>], <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="kw">adjustcolor</span>(<span class="st">&quot;blue&quot;</span>, <span class="fl">0.5</span>))</a></code></pre></div>
+<p><img src="figure/week_3/catchers-1.png" title="plot of chunk catchers" alt="plot of chunk catchers" style="display: block; margin: auto;" /></p>
+</section><section id="is-shrinkage-here-a-good-idea" class="slide level2">
+<h2>Is shrinkage here a good idea?</h2>
+<p>With <em>simulated data</em>, compare median absolute error for</p>
+<ul>
+<li><p>posterior median <span class="math inline">\(\theta_i\)</span></p></li>
+<li><p>empirical batting average</p></li>
+</ul>
+</section></section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'none', // none/fade/slide/convex/concave/zoom
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/math/math.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
