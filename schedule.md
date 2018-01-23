@@ -30,8 +30,8 @@ Week 2 (*1/16*)
 
 Week 3 (*1/23*)
 
-: Assessing power, model choice, and using simulation: looking more at shrinkage,
-    posterior predictive sampling, Bayes factors.
+: [(slides)](slides/week_3.slides.html) Assessing power, model choice, and using simulation: looking more at shrinkage,
+    posterior predictive sampling, model comparison.
     Logistic regression: robustly, including categorical factors.
     **(K ch 13 and 21, with a bit of chapters 10-12)**
 

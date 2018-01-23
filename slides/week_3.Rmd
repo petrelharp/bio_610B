@@ -1,0 +1,353 @@
+---
+title: "Simulation, power, and logistic regression"
+author: "Peter Ralph"
+date: "22 January 2018 -- Advanced Biological Statistics"
+---
+
+
+```{r setup, include=FALSE}
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+library(tidyverse)
+library(rstan)
+options(mc.cores = parallel::detectCores())
+```
+
+## Outline
+
+1. Uses of simulation
+
+2. ... applied to the hierarchical model.
+
+3. Posterior predictive sampling.
+
+4. Shrinkage: sharing information
+
+5. Predicting binary outcomes from quantitative variables: Bayesian logistic regression
+
+
+
+# Back to baseball
+
+## From last time:
+
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+$$\begin{aligned}
+    Z_i &\sim \Binom(N_i, \theta_i) \\
+    \theta_i &\sim \Beta(\mu_{p_i} \kappa_{p_i}, (1-\mu_{p_i})\kappa_{p_i}) \\
+    \mu &\sim \Beta(1, 1) \\
+    \kappa_p &\sim \Gam(0.1, 0.1) .
+\end{aligned}$$
+
+::::::::::::::
+::: {.column width="50%"}
+
+
+```{r stan_model}
+pos_model <- "
+data {
+    int N;   // number of players
+    int hits[N];
+    int at_bats[N];
+    int npos; // number of positions
+    int position[N];
+}
+parameters {
+    real<lower=0, upper=1> theta[N];
+    real<lower=0, upper=1> omega[npos];
+    real<lower=0> kappa[npos];
+}
+model {
+    real alpha[N];
+    real beta[N];
+    for (i in 1:N) {
+        alpha[i] = omega[position[i]] * kappa[position[i]];
+        beta[i] = (1 - omega[position[i]]) * kappa[position[i]];
+    }
+    hits ~ binomial(at_bats, theta);
+    for (i in 1:N) {
+        theta[i] ~ beta(alpha[i], beta[i]);
+    }
+    omega ~ beta(1,1);
+    kappa ~ gamma(0.1,0.1);
+} "
+```
+
+
+::::::
+::::::::::::::
+
+
+--------------------
+
+
+```{r fit_pos_model, cache=TRUE}
+batting <- read.csv("BattingAverage.csv", header=TRUE)
+system.time(pos_fit <- stan(model_code=pos_model, chains=3, iter=100,
+                            data=list(N=nrow(batting),
+                               hits=batting$Hits,
+                               at_bats=batting$AtBats,
+                               npos=nlevels(batting$PriPos),
+                               position=as.numeric(batting$PriPos))))
+```
+
+## Diagnostics
+
+```{r print_fit}
+print(pos_fit, pars=c("omega", "kappa"))
+```
+
+----------------
+
+Is it mixing?
+
+```{r plot_trace}
+stan_trace(pos_fit, pars="omega")
+```
+
+
+## Run longer!
+
+```{r fit_pos_model_again, cache=TRUE}
+system.time(pos_fit <- stan(model_code=pos_model, chains=3, iter=1000,
+                            control=list(max_treedepth=15),
+                            data=list(N=nrow(batting),
+                               hits=batting$Hits,
+                               at_bats=batting$AtBats,
+                               npos=nlevels(batting$PriPos),
+                               position=as.numeric(batting$PriPos))))
+```
+
+-------------
+
+```{r print_fit_again}
+print(pos_fit, pars=c("omega", "kappa"))
+```
+
+
+-------------
+
+Is it mixing?
+
+```{r plot_trace_again}
+stan_trace(pos_fit, pars="omega")
+```
+
+-------------
+
+```{r plot_kappa_again}
+stan_trace(pos_fit, pars="kappa")
+```
+
+## Let's look at the results!
+
+```{r first_hist}
+stan_hist(pos_fit, pars="omega", bins=30) + xlim(0, 0.4)
+```
+
+-----------
+
+I like labels.
+
+```{r plot_omega}
+param_samples <- extract(pos_fit)
+layout(matrix(1:9, ncol=3))
+par(mar=c(4,3,1,1)+.1)
+for (k in 1:9) {
+    hist(param_samples$omega[,k], main=levels(batting$PriPos)[k],
+         xlim=c(0, 0.4), xlab='batting average', ylab=expression(omega))
+}
+```
+
+-----------
+
+
+```{r plot_kappa}
+layout(matrix(1:9, ncol=3))
+par(mar=c(4,3,1,1)+.1)
+for (k in 1:9) {
+    hist(param_samples$kappa[,k], main=levels(batting$PriPos)[k],
+         xlab='batting average', ylab=expression(kappa))
+}
+```
+
+## What else do you want to know?
+
+About
+$$\begin{aligned}
+    \theta_i &: \text{individual $i$ batting averages} \\
+    \omega_p &: \text{position $p$ mean batting averages} \\
+    \kappa_p &: \text{position $p$ variability of batting averages}
+\end{aligned}$$
+
+
+**(demonstration)**
+
+
+
+# Simulation
+
+## Wouldn't it be nice if we knew the truth?
+
+. . .
+
+**Discuss:**
+
+Write down (on whiteboards)
+a procedure to simulate data
+that looks like the baseball data.
+
+. . .
+
+**(demonstration)**
+
+
+## General questions with simulated data
+
+1. Does my statistical inference method work?
+
+. . .
+
+
+2. Do the credible intervals contain the true value? 
+
+    (i.e., Is the method "well-calibrated"?)
+
+    *They usually should.*
+
+. . .
+
+3. How wide are credible intervals, typically?
+
+    This is (one kind of) **statistical power.** 
+
+
+# Stochastic minute
+
+## Exponential, and Gamma
+
+If $T \sim \Exp(\text{rate}=\lambda)$, then
+
+$$\begin{aligned}
+   \P\{ T \in dt \} = \lambda e^{-\lambda t} dt .
+\end{aligned}$$
+
+1. $T$ can be any nonnegative real number.
+
+2. $T$ is *memoryless*: 
+   $$\begin{aligned}
+        \P\{ T > x + y \given T > x \} = \P\{ T > y \} .
+   \end{aligned}$$
+
+3. A machine produces $n$ widgets per second;
+   each widget has probability $\lambda/n$ of being broken.
+   The time until the first broken widget appears (in seconds)
+   is approximately $\sim \Exp(\lambda)$.
+
+---------------------
+
+If $S \sim \Gam(\text{shape}=\alpha, \text{rate}=\lambda)$, then
+
+$$\begin{aligned}
+   \P\{ S \in dt \} = \frac{\alpha^\lambda}{\Gam(\alpha)} t^{\alpha - 1} e^{-\lambda t} dt .
+\end{aligned}$$
+
+1. If $T_1, \ldots, T_k$ are independent $\Exp(\lambda)$, then
+   $S = T_1 + \cdots + T_k$ is $\Gam(k, \lambda)$.
+
+
+2. A machine produces $n$ widgets per second;
+   each widget has probability $\lambda/n$ of being broken.
+   The time until the $k^\text{th}$ broken widget appears (in seconds)
+   is approximately $\sim \Gam(k, \lambda)$.
+
+
+## Your turn
+
+1. Simulate data.
+
+2. Run Stan (just do `iter=1000`).
+
+3. Look at the results:
+
+    * `stan_trace()`
+    * `stan_hist()`
+    * `extract()`
+
+
+# Sharing power // Shrinkage
+
+## Example
+
+Suppose that I have a large pot of coins
+that are all similar to each other.
+I flip each one ten times, and record the number of Heads.
+What is *each coin's* probability of Heads?
+
+- Treated *separately*,
+  we would be very uncertain about each coin.
+
+- Together, they should tell us very accurately 
+  what are *likely* values of $\theta$.
+
+- This information can improve the estimate of each separate $\theta$.
+
+- The more similar the coins are, the more information we gain.
+
+
+
+## Shrinkage and baseball
+
+Some players were at bat very few times.
+How does the information about their position affect our inference about their batting averages?
+
+```{r baseball_shrinkage}
+batting$post_med <- matrixStats::colMedians(param_samples$theta)
+batting$post_Q1 <- matrixStats::colQuantiles(param_samples$theta, probs=0.25)
+batting$post_Q3 <- matrixStats::colQuantiles(param_samples$theta, probs=0.75)
+pos_means <- colMeans(param_samples$omega)
+names(pos_means) <- levels(batting$PriPos)
+pos_means
+```
+
+--------------
+
+Pitchers had posterior mean $\mu$ of `r pos_means["Pitcher"]`
+
+````{r pitchers}
+with(subset(batting[order(batting$post_med),], PriPos=="Pitcher"), {
+     plot(Hits / AtBats, main="Pitchers", xaxt='n', ylim=c(0, 0.4),
+         xlab='player', ylab="posterior median theta");
+     segments(x0=seq_along(Hits), y0=post_Q1, y1=post_Q3,
+         col=adjustcolor('red',0.5));
+     points(post_med, pch=20) })
+abline(h=pos_means["Pitcher"], lwd=2, col=adjustcolor("blue", 0.5))
+```
+
+---------------
+
+Catchers had posterior mean $\mu$ of `r pos_means["Catcher"]`
+
+````{r catchers}
+with(subset(batting[order(batting$post_med),], PriPos=="Catcher"), {
+     plot(Hits / AtBats, main="Catchers", xaxt='n', ylim=c(0, 0.4),
+         xlab='player', ylab="posterior median theta");
+     segments(x0=seq_along(Hits), y0=post_Q1, y1=post_Q3,
+         col=adjustcolor('red',0.5));
+     points(post_med, pch=20) })
+abline(h=pos_means["Catcher"], lwd=2, col=adjustcolor("blue", 0.5))
+```
+
+## Is shrinkage here a good idea?
+
+With *simulated data*, compare median absolute error for
+
+- posterior median $\theta_i$
+
+- empirical batting average
