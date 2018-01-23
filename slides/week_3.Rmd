@@ -188,60 +188,6 @@ $$\begin{aligned}
 **(demonstration)**
 
 
-
-# Simulation
-
-## Wouldn't it be nice if we knew the truth?
-
-. . .
-
-**Discuss:**
-
-Write down (on whiteboards)
-a procedure to simulate data
-that looks like the baseball data.
-
-. . .
-
-**(demonstration)**
-
-
-## General questions with simulated data
-
-1. Does my statistical inference method work?
-
-. . .
-
-
-2. Do the credible intervals contain the true value? 
-
-    (i.e., Is the method "well-calibrated"?)
-
-    *They usually should.*
-
-. . .
-
-3. How wide are credible intervals, typically?
-
-    This is (one kind of) **statistical power.** 
-
-
-# Posterior predictive sampling
-
-## How to choose parameter values for simulation?
-
-It depends, but one good choice is
-*from the posterior distribution* -
-then you can see how the model behaves
-with data close to the real data.
-
-This is known as **posterior predictive sampling**.
-
----------------------------
-
-![Kruschke figure 13.2: posterior predictive sampilng](post_pred_kruschke.png)
-
-
 # Stochastic minute
 
 ## Exponential, and Gamma
@@ -282,6 +228,23 @@ $$\begin{aligned}
    is approximately $\sim \Gam(k, \lambda)$.
 
 
+
+# Simulation
+
+## Wouldn't it be nice if we knew the truth?
+
+. . .
+
+**Discuss:**
+
+Write down (on whiteboards)
+a procedure to simulate data
+that looks like the baseball data.
+
+. . .
+
+**(demonstration)**
+
 ## Your turn
 
 1. Simulate data.
@@ -293,6 +256,43 @@ $$\begin{aligned}
     * `stan_trace()`
     * `stan_hist()`
     * `extract()`
+
+
+
+## General questions with simulated data
+
+1. Does my statistical inference method work?
+
+. . .
+
+
+2. Do the credible intervals contain the true value? 
+
+    (i.e., Is the method "well-calibrated"?)
+
+    *They usually should.*
+
+. . .
+
+3. How wide are credible intervals, typically?
+
+    This is (one kind of) **statistical power.** 
+
+
+# Posterior predictive sampling
+
+## How to choose parameter values for simulation?
+
+It depends, but one good choice is
+*from the posterior distribution* -
+then you can see how the model behaves
+with data close to the real data.
+
+This is known as **posterior predictive sampling**.
+
+---------------------------
+
+![Kruschke figure 13.2: posterior predictive sampilng](post_pred_kruschke.png)
 
 
 # Sharing power // Shrinkage
@@ -322,9 +322,10 @@ Some players were at bat very few times.
 How does the information about their position affect our inference about their batting averages?
 
 ```{r baseball_shrinkage}
-batting$post_med <- matrixStats::colMedians(param_samples$theta)
-batting$post_Q1 <- matrixStats::colQuantiles(param_samples$theta, probs=0.25)
-batting$post_Q3 <- matrixStats::colQuantiles(param_samples$theta, probs=0.75)
+library(matrixStats)  # for colMedians etc
+batting$post_med <- colMedians(param_samples$theta)
+batting$post_Q1 <- colQuantiles(param_samples$theta, probs=0.25)
+batting$post_Q3 <- colQuantiles(param_samples$theta, probs=0.75)
 pos_means <- colMeans(param_samples$mu)
 names(pos_means) <- levels(batting$PriPos)
 pos_means
