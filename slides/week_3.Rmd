@@ -185,7 +185,39 @@ $$\begin{aligned}
 \end{aligned}$$
 
 
-**(demonstration)**
+## Do positions with more at-bats have higher batting averages?
+
+To answer this, let's find the posterior distribution
+of the difference in means ($\mu_p$) between two positions,
+1st base, who have a lot of at-bats, and pitchers, who don't.
+
+To do this, we'll use the random samples obtained with `extract()`.
+```{r diff_means}
+first_base_col <- which(levels(batting$PriPos) == "1st Base")
+pitcher_col <- which(levels(batting$PriPos) == "Pitcher")
+mu_diff <- param_samples$mu[,first_base_col] - param_samples$mu[,pitcher_col]
+```
+The posterior mean of $\mu_\text{1st base} - \mu_\text{pitcher}$ is `r mean(mu_diff)`;
+and the posterior SD is `r sd(mu_diff)`.
+This is a very large difference: it seems that 1st basemen (on average) in this dataset
+are much better batters than pitchers.
+We are very certain of this, because none of the `r length(mu_diff)` samples
+had pitchers with higher $\mu$ than 1st basemen
+
+## What position has the most consistent batting average?
+
+Find the posterior distribution of SDs of $\theta_i$s, separately by position.
+
+```{r pos_sds}
+library(magrittr)
+library(dplyr)
+pos_sds <- sapply(1:nlevels(batting$PriPos), function (k) {
+                      use_these <- batting$PriPos == levels(batting$PriPos)[k]
+                      rowSds(param_samples$theta[,use_these])
+         } )
+colnames(pos_sds) <- levels(batting$PriPos)
+boxplot(pos_sds, las=3)
+```
 
 
 # Stochastic minute
@@ -244,6 +276,38 @@ that looks like the baseball data.
 . . .
 
 **(demonstration)**
+
+
+------------
+
+Using the posterior mean on $\theta$:
+```{r simulate_fake_data}
+batting$post_mean <- colMeans(param_samples$theta)
+batting$fake_hits <- rbinom(nrow(batting), 
+                            size=batting$AtBats, 
+                            prob=batting$post_mean)
+```
+
+------------
+
+Generating fake data by first sampling $\theta$s:
+We'll start with the posterior mean values for $\mu$ and $\kappa$:
+```{r simulate_with_thetas}
+post_mean_mu <- colMeans(param_samples$mu)
+post_mean_kappa <- colMeans(param_samples$kappa)
+names(post_mean_mu) <- names(post_mean_kappa) <- levels(batting$PriPos)
+batting$sim_theta <- rbeta(nrow(batting),
+                           shape1=post_mean_mu[batting$PriPos] * post_mean_kappa[batting$PriPos],
+                           shape2=(1-post_mean_mu[batting$PriPos]) * post_mean_kappa[batting$PriPos])
+batting$sim_theta_hits <- rbinom(nrow(batting), 
+                                 size=batting$AtBats, 
+                                 prob=batting$sim_theta)
+```
+
+## Next: use simulated data to infer parameters, and compare to the now-known truth.
+
+
+
 
 ## Your turn
 
