@@ -1,0 +1,887 @@
+"Player","PriPos","Hits","AtBats","PlayerNumber","PriPosNumber","playerID","weight","height","bats","birthYear","debut","finalGame"
+"Aaron Cunningham","Left Field",17,97,198,7,"cunniaa01",215,71,"R",1986,2008-08-31,2012-07-24
+"Aaron Harang","Pitcher",4,56,360,1,"haranaa01",260,79,"R",1978,2002-05-25,2015-10-03
+"Aaron Hill","2nd Base",184,609,394,4,"hillaa01",200,71,"R",1982,2005-05-20,2016-10-01
+"Aaron Laffey","Pitcher",0,1,482,1,"laffeaa01",190,71,"L",1985,2007-08-04,2015-07-31
+"Aaron Loup","Pitcher",0,1,522,1,"loupaa01",210,71,"L",1987,2012-07-14,2016-09-30
+"Adam Dunn","1st Base",110,539,242,3,"dunnad01",285,78,"L",1979,2001-07-20,2014-09-28
+"Adam Jones","Center Field",186,648,447,8,"jonesad01",215,74,"R",1985,2006-07-14,2016-10-02
+"Adam Kennedy","3rd Base",44,168,464,5,"kennead01",195,71,"L",1976,1999-08-21,2012-09-07
+"Adam LaRoche","1st Base",155,571,490,3,"larocad01",205,74,"L",1979,2004-04-07,2015-10-02
+"Adam Lind","1st Base",82,321,512,3,"lindad01",195,74,"L",1983,2006-09-02,2016-10-01
+"Adam Moore","Catcher",2,11,600,2,"mooread01",220,75,"R",1984,2009-09-17,2016-09-27
+"Adam Ottavino","Pitcher",1,9,654,1,"ottavad01",220,77,"B",1985,2010-05-29,2016-10-01
+"Adam Rosales","2nd Base",22,99,762,4,"rosalad01",200,74,"R",1983,2008-08-09,2016-10-02
+"Adam Wainwright","Pitcher",8,66,900,1,"wainwad01",235,79,"R",1981,2005-09-11,2016-10-02
+"Adeiny Hechavarria","3rd Base",32,126,373,5,"hechaad01",195,72,"R",1989,2012-08-04,2016-10-02
+"Adrian Beltre","3rd Base",194,604,59,5,"beltrad01",220,71,"R",1979,1998-06-24,2016-10-02
+"Adrian Cardenas","2nd Base",11,60,126,4,"cardead01",205,72,"L",1987,2012-05-07,2012-10-03
+"Adrian Gonzalez","1st Base",188,629,320,3,"gonzaad01",215,74,"L",1982,2004-04-18,2016-10-02
+"Adron Chambers","Center Field",12,54,151,8,"chambad01",200,70,"L",1986,2011-09-06,2013-09-29
+"Albert Pujols","1st Base",173,607,711,3,"pujolal01",240,75,"R",1980,2001-04-02,2016-09-26
+"Alberto Callaspo","3rd Base",115,457,121,5,"callaal01",225,69,"B",1983,2006-08-06,2015-08-19
+"Alberto Gonzalez","Shortstop",13,54,321,6,"gonzaal03",195,70,"R",1983,2007-09-01,2013-07-19
+"Alcides Escobar","Shortstop",177,605,253,6,"escobal02",185,73,"R",1986,2008-09-03,2016-10-02
+"Alejandro De Aza","Center Field",147,524,209,8,"deazaal01",195,72,"L",1984,2007-04-02,2016-10-02
+"Alex Avila","Catcher",89,367,26,2,"avilaal01",210,71,"L",1987,2009-08-06,2016-10-02
+"Alex Castellanos","Left Field",4,23,141,7,"casteal01",200,72,"R",1986,2012-05-31,2013-09-29
+"Alex Gordon","Left Field",189,642,327,7,"gordoal01",220,73,"L",1984,2007-04-02,2016-10-02
+"Alex Hinshaw","Pitcher",0,1,397,1,"hinshal01",175,74,"L",1982,2008-05-15,2012-08-27
+"Alex Liddi","3rd Base",26,116,506,5,"liddial01",225,76,"R",1988,2011-09-07,2013-06-17
+"Alex Presley","Left Field",82,346,707,7,"preslal01",195,70,"L",1985,2010-09-08,2016-08-20
+"Alex Rios","Right Field",184,605,742,9,"riosal01",210,77,"R",1981,2004-05-27,2015-10-04
+"Alex Rodriguez","3rd Base",126,463,749,5,"rodrial01",230,75,"R",1975,1994-07-08,2016-08-12
+"Alex White","Pitcher",5,28,918,1,"whiteal01",220,75,"R",1988,2011-04-30,2012-09-30
+"Alexei Ramirez","Shortstop",157,593,720,6,"ramiral03",180,74,"R",1981,2008-03-31,2016-10-02
+"Alexi Amarista","2nd Base",66,275,13,4,"amarial01",160,66,"L",1989,2011-04-26,2016-10-01
+"Alexi Casilla","2nd Base",72,299,139,4,"casilal01",170,69,"B",1984,2006-09-01,2014-09-27
+"Alexi Ogando","Pitcher",1,2,645,1,"ogandal01",200,76,"R",1983,2010-06-15,2016-06-26
+"Alfonso Soriano","Left Field",147,561,829,7,"soriaal01",195,73,"R",1976,1999-09-14,2014-07-05
+"Alfredo Simon","Pitcher",0,4,817,1,"simonal01",265,78,"R",1981,2008-09-06,2016-09-05
+"Ali Solis","Catcher",0,4,828,2,"solisal01",200,72,"R",1987,2012-09-16,2014-06-08
+"Allen Craig","1st Base",144,469,187,3,"craigal01",215,74,"R",1984,2010-04-08,2015-10-04
+"Andre Ethier","Right Field",158,556,258,9,"ethiean01",210,74,"L",1982,2006-05-02,2016-10-02
+"Andrelton Simmons","Shortstop",48,166,816,6,"simmoan01",195,74,"R",1989,2012-06-02,2016-10-02
+"Andres Torres","Center Field",86,374,865,8,"torrean02",195,70,"B",1978,2002-04-07,2013-08-21
+"Andrew Cashner","Pitcher",1,7,138,1,"cashnan01",235,78,"R",1986,2010-05-31,2016-09-30
+"Andrew McCutchen","Center Field",194,593,573,8,"mccutan01",195,70,"R",1986,2009-06-04,2016-10-02
+"Andrew Romine","Shortstop",7,17,761,6,"rominan01",200,73,"B",1985,2010-09-24,2016-10-02
+"Andrew Werner","Pitcher",1,12,914,1,"wernean01",215,74,"L",1987,2012-08-22,2012-10-03
+"Andruw Jones","Left Field",46,233,448,7,"jonesan01",225,73,"R",1977,1996-08-15,2012-10-03
+"Andy Dirks","Left Field",101,314,227,7,"dirksan01",195,72,"L",1986,2011-05-16,2013-09-29
+"Andy Parrino","Shortstop",24,116,666,6,"parrian01",185,72,"B",1985,2011-08-26,2015-06-17
+"Andy Pettitte","Pitcher",1,4,691,1,"pettian01",235,77,"L",1972,1995-04-29,2013-09-28
+"Aneury Rodriguez","Pitcher",1,1,750,1,"rodrian01",250,76,"R",1987,2011-04-02,2012-05-08
+"Angel Pagan","Center Field",174,605,660,8,"paganan01",200,74,"B",1981,2006-04-03,2016-10-02
+"Anibal Sanchez","Pitcher",3,30,783,1,"sanchan01",205,72,"R",1984,2006-06-25,2016-09-25
+"Anthony Bass","Pitcher",4,31,43,1,"bassan01",200,74,"R",1987,2011-06-13,2015-09-28
+"Anthony Gose","Right Field",37,166,330,9,"gosean01",190,73,"L",1990,2012-07-17,2016-05-15
+"Anthony Recker","Catcher",7,49,729,2,"reckean01",240,74,"R",1983,2011-08-25,2016-10-01
+"Anthony Rizzo","1st Base",96,337,744,3,"rizzoan01",240,75,"L",1989,2011-06-09,2016-10-02
+"Anthony Swarzak","Pitcher",0,2,846,1,"swarzan01",215,76,"R",1985,2009-05-23,2016-09-30
+"Aramis Ramirez","3rd Base",171,570,721,5,"ramirar01",205,73,"R",1978,1998-05-26,2015-10-03
+"Armando Galarraga","Pitcher",0,8,294,1,"galarar01",230,75,"R",1982,2007-09-15,2012-08-19
+"Asdrubal Cabrera","Shortstop",150,555,111,6,"cabreas01",205,72,"B",1985,2007-08-08,2016-10-02
+"Aubrey Huff","1st Base",15,78,410,3,"huffau01",225,76,"L",1976,2000-08-02,2012-10-03
+"Austin Jackson","Center Field",163,543,427,8,"jacksau01",205,73,"R",1987,2010-04-05,2016-06-09
+"Austin Kearns","Left Field",36,147,457,7,"kearnau01",240,75,"R",1980,2002-04-17,2013-05-03
+"Avisail Garcia","Right Field",15,47,298,9,"garciav01",240,76,"R",1991,2012-08-31,2016-10-02
+"Barret Browning","Pitcher",0,1,97,1,"brownba01",230,74,"L",1984,2012-06-30,2012-08-23
+"Barry Zito","Pitcher",4,53,947,1,"zitoba01",205,74,"L",1978,2000-07-22,2015-09-30
+"Bartolo Colon","Pitcher",0,4,172,1,"colonba01",285,71,"R",1973,1997-04-04,2016-10-01
+"Ben Francisco","Right Field",46,192,282,9,"francbe01",195,73,"R",1981,2007-05-01,2013-05-17
+"Ben Revere","Right Field",150,511,735,9,"reverbe01",175,69,"L",1988,2010-09-07,2016-10-02
+"Ben Sheets","Pitcher",0,13,812,1,"sheetbe01",195,73,"R",1978,2001-04-05,2012-10-03
+"Ben Zobrist","Right Field",151,560,948,9,"zobribe01",210,75,"B",1981,2006-08-01,2016-10-02
+"Billy Butler","1st Base",192,614,109,3,"butlebi03",260,72,"R",1986,2007-05-01,2016-10-02
+"Blake Beavan","Pitcher",0,2,50,1,"beavabl01",245,79,"R",1989,2011-07-03,2014-04-15
+"Blake DeWitt","2nd Base",4,29,220,4,"dewitbl01",195,71,"L",1985,2008-03-31,2013-04-19
+"Blake Lalli","Catcher",2,15,486,2,"lallibl01",210,73,"L",1983,2012-05-18,2016-09-29
+"Blake Tekotte","Left Field",2,15,855,7,"tekotbl01",180,71,"L",1987,2011-05-25,2013-08-11
+"Bobby Abreu","Left Field",53,219,2,7,"abreubo01",220,72,"L",1974,1996-09-01,2014-09-28
+"Bobby Wilson","Catcher",36,171,925,2,"wilsobo02",230,72,"R",1983,2008-04-28,2016-10-01
+"Brad Bergesen","Pitcher",0,1,60,1,"bergebr02",210,74,"L",1985,2009-04-21,2012-10-01
+"Brad Boxberger","Pitcher",0,1,87,1,"boxbebr01",225,74,"R",1988,2012-06-10,2016-10-02
+"Brad Hand","Pitcher",0,1,355,1,"handbr01",220,75,"L",1990,2011-06-07,2016-10-02
+"Brad Lincoln","Pitcher",2,10,511,1,"lincobr01",225,72,"L",1985,2010-06-09,2014-04-08
+"Brad Penny","Pitcher",0,1,682,1,"pennybr01",270,76,"R",1978,2000-04-07,2014-09-26
+"Brad Ziegler","Pitcher",1,4,944,1,"zieglbr01",220,76,"R",1979,2008-05-31,2016-10-02
+"Brandon Allen","1st Base",2,20,8,3,"allenbr01",230,74,"L",1986,2009-08-22,2012-05-09
+"Brandon Barnes","Center Field",20,98,39,8,"barnebr02",210,74,"R",1986,2012-08-07,2016-07-24
+"Brandon Beachy","Pitcher",5,27,49,1,"beachbr01",220,74,"R",1986,2010-09-20,2015-07-20
+"Brandon Belt","1st Base",113,411,57,3,"beltbr01",220,77,"L",1988,2011-03-31,2016-10-02
+"Brandon Crawford","Shortstop",108,435,188,6,"crawfbr01",215,74,"L",1987,2011-05-27,2016-10-02
+"Brandon Dickson","Pitcher",1,2,226,1,"dicksbr01",190,77,"R",1984,2011-07-02,2012-08-28
+"Brandon Gomes","Pitcher",0,1,314,1,"gomesbr01",190,71,"R",1984,2011-05-03,2015-10-03
+"Brandon Guyer","Left Field",1,7,342,7,"guyerbr01",200,74,"R",1986,2011-05-06,2016-09-30
+"Brandon Hicks","Shortstop",11,64,393,6,"hicksbr01",215,74,"R",1985,2010-05-05,2014-07-10
+"Brandon Inge","3rd Base",66,303,423,5,"ingebr01",190,71,"R",1977,2001-04-03,2013-07-21
+"Brandon Laird","3rd Base",9,35,484,5,"lairdbr01",215,73,"R",1987,2011-07-22,2013-09-29
+"Brandon Moss","1st Base",77,265,616,3,"mossbr01",210,73,"L",1983,2007-08-06,2016-10-02
+"Brandon Phillips","2nd Base",163,580,693,4,"phillbr01",210,72,"R",1981,2002-09-13,2016-09-27
+"Brandon Snyder","1st Base",18,65,823,3,"snydebr03",225,74,"R",1986,2010-09-10,2016-09-30
+"Brayan Pena","Catcher",50,212,677,2,"penabr01",240,69,"B",1982,2005-05-23,2016-09-26
+"Brendan Ryan","Shortstop",79,407,776,6,"ryanbr01",190,73,"R",1982,2007-06-02,2016-06-14
+"Brennan Boesch","Right Field",113,470,79,9,"boescbr01",225,76,"L",1985,2010-04-23,2015-10-01
+"Brent Lillibridge","1st Base",37,190,507,3,"lillibr01",185,71,"R",1983,2008-04-26,2013-08-04
+"Brent Morel","3rd Base",20,113,606,5,"morelbr01",230,74,"R",1987,2010-09-07,2015-07-24
+"Brett Carroll","Center Field",0,2,134,8,"carrobr01",210,71,"R",1982,2007-06-17,2012-04-13
+"Brett Cecil","Pitcher",0,2,145,1,"cecilbr01",235,75,"R",1986,2009-05-05,2016-10-02
+"Brett Gardner","Left Field",10,31,301,7,"gardnbr01",195,71,"L",1983,2008-06-30,2016-10-02
+"Brett Hayes","Catcher",23,114,371,2,"hayesbr01",210,73,"R",1984,2009-05-22,2015-05-23
+"Brett Jackson","Center Field",21,120,428,8,"jacksbr01",220,74,"L",1988,2012-08-05,2014-09-26
+"Brett Lawrie","3rd Base",135,494,493,5,"lawribr01",210,72,"R",1990,2011-08-05,2016-07-21
+"Brett Pill","1st Base",22,105,697,3,"pillbr01",225,76,"R",1984,2011-09-06,2013-09-28
+"Brett Wallace","1st Base",58,229,902,3,"wallabr01",250,74,"L",1986,2010-07-31,2016-09-28
+"Brian Bixler","Right Field",17,88,69,9,"bixlebr01",195,73,"R",1982,2008-04-06,2012-07-28
+"Brian Bogusevic","Right Field",72,355,80,9,"bogusbr01",215,75,"L",1984,2010-09-01,2015-10-03
+"Brian Dozier","Shortstop",74,316,235,6,"doziebr01",200,71,"R",1987,2012-05-07,2016-10-01
+"Brian Duensing","Pitcher",0,1,239,1,"duensbr01",200,72,"L",1983,2009-04-10,2016-09-30
+"Brian Matusz","Pitcher",1,4,561,1,"matusbr01",190,77,"L",1987,2009-08-04,2016-07-31
+"Brian McCann","Catcher",101,439,569,2,"mccanbr01",225,75,"L",1984,2005-06-10,2016-10-02
+"Brian Roberts","2nd Base",12,66,745,4,"roberbr01",175,69,"B",1977,2001-06-14,2014-07-28
+"Brian Sanches","Pitcher",0,1,782,1,"sanchbr01",190,73,"R",1978,2006-06-01,2012-07-14
+"Brian Schneider","Catcher",20,89,804,2,"schnebr01",210,73,"L",1976,2000-05-26,2012-08-23
+"Brock Holt","2nd Base",19,65,404,4,"holtbr01",180,68,"L",1988,2012-09-01,2016-10-02
+"Bronson Arroyo","Pitcher",9,63,24,1,"arroybr01",185,75,"R",1977,2000-06-12,2014-06-15
+"Brooks Conrad","3rd Base",13,98,176,5,"conrabr01",190,70,"B",1980,2008-07-21,2014-07-27
+"Brooks Raley","Pitcher",2,10,719,1,"raleybr01",200,75,"L",1988,2012-08-07,2013-09-27
+"Bruce Chen","Pitcher",1,5,156,1,"chenbr01",215,74,"L",1977,1998-09-07,2015-05-15
+"Bryan Anderson","Catcher",3,12,14,2,"anderbr05",200,73,"L",1986,2010-04-15,2015-10-04
+"Bryan Holaday","Catcher",3,12,401,2,"holadbr01",205,72,"R",1987,2012-06-06,2016-10-02
+"Bryan LaHair","1st Base",88,340,483,3,"lahaibr01",245,77,"L",1982,2008-07-18,2012-10-03
+"Bryan Petersen","Left Field",47,241,689,7,"peterbr01",200,72,"L",1986,2010-05-07,2012-10-03
+"Bryce Harper","Center Field",144,533,363,8,"harpebr03",215,75,"L",1992,2012-04-28,2016-10-02
+"Bud Norris","Pitcher",5,50,641,1,"norribu01",215,72,"R",1985,2009-07-29,2016-09-18
+"Burke Badenhop","Pitcher",0,1,31,1,"badenbu01",205,77,"R",1983,2008-04-09,2015-10-03
+"Buster Posey","Catcher",178,530,705,2,"poseybu01",215,73,"R",1987,2009-09-11,2016-10-02
+"Cameron Maybin","Center Field",123,507,565,8,"maybica01",215,75,"R",1987,2007-08-17,2016-10-02
+"Carl Crawford","Left Field",33,117,189,7,"crawfca02",230,74,"L",1981,2002-07-20,2016-06-03
+"Carl Pavano","Pitcher",0,2,670,1,"pavanca01",265,77,"R",1976,1998-05-23,2012-06-01
+"Carlos Beltran","Right Field",147,547,58,9,"beltrca01",215,73,"B",1977,1998-09-14,2016-10-02
+"Carlos Corporan","Catcher",21,78,181,2,"corpoca01",240,74,"B",1984,2009-05-06,2015-07-12
+"Carlos Gomez","Center Field",108,415,317,8,"gomezca01",220,75,"R",1985,2007-05-13,2016-10-02
+"Carlos Gonzalez","Left Field",157,518,323,7,"gonzaca01",220,73,"L",1985,2008-05-30,2016-10-02
+"Carlos Lee","1st Base",145,550,497,3,"leeca01",270,74,"R",1976,1999-05-07,2012-10-03
+"Carlos Peguero","Right Field",10,56,674,9,"pegueca01",260,77,"L",1987,2011-04-19,2015-06-03
+"Carlos Pena","1st Base",98,497,678,3,"penaca01",225,74,"L",1978,2001-09-05,2014-07-12
+"Carlos Quentin","Left Field",74,284,713,7,"quentca01",235,73,"R",1982,2006-07-20,2014-07-26
+"Carlos Ruiz","Catcher",121,372,772,2,"ruizca01",215,70,"R",1979,2006-05-06,2016-09-30
+"Carlos Santana","Catcher",128,507,789,2,"santaca01",210,71,"B",1986,2010-06-11,2016-10-02
+"Carlos Torres","Pitcher",2,9,866,1,"torreca01",180,73,"R",1982,2009-07-22,2016-10-02
+"Carlos Triunfel","Shortstop",5,22,869,6,"triunca01",195,71,"R",1990,2012-09-07,2014-08-17
+"Carlos Villanueva","Pitcher",1,2,891,1,"villaca01",220,74,"R",1983,2006-05-23,2016-09-24
+"Carlos Zambrano","Pitcher",6,34,943,1,"zambrca01",275,76,"B",1981,2001-08-20,2012-09-21
+"Casey Coleman","Pitcher",1,3,169,1,"colemca01",185,72,"L",1987,2010-08-02,2014-09-28
+"Casey Kelly","Pitcher",2,10,458,1,"kellyca01",215,75,"R",1989,2012-08-27,2016-07-01
+"Casey Kotchman","1st Base",106,463,475,3,"kotchca01",220,75,"L",1983,2004-05-09,2013-06-08
+"Casey McGehee","1st Base",69,318,577,3,"mcgehca01",220,73,"R",1982,2008-09-02,2016-09-27
+"Casper Wells","Left Field",65,285,910,7,"wellsca01",220,74,"R",1984,2010-05-15,2013-09-28
+"CC Sabathia","Pitcher",0,5,777,1,"sabatcc01",300,78,"L",1980,2001-04-08,2016-09-29
+"Cesar Izturis","Shortstop",40,166,425,6,"izturce01",180,69,"B",1980,2001-06-23,2013-09-29
+"Cesar Ramos","Pitcher",0,1,725,1,"ramosce01",200,74,"L",1984,2009-09-16,2016-07-10
+"Chad Billingsley","Pitcher",8,42,68,1,"billich01",240,73,"R",1984,2006-06-15,2015-07-18
+"Chad Gaudin","Pitcher",0,8,303,1,"gaudich01",190,70,"R",1983,2003-08-01,2013-08-16
+"Chad Tracy","1st Base",25,93,867,3,"tracych01",205,73,"L",1980,2004-04-21,2013-09-28
+"Charlie Blackmon","Right Field",32,113,72,9,"blackch02",210,75,"L",1986,2011-06-07,2016-10-02
+"Charlie Culberson","2nd Base",3,22,197,4,"culbech01",200,72,"R",1989,2012-05-13,2016-10-02
+"Chase Headley","3rd Base",173,604,372,5,"headlch01",215,74,"B",1984,2007-06-15,2016-10-01
+"Chase Utley","2nd Base",77,301,879,4,"utleych01",195,73,"L",1978,2003-04-04,2016-10-02
+"Chipper Jones","3rd Base",111,387,449,5,"jonesch06",210,76,"B",1972,1993-09-11,2012-10-03
+"Chone Figgins","Left Field",30,166,270,7,"figgich01",180,68,"B",1978,2002-08-25,2014-06-13
+"Chris Archer","Pitcher",0,3,20,1,"archech01",190,75,"R",1988,2012-06-20,2016-09-29
+"Chris Capuano","Pitcher",5,54,125,1,"capuach01",225,74,"L",1978,2003-05-04,2016-05-25
+"Chris Coghlan","Left Field",13,93,168,7,"coghlch01",195,72,"L",1985,2009-05-08,2016-10-02
+"Chris Davis","1st Base",139,515,205,3,"davisch02",230,75,"L",1986,2008-06-26,2016-10-02
+"Chris Denorfia","Right Field",102,348,215,9,"denorch01",195,72,"R",1980,2005-09-07,2015-10-04
+"Chris Dickerson","Left Field",4,14,224,7,"dickech01",230,76,"L",1982,2008-08-12,2014-09-05
+"Chris Getz","2nd Base",52,189,307,4,"getzch01",185,72,"L",1983,2008-04-28,2014-05-10
+"Chris Gimenez","Catcher",26,100,311,2,"gimench01",230,74,"R",1982,2009-06-03,2016-10-02
+"Chris Heisey","Left Field",92,347,375,7,"heisech01",220,73,"R",1984,2010-05-03,2016-10-02
+"Chris Herrmann","Catcher",1,18,390,2,"herrmch01",200,72,"L",1987,2012-09-16,2016-09-09
+"Chris Iannetta","Catcher",53,221,419,2,"iannech01",230,72,"R",1983,2006-08-27,2016-10-02
+"Chris Johnson","3rd Base",137,488,439,5,"johnsch05",225,75,"R",1984,2009-09-09,2016-10-02
+"Chris Leroux","Pitcher",0,1,501,1,"lerouch01",225,78,"L",1984,2009-05-26,2014-05-02
+"Chris Narveson","Pitcher",0,3,624,1,"narvech01",205,75,"L",1981,2006-09-08,2016-04-19
+"Chris Nelson","3rd Base",104,345,630,5,"nelsoch01",205,71,"R",1985,2010-06-19,2014-08-29
+"Chris Parmelee","1st Base",44,192,663,3,"parmech01",220,73,"L",1988,2011-09-06,2016-06-09
+"Chris Resop","Pitcher",0,3,734,1,"resopch01",225,75,"R",1982,2005-06-28,2013-05-14
+"Chris Rusin","Pitcher",2,12,773,1,"rusinch01",195,74,"L",1986,2012-08-21,2016-10-02
+"Chris Sale","Pitcher",0,2,779,1,"salech01",180,78,"L",1989,2010-08-06,2016-10-02
+"Chris Schwinden","Pitcher",1,4,806,1,"schwich01",215,75,"R",1986,2011-09-08,2012-05-30
+"Chris Snyder","Catcher",39,221,824,2,"snydech02",235,76,"R",1981,2004-08-21,2013-09-28
+"Chris Stewart","Catcher",34,141,836,2,"stewach01",205,76,"R",1982,2006-09-06,2016-09-11
+"Chris Volstad","Pitcher",5,28,898,1,"volstch01",235,80,"R",1986,2008-07-06,2015-06-24
+"Christian Friedrich","Pitcher",2,25,289,1,"friedch01",215,76,"R",1987,2012-05-09,2016-09-29
+"Clay Buchholz","Pitcher",0,2,99,1,"buchhcl01",190,75,"L",1984,2007-08-17,2016-09-28
+"Clay Hensley","Pitcher",0,1,379,1,"henslcl01",190,71,"R",1979,2005-07-20,2012-10-03
+"Clayton Kershaw","Pitcher",12,58,467,1,"kershcl01",225,76,"L",1988,2008-05-25,2016-10-01
+"Clayton Mortensen","Pitcher",0,1,612,1,"mortecl01",185,76,"R",1985,2009-06-29,2013-06-10
+"Clayton Richard","Pitcher",6,69,740,1,"richacl01",240,77,"L",1983,2008-07-23,2016-10-01
+"Clete Thomas","Right Field",4,28,859,9,"thomacl02",200,71,"L",1983,2008-03-31,2013-09-29
+"Cliff Pennington","Shortstop",90,418,681,6,"pennicl01",195,71,"B",1984,2008-08-12,2016-10-02
+"Clint Barmes","Shortstop",104,455,38,6,"barmecl01",200,73,"R",1979,2003-09-05,2015-10-04
+"Coco Crisp","Center Field",118,455,190,8,"crispco01",185,70,"B",1979,2002-08-15,2016-10-02
+"Cody Ransom","Shortstop",54,246,727,6,"ransoco01",200,74,"R",1976,2001-09-05,2013-08-31
+"Cody Ross","Right Field",127,476,765,9,"rossco01",195,71,"R",1980,2003-07-04,2015-05-01
+"Colby Lewis","Pitcher",2,4,504,1,"lewisco01",240,76,"R",1979,2002-04-01,2016-10-01
+"Colby Rasmus","Center Field",126,565,728,8,"rasmuco01",195,74,"L",1986,2009-04-07,2016-09-18
+"Cole Hamels","Pitcher",15,69,351,1,"hamelco01",205,76,"L",1983,2006-05-12,2016-09-28
+"Collin Cowgill","Left Field",28,104,185,7,"cowgico01",190,69,"R",1986,2011-07-26,2016-04-19
+"Collin McHugh","Pitcher",0,4,578,1,"mchugco01",190,74,"R",1987,2012-08-23,2016-10-01
+"Conor Gillaspie","3rd Base",3,20,310,5,"gillaco01",195,73,"L",1987,2008-09-09,2016-10-02
+"Cord Phelps","2nd Base",7,33,692,4,"phelpco01",210,73,"B",1987,2011-06-08,2014-08-23
+"Corey Brown","Left Field",5,25,95,7,"brownco01",200,73,"L",1985,2011-09-06,2014-08-16
+"Corey Hart","1st Base",152,562,368,3,"hartco01",240,78,"R",1982,2004-05-25,2015-06-21
+"Cory Burns","Pitcher",0,1,105,1,"burnsco01",205,73,"R",1987,2012-08-04,2013-09-04
+"Cory Luebke","Pitcher",0,11,528,1,"luebkco01",210,76,"R",1985,2010-09-03,2016-06-17
+"Craig Breslow","Pitcher",0,3,91,1,"breslcr01",190,72,"L",1980,2005-07-23,2016-05-10
+"Craig Gentry","Center Field",73,240,305,8,"gentrcr01",190,74,"R",1983,2009-09-06,2016-04-25
+"Craig Stammen","Pitcher",0,6,833,1,"stammcr01",230,76,"R",1984,2009-05-21,2015-04-14
+"Cristhian Martinez","Pitcher",0,3,548,1,"marticr01",185,73,"R",1982,2009-05-21,2013-04-06
+"Curtis Granderson","Center Field",138,596,333,8,"grandcu01",200,73,"L",1981,2004-09-13,2016-10-02
+"Daisuke Matsuzaka","Pitcher",0,2,558,1,"matsuda01",205,72,"R",1980,2007-04-05,2014-09-25
+"Dallas Keuchel","Pitcher",2,20,468,1,"keuchda01",205,75,"L",1988,2012-06-17,2016-08-27
+"Dan Haren","Pitcher",0,4,362,1,"harenda01",215,77,"R",1980,2003-06-30,2015-10-04
+"Dan Jennings","Pitcher",0,1,435,1,"jennida01",210,75,"L",1987,2012-04-30,2016-09-29
+"Dan Johnson","1st Base",8,22,440,3,"johnsda06",210,74,"L",1979,2005-05-27,2015-07-28
+"Dan Otero","Pitcher",0,1,653,1,"oteroda01",205,75,"R",1985,2012-04-07,2016-09-30
+"Dan Uggla","2nd Base",115,523,875,4,"ugglada01",210,71,"R",1980,2006-04-03,2015-10-03
+"Daniel Bard","Pitcher",0,2,37,1,"bardda01",215,76,"R",1985,2009-05-13,2013-04-27
+"Daniel Descalso","2nd Base",85,374,217,4,"descada01",190,70,"L",1986,2010-09-18,2016-10-02
+"Daniel Hudson","Pitcher",2,13,407,1,"hudsoda01",230,75,"R",1987,2009-09-04,2016-10-02
+"Daniel Murphy","2nd Base",166,571,619,4,"murphda08",215,73,"L",1985,2008-08-02,2016-10-02
+"Daniel Nava","Left Field",65,267,625,7,"navada01",200,71,"B",1983,2010-06-12,2016-10-02
+"Danny Espinosa","2nd Base",147,594,256,4,"espinda01",205,72,"B",1987,2010-09-01,2016-10-02
+"Danny Valencia","3rd Base",29,154,883,5,"valenda01",210,74,"R",1984,2010-06-03,2016-10-01
+"Danny Worth","2nd Base",16,74,933,4,"worthda01",195,73,"R",1985,2010-05-16,2016-07-24
+"Daric Barton","1st Base",23,113,42,3,"bartoda02",215,72,"L",1985,2007-09-10,2014-05-13
+"Darin Mastroianni","Right Field",41,163,554,9,"mastrda01",190,71,"R",1985,2011-08-24,2016-05-21
+"Darin Ruf","Left Field",11,33,770,7,"rufda01",250,75,"R",1986,2012-09-14,2016-10-01
+"Darnell McDonald","Left Field",18,88,574,7,"mcdonda02",205,71,"R",1978,2004-04-30,2013-09-29
+"Darwin Barney","2nd Base",139,548,40,4,"barneda01",180,70,"R",1985,2010-08-12,2016-09-28
+"Dave Sappelt","Right Field",19,69,794,9,"sappeda01",195,69,"R",1987,2011-08-07,2013-07-23
+"David Cooper","1st Base",42,140,178,3,"coopeda01",200,72,"L",1987,2011-04-29,2012-08-22
+"David DeJesus","Right Field",133,506,212,9,"dejesda01",190,71,"L",1979,2003-09-02,2015-09-23
+"David Freese","3rd Base",147,501,288,5,"freesda01",225,74,"R",1983,2009-04-06,2016-09-29
+"David Hernandez","Pitcher",1,1,381,1,"hernada01",245,75,"R",1985,2009-05-28,2016-10-01
+"David Herndon","Pitcher",0,1,387,1,"herndda01",200,77,"R",1985,2010-04-05,2012-04-29
+"David Lough","Center Field",14,59,521,8,"loughda01",175,70,"L",1986,2012-09-01,2016-06-01
+"David Murphy","Left Field",139,457,620,7,"murphda07",210,75,"L",1981,2006-09-02,2015-10-03
+"David Ortiz","1st Base",103,324,652,3,"ortizda01",230,75,"L",1975,1997-09-02,2016-10-02
+"David Price","Pitcher",0,4,708,1,"priceda01",215,77,"L",1985,2008-09-14,2016-10-02
+"David Ross","Catcher",45,176,766,2,"rossda01",230,74,"R",1977,2002-06-29,2016-10-01
+"David Wright","3rd Base",178,581,934,5,"wrighda03",205,72,"R",1982,2004-07-21,2016-05-27
+"Dayan Viciedo","Left Field",129,505,889,7,"vicieda01",240,71,"R",1989,2010-06-20,2014-09-28
+"Dee Gordon","Shortstop",69,303,328,6,"gordode01",170,71,"L",1988,2011-06-06,2016-10-02
+"Delmon Young","Left Field",153,574,939,7,"youngde03",240,75,"R",1985,2006-08-29,2015-06-29
+"Denard Span","Center Field",146,516,831,8,"spande01",210,72,"L",1984,2008-04-06,2016-10-02
+"Denis Phipps","Center Field",3,10,694,8,"phippde01",220,74,"R",1985,2012-09-03,2012-09-30
+"Derek Holland","Pitcher",0,2,402,1,"hollade01",205,74,"B",1986,2009-04-22,2016-10-01
+"Derek Jeter","Shortstop",216,683,437,6,"jeterde01",195,75,"R",1974,1995-05-29,2014-09-28
+"Derek Lowe","Pitcher",2,4,524,1,"lowede01",230,78,"R",1973,1997-04-26,2013-05-19
+"Derek Norris","Catcher",42,209,642,2,"norride01",230,72,"R",1989,2012-06-21,2016-10-01
+"Desmond Jennings","Left Field",124,505,436,7,"jennide01",210,74,"R",1986,2010-09-01,2016-08-02
+"Devin Mesoraco","Catcher",35,165,587,2,"mesorde01",220,73,"R",1988,2011-09-03,2016-04-27
+"Dewayne Wise","Left Field",58,224,928,7,"wisede01",200,72,"L",1978,2000-04-06,2013-05-29
+"Dexter Fowler","Center Field",136,454,280,8,"fowlede01",195,77,"B",1986,2008-09-02,2016-10-02
+"Didi Gregorius","Shortstop",6,20,338,6,"gregodi01",205,75,"L",1990,2012-09-05,2016-10-02
+"Dillon Gee","Pitcher",4,27,304,1,"geedi01",205,73,"R",1986,2010-09-07,2016-09-25
+"Dioner Navarro","Catcher",20,69,626,2,"navardi01",215,69,"B",1984,2004-09-07,2016-09-30
+"DJ LeMahieu","2nd Base",68,229,499,4,"lemahdj01",215,76,"R",1988,2011-05-30,2016-09-30
+"Domonic Brown","Right Field",44,187,96,9,"browndo01",225,77,"L",1987,2010-07-28,2015-09-02
+"Don Kelly","Right Field",21,113,459,9,"kellydo01",215,76,"L",1980,2007-04-02,2016-07-27
+"Donnie Murphy","3rd Base",25,116,621,5,"murphdo01",190,70,"R",1983,2004-09-18,2014-07-04
+"Donovan Solano","2nd Base",84,285,826,4,"solando01",205,70,"R",1987,2012-05-21,2016-10-02
+"Doug Fister","Pitcher",0,2,271,1,"fistedo01",210,80,"L",1984,2009-08-08,2016-09-28
+"Drew Butera","Catcher",22,111,108,2,"buterdr01",200,73,"R",1983,2010-04-09,2016-10-02
+"Drew Hutchison","Pitcher",0,2,418,1,"hutchdr01",205,75,"L",1990,2012-04-21,2016-09-30
+"Drew Pomeranz","Pitcher",6,26,703,1,"pomerdr01",240,78,"R",1988,2011-09-11,2016-10-02
+"Drew Smyly","Pitcher",0,1,821,1,"smylydr01",190,75,"L",1989,2012-04-12,2016-09-26
+"Drew Stubbs","Center Field",105,493,840,8,"stubbdr01",205,76,"R",1984,2009-08-19,2016-10-02
+"Drew Sutton","Left Field",31,122,843,7,"suttodr01",200,75,"B",1983,2009-07-02,2012-07-30
+"Duane Below","Pitcher",0,1,56,1,"belowdu01",210,75,"L",1985,2011-07-20,2013-05-27
+"Dustin Ackley","2nd Base",137,607,4,4,"ackledu01",205,73,"L",1988,2011-06-17,2016-05-29
+"Dustin Moseley","Pitcher",0,1,615,1,"moseldu01",215,76,"R",1981,2006-07-17,2012-04-07
+"Dustin Pedroia","2nd Base",163,563,673,4,"pedrodu01",175,69,"R",1983,2006-08-22,2016-10-02
+"Edinson Volquez","Pitcher",4,56,897,1,"volqued01",220,72,"R",1983,2005-08-30,2016-10-01
+"Eduardo Escobar","3rd Base",28,131,254,5,"escobed01",185,70,"B",1989,2011-09-02,2016-10-02
+"Eduardo Nunez","Shortstop",26,89,644,6,"nunezed02",195,72,"R",1987,2010-08-19,2016-09-25
+"Edwar Cabrera","Pitcher",0,1,112,1,"cabreed01",195,72,"L",1987,2012-06-27,2012-07-24
+"Edwin Encarnacion","1st Base",152,542,251,3,"encared01",230,73,"R",1983,2005-06-24,2016-10-02
+"Edwin Jackson","Pitcher",13,57,429,1,"jacksed01",215,74,"R",1983,2003-09-09,2016-09-30
+"Edwin Maysonet","Shortstop",15,60,566,6,"maysoed01",180,73,"R",1981,2008-09-07,2012-06-19
+"Eli Whiteside","Catcher",1,11,919,2,"whiteel03",220,74,"R",1979,2005-07-05,2014-06-21
+"Elian Herrera","Left Field",47,187,388,7,"herreel01",205,71,"B",1985,2012-05-15,2015-09-19
+"Elliot Johnson","Shortstop",72,297,441,6,"johnsel02",190,73,"B",1984,2008-04-05,2014-05-02
+"Elvin Ramirez","Pitcher",0,1,722,1,"ramirel02",208,75,"R",1987,2012-06-03,2012-10-03
+"Elvis Andrus","Shortstop",180,629,17,6,"andruel01",200,72,"R",1988,2009-04-06,2016-10-02
+"Emilio Bonifacio","Center Field",63,244,81,8,"bonifem01",210,70,"B",1985,2007-09-02,2016-10-01
+"Emmanuel Burriss","2nd Base",29,136,106,4,"burriem01",190,72,"B",1985,2008-04-20,2016-09-28
+"Endy Chavez","Left Field",32,158,153,7,"chaveen01",170,71,"L",1978,2001-05-29,2014-09-27
+"Eric Chavez","3rd Base",78,278,154,5,"chaveer01",215,73,"L",1977,1998-09-08,2014-06-08
+"Eric Farris","2nd Base",1,8,262,4,"farrier01",180,69,"R",1986,2011-07-28,2012-10-02
+"Eric Fryer","Left Field",1,4,290,7,"fryerer01",215,74,"R",1985,2011-06-26,2016-10-02
+"Eric Hacker","Pitcher",0,3,345,1,"hackeer01",230,73,"B",1983,2009-09-22,2012-08-25
+"Eric Hinske","1st Base",26,132,398,3,"hinsker01",235,74,"L",1977,2002-04-01,2013-06-27
+"Eric Hosmer","1st Base",124,535,405,3,"hosmeer01",225,76,"L",1989,2011-05-06,2016-09-30
+"Eric Sogard","Shortstop",17,102,825,6,"sogarer01",180,69,"L",1986,2010-09-14,2015-10-02
+"Eric Stults","Pitcher",7,28,841,1,"stulter01",220,74,"L",1979,2006-09-05,2015-05-26
+"Eric Thames","Left Field",63,271,856,7,"thameer01",210,72,"L",1986,2011-05-18,2012-10-01
+"Erick Aybar","Shortstop",150,517,30,6,"aybarer01",195,70,"B",1984,2006-05-16,2016-10-01
+"Erik Bedard","Pitcher",4,37,53,1,"bedarer01",195,73,"L",1979,2002-04-17,2014-07-12
+"Erik Komatsu","Right Field",11,51,472,9,"komater01",175,70,"L",1987,2012-04-06,2012-05-22
+"Erik Kratz","Catcher",35,141,479,2,"kratzer01",240,76,"R",1980,2010-07-17,2016-07-17
+"Ervin Santana","Pitcher",0,4,790,1,"santaer01",175,74,"R",1982,2005-05-17,2016-09-28
+"Esmil Rogers","Pitcher",1,3,756,1,"rogeres01",200,75,"R",1985,2009-09-12,2015-06-12
+"Eury Perez","Center Field",1,5,685,8,"perezeu01",190,72,"R",1990,2012-09-01,2015-08-23
+"Evan Longoria","3rd Base",79,273,519,5,"longoev01",210,74,"R",1985,2008-04-12,2016-10-02
+"Everth Cabrera","Shortstop",98,398,113,6,"cabreev01",190,70,"B",1986,2009-04-08,2015-06-04
+"Ezequiel Carrera","Left Field",40,147,133,7,"carreez01",185,71,"L",1987,2011-05-20,2016-10-02
+"Felix Doubront","Pitcher",0,1,232,1,"doubrfe01",240,74,"L",1987,2010-06-18,2015-10-03
+"Felix Hernandez","Pitcher",1,3,382,1,"hernafe02",225,75,"R",1986,2005-08-04,2016-10-02
+"Fernando Abad","Pitcher",1,7,1,1,"abadfe01",220,73,"L",1985,2010-07-28,2016-09-25
+"Fernando Martinez","Left Field",28,118,549,7,"martife02",210,73,"L",1988,2009-05-26,2013-05-05
+"Fernando Rodriguez","Pitcher",0,3,752,1,"rodrife02",235,75,"R",1984,2009-05-02,2016-07-03
+"Fernando Salas","Pitcher",0,1,778,1,"salasfe01",200,74,"R",1985,2010-05-28,2016-10-01
+"Francisco Cervelli","Catcher",0,1,148,2,"cervefr01",210,73,"R",1986,2008-09-18,2016-09-27
+"Francisco Liriano","Pitcher",0,3,513,1,"liriafr01",225,74,"L",1983,2005-09-05,2016-09-28
+"Francisco Peguero","Left Field",3,16,675,7,"peguefr01",190,72,"R",1988,2012-08-25,2013-09-29
+"Franklin Gutierrez","Center Field",39,150,341,8,"gutiefr01",200,74,"R",1983,2005-08-31,2016-10-02
+"Franklin Morales","Pitcher",1,2,604,1,"moralfr01",210,73,"L",1986,2007-08-18,2016-07-31
+"Freddie Freeman","1st Base",140,540,287,3,"freemfr01",220,77,"L",1989,2010-09-01,2016-10-02
+"Freddy Galvis","2nd Base",43,190,296,4,"galvifr01",185,70,"B",1989,2012-04-05,2016-10-02
+"Gaby Sanchez","1st Base",65,299,784,3,"sanchga01",235,73,"R",1983,2008-09-17,2014-09-28
+"Garrett Jones","1st Base",130,475,450,3,"jonesga02",235,77,"L",1981,2007-05-15,2015-07-29
+"Garrett Richards","Pitcher",0,2,741,1,"richaga01",210,75,"R",1988,2011-08-10,2016-05-01
+"Gavin Floyd","Pitcher",0,1,276,1,"floydga01",245,76,"R",1983,2004-09-03,2016-06-25
+"Geoff Blum","3rd Base",4,28,78,5,"blumge01",220,75,"B",1973,1999-08-09,2012-07-17
+"George Kontos","Pitcher",0,1,474,1,"kontoge01",215,75,"R",1985,2011-09-10,2016-09-25
+"George Kottaras","Catcher",36,171,477,2,"kottage01",200,72,"L",1983,2008-09-13,2014-09-28
+"Geovany Soto","Catcher",64,324,830,2,"sotoge01",225,73,"R",1983,2005-09-23,2016-08-14
+"Gerald Laird","Catcher",49,174,485,2,"lairdge01",230,73,"R",1979,2003-04-30,2015-04-08
+"Gerardo Parra","Center Field",105,385,664,8,"parrage01",210,71,"L",1987,2009-05-13,2016-09-29
+"Giancarlo Stanton","Right Field",130,449,834,9,"stantmi03",245,78,"R",1989,2010-06-08,2016-10-02
+"Gil Velazquez","3rd Base",13,56,886,5,"velazgi01",185,74,"R",1979,2008-09-25,2013-08-22
+"Gio Gonzalez","Pitcher",6,64,325,1,"gonzagi01",205,72,"R",1985,2008-08-06,2016-09-28
+"Gordon Beckham","2nd Base",123,525,52,4,"beckhgo01",190,72,"R",1986,2009-06-04,2016-10-01
+"Gorkys Hernandez","Center Field",30,156,383,8,"hernago01",190,73,"R",1987,2012-05-21,2016-10-01
+"Grant Balfour","Pitcher",0,1,35,1,"balfogr01",200,74,"R",1977,2001-07-22,2015-04-18
+"Greg Dobbs","3rd Base",91,319,228,5,"dobbsgr01",205,73,"L",1978,2004-09-08,2014-06-24
+"Gregor Blanco","Right Field",96,393,73,9,"blancgr01",175,71,"L",1983,2008-03-30,2016-09-28
+"Guillermo Moscoso","Pitcher",2,11,614,1,"moscogu01",200,73,"R",1983,2009-05-30,2013-09-29
+"Guillermo Quiroz","Catcher",0,2,717,2,"quirogu01",215,73,"R",1981,2004-09-04,2014-09-13
+"Hank Conger","Catcher",3,18,175,2,"congeha01",220,74,"B",1988,2010-09-11,2016-07-08
+"Hanley Ramirez","3rd Base",155,604,724,5,"ramirha01",235,74,"R",1983,2005-09-20,2016-10-02
+"Hector Gimenez","Catcher",5,11,312,2,"gimenhe01",230,70,"B",1982,2006-09-25,2013-06-29
+"Hector Luna","1st Base",14,62,529,3,"lunahe01",190,73,"R",1980,2004-04-08,2012-08-17
+"Hector Noesi","Pitcher",2,4,639,1,"noesihe01",205,75,"R",1987,2011-05-18,2015-06-15
+"Hector Sanchez","Catcher",61,218,785,2,"sanchhe01",235,72,"B",1989,2011-07-15,2016-09-21
+"Henderson Alvarez","Pitcher",0,1,11,1,"alvarhe01",205,72,"R",1990,2011-08-10,2015-05-22
+"Henry Blanco","Catcher",12,64,74,2,"blanche01",220,71,"R",1971,1997-07-25,2013-09-23
+"Hernan Perez","2nd Base",1,2,686,4,"perezhe01",215,73,"R",1991,2012-06-09,2016-10-02
+"Hideki Matsui","Left Field",14,95,557,7,"matsuhi01",210,74,"L",1974,2003-03-31,2012-07-22
+"Hiroki Kuroda","Pitcher",0,2,481,1,"kurodhi01",205,73,"R",1975,2008-04-04,2014-09-25
+"Homer Bailey","Pitcher",8,70,32,1,"baileho02",225,76,"R",1986,2007-06-08,2016-08-28
+"Howie Kendrick","2nd Base",158,550,462,4,"kendrho01",220,71,"R",1983,2006-04-26,2016-10-02
+"Humberto Quintero","Catcher",32,138,716,2,"quinthu01",215,70,"R",1979,2003-09-03,2014-09-27
+"Hunter Pence","Right Field",156,617,680,9,"pencehu01",220,76,"R",1983,2007-04-28,2016-10-02
+"Ian Desmond","Shortstop",150,513,218,6,"desmoia01",215,75,"R",1985,2009-09-10,2016-10-01
+"Ian Kennedy","Pitcher",4,51,465,1,"kenneia01",200,72,"R",1984,2007-09-01,2016-10-02
+"Ian Kinsler","2nd Base",168,655,469,4,"kinslia01",200,72,"R",1982,2006-04-03,2016-10-02
+"Ian Stewart","3rd Base",36,179,837,5,"stewaia01",225,75,"L",1985,2007-08-11,2014-05-11
+"Ichiro Suzuki","Right Field",178,629,844,9,"suzukic01",175,71,"L",1973,2001-04-02,2016-10-02
+"Irving Falu","2nd Base",29,85,260,4,"faluir01",185,69,"B",1983,2012-05-06,2014-07-12
+"Ivan De Jesus","2nd Base",9,41,210,4,"dejesiv02",200,71,"R",1987,2011-04-01,2016-10-02
+"Ivan Nova","Pitcher",1,7,643,1,"novaiv01",240,77,"R",1987,2010-05-13,2016-09-29
+"Jack Hannahan","3rd Base",70,287,357,5,"hannaja01",210,74,"L",1980,2006-05-25,2014-09-27
+"Jacob Turner","Pitcher",0,14,873,1,"turneja01",215,77,"R",1991,2011-07-30,2016-10-02
+"Jacoby Ellsbury","Center Field",82,303,249,8,"ellsbja01",195,73,"L",1983,2007-06-30,2016-10-02
+"Jaime Garcia","Pitcher",10,40,300,1,"garcija02",215,74,"L",1986,2008-07-11,2016-09-26
+"Jair Jurrjens","Pitcher",1,13,452,1,"jurrjja01",200,73,"R",1986,2007-08-15,2014-07-09
+"Jake Arrieta","Pitcher",0,3,23,1,"arrieja01",225,76,"R",1986,2010-06-10,2016-09-28
+"Jake Elmore","Shortstop",13,68,250,6,"elmorja01",180,70,"R",1987,2012-08-11,2016-10-02
+"Jake Peavy","Pitcher",0,5,672,1,"peavyja01",195,73,"R",1981,2002-06-22,2016-09-21
+"Jake Westbrook","Pitcher",6,49,916,1,"westbja01",210,75,"R",1977,2000-06-17,2013-09-29
+"James Darnell","Left Field",4,17,203,7,"darneja01",205,74,"R",1987,2011-08-09,2012-05-17
+"James Loney","1st Base",108,434,518,3,"loneyja01",235,75,"L",1984,2006-04-04,2016-10-02
+"James McDonald","Pitcher",7,49,575,1,"mcdonja03",205,77,"L",1984,2008-09-17,2013-05-01
+"James Russell","Pitcher",0,1,774,1,"russeja02",205,76,"L",1986,2010-04-05,2016-04-19
+"James Shields","Pitcher",1,5,813,1,"shielja02",215,75,"R",1981,2006-05-31,2016-10-01
+"Jamey Carroll","2nd Base",126,470,135,4,"carroja01",175,70,"R",1974,2002-09-11,2013-09-27
+"Jamey Wright","Pitcher",0,2,935,1,"wrighja01",240,78,"R",1974,1996-07-03,2014-09-27
+"Jamie Moyer","Pitcher",2,13,618,1,"moyerja01",170,72,"L",1962,1986-06-16,2012-05-27
+"Jared Hughes","Pitcher",0,1,411,1,"hugheja02",240,79,"R",1985,2011-09-07,2016-10-02
+"Jarrod Dyson","Center Field",76,292,244,8,"dysonja01",165,70,"L",1984,2010-09-07,2016-10-02
+"Jarrod Parker","Pitcher",0,6,662,1,"parkeja02",195,73,"R",1988,2011-09-27,2013-09-28
+"Jarrod Saltalamacchia","Catcher",90,405,780,2,"saltaja01",235,76,"B",1985,2007-05-02,2016-10-01
+"Jason Bartlett","Shortstop",11,83,41,6,"bartlja01",190,72,"R",1979,2004-08-03,2014-04-06
+"Jason Bay","Left Field",32,194,48,7,"bayja01",210,74,"R",1978,2003-05-23,2013-07-26
+"Jason Berken","Pitcher",0,5,61,1,"berkeja01",210,72,"R",1983,2009-05-26,2012-10-01
+"Jason Bourgeois","Center Field",16,62,83,8,"bourgja01",195,69,"R",1982,2008-09-09,2015-10-04
+"Jason Castro","Catcher",66,257,143,2,"castrja01",215,75,"L",1987,2010-06-22,2016-09-30
+"Jason Donald","3rd Base",25,124,230,5,"donalja01",195,73,"R",1984,2010-05-18,2012-10-03
+"Jason Giambi","1st Base",20,89,308,3,"giambja01",240,75,"L",1971,1995-05-08,2014-09-27
+"Jason Hammel","Pitcher",0,4,353,1,"hammeja01",225,78,"R",1982,2006-04-11,2016-09-24
+"Jason Heyward","Right Field",158,587,392,9,"heywaja01",240,77,"L",1989,2010-04-05,2016-10-02
+"Jason Kipnis","2nd Base",152,591,470,4,"kipnija01",195,71,"L",1987,2011-07-22,2016-10-02
+"Jason Kubel","Left Field",128,506,480,7,"kubelja01",220,72,"L",1982,2004-08-31,2014-06-06
+"Jason Marquis","Pitcher",9,32,542,1,"marquja01",220,73,"L",1978,2000-06-06,2015-05-25
+"Jason Pridie","Center Field",3,10,709,8,"pridija01",205,73,"L",1983,2008-09-03,2015-09-29
+"Jason Repko","Center Field",1,11,733,8,"repkoja01",200,71,"R",1980,2005-04-06,2012-04-20
+"Jason Vargas","Pitcher",2,5,885,1,"vargaja01",215,72,"L",1983,2005-07-14,2016-09-28
+"Jay Bruce","Right Field",141,560,98,9,"bruceja01",225,75,"L",1987,2008-05-27,2016-10-02
+"Jayson Nix","3rd Base",43,177,637,5,"nixja01",195,71,"R",1982,2008-04-01,2014-09-28
+"Jayson Werth","Right Field",90,300,915,9,"werthja01",235,77,"R",1979,2002-09-01,2016-09-30
+"Jean Segura","Shortstop",39,151,810,6,"segurje01",205,70,"R",1990,2012-07-24,2016-10-02
+"Jeanmar Gomez","Pitcher",1,4,318,1,"gomezje01",215,75,"R",1988,2010-07-18,2016-09-29
+"Jed Lowrie","Shortstop",83,340,525,6,"lowrije01",180,72,"B",1984,2008-04-15,2016-08-03
+"Jeff Baker","Right Field",45,188,33,9,"bakerje03",220,74,"R",1981,2005-04-04,2015-07-07
+"Jeff Bianchi","Shortstop",13,69,67,6,"biancje01",185,71,"R",1986,2012-07-13,2015-06-14
+"Jeff Clement","1st Base",3,22,164,3,"clemeje01",220,73,"L",1983,2007-09-04,2012-09-28
+"Jeff Francis","Pitcher",2,31,281,1,"francje01",220,77,"L",1981,2004-08-25,2015-10-04
+"Jeff Francoeur","Right Field",132,561,284,9,"francje02",225,76,"R",1984,2005-07-07,2016-10-02
+"Jeff Karstens","Pitcher",3,28,455,1,"karstje01",185,75,"R",1982,2006-08-22,2012-10-01
+"Jeff Keppinger","3rd Base",125,385,466,5,"keppije01",185,72,"R",1980,2004-08-20,2013-09-23
+"Jeff Locke","Pitcher",1,11,515,1,"lockeje01",200,72,"L",1987,2011-09-10,2016-09-24
+"Jeff Mathis","Catcher",46,211,556,2,"mathije01",205,72,"R",1983,2005-08-12,2016-10-01
+"Jeff Samardzija","Pitcher",5,50,781,1,"samarje01",225,77,"R",1985,2008-07-25,2016-09-28
+"Jeff Suppan","Pitcher",1,10,842,1,"suppaje01",225,74,"R",1975,1995-07-17,2012-05-28
+"Jemile Weeks","2nd Base",98,444,907,4,"weeksje01",170,69,"B",1987,2011-06-07,2016-05-07
+"Jenrry Mejia","Pitcher",0,3,583,1,"mejiaje01",205,72,"R",1989,2010-04-07,2015-07-26
+"Jered Weaver","Pitcher",1,2,905,1,"weaveje02",210,79,"R",1982,2006-05-27,2016-09-26
+"Jeremy Affeldt","Pitcher",0,1,7,1,"affelje01",225,76,"L",1979,2002-04-06,2015-10-04
+"Jeremy Guthrie","Pitcher",2,25,340,1,"guthrje01",205,73,"R",1979,2004-08-28,2015-09-26
+"Jeremy Hefner","Pitcher",2,20,374,1,"hefneje01",205,76,"R",1986,2012-04-23,2013-08-09
+"Jeremy Hellickson","Pitcher",0,1,376,1,"hellije01",190,73,"R",1987,2010-08-02,2016-09-29
+"Jeremy Hermida","Right Field",6,24,380,9,"hermije01",220,75,"L",1984,2005-08-31,2012-04-26
+"Jerome Williams","Pitcher",1,4,923,1,"willije02",260,75,"R",1981,2003-04-26,2016-09-26
+"Jerry Sands","Left Field",4,23,788,7,"sandsje01",225,76,"R",1987,2011-04-18,2016-06-04
+"Jesse Chavez","Pitcher",0,2,155,1,"chaveje01",175,74,"R",1983,2008-08-27,2016-09-29
+"Jesus Flores","Catcher",59,277,273,2,"floreje02",210,73,"R",1984,2007-04-04,2012-10-03
+"Jesus Guzman","Left Field",71,287,343,7,"guzmaje01",200,73,"R",1984,2009-05-21,2014-09-24
+"Jesus Montero","Catcher",134,515,598,2,"monteje01",235,75,"R",1989,2011-09-01,2015-10-03
+"Jeurys Familia","Pitcher",0,1,261,1,"familje01",240,75,"R",1989,2012-09-04,2016-10-01
+"Jhonatan Solano","Catcher",11,35,827,2,"solanjh01",205,69,"R",1985,2012-05-29,2015-05-31
+"Jhonny Peralta","Shortstop",127,531,683,6,"peraljh01",225,74,"R",1982,2003-06-12,2016-10-02
+"Jhoulys Chacin","Pitcher",7,24,150,1,"chacijh01",215,75,"R",1988,2009-07-25,2016-10-02
+"Jim Thome","1st Base",41,163,860,3,"thomeji01",250,76,"L",1970,1991-09-04,2012-10-03
+"Jimmy Paredes","Right Field",14,74,661,9,"paredji01",200,75,"B",1988,2011-08-01,2016-10-02
+"Jimmy Rollins","Shortstop",158,632,759,6,"rolliji01",175,67,"B",1978,2000-09-17,2016-06-08
+"Joaquin Arias","3rd Base",86,319,22,5,"ariasjo01",185,73,"R",1984,2006-09-13,2015-07-24
+"Joe Blanton","Pitcher",4,55,76,1,"blantjo01",225,75,"R",1980,2004-09-21,2016-10-02
+"Joe Mahoney","1st Base",0,4,535,3,"mahonjo01",245,78,"L",1987,2012-07-07,2013-04-27
+"Joe Mather","Center Field",47,225,555,8,"mathejo02",215,76,"R",1982,2008-05-30,2012-10-01
+"Joe Mauer","Catcher",174,545,562,2,"mauerjo01",225,77,"L",1983,2004-04-05,2016-09-25
+"Joe Saunders","Pitcher",3,35,795,1,"saundjo01",215,75,"L",1981,2005-08-16,2014-09-26
+"Joe Savery","Pitcher",0,2,797,1,"saverjo01",235,75,"L",1985,2011-09-20,2014-05-18
+"Joe Wieland","Pitcher",2,8,920,1,"wielajo01",205,74,"R",1990,2012-04-14,2016-08-12
+"Joel Carreno","Pitcher",0,1,132,1,"carrejo01",255,74,"R",1987,2011-08-23,2012-09-28
+"Joey Votto","1st Base",126,374,899,3,"vottojo01",220,74,"L",1983,2007-09-04,2016-10-02
+"Johan Santana","Pitcher",3,35,791,1,"santajo01",210,72,"L",1979,2000-04-03,2012-08-17
+"John Axford","Pitcher",0,1,29,1,"axforjo01",220,77,"R",1983,2009-09-15,2016-10-02
+"John Baker","Catcher",46,193,34,2,"bakerjo01",215,73,"L",1981,2008-07-09,2014-09-28
+"John Buck","Catcher",66,343,100,2,"buckjo01",245,75,"R",1980,2004-06-25,2014-09-28
+"John Danks","Pitcher",0,3,201,1,"danksjo01",210,73,"L",1985,2007-04-08,2016-04-28
+"John Hester","Catcher",18,85,391,2,"hestejo01",235,76,"R",1983,2009-08-28,2013-09-16
+"John Jaso","Catcher",81,294,433,2,"jasojo01",205,74,"L",1983,2008-09-06,2016-10-02
+"John Lannan","Pitcher",1,9,488,1,"lannajo01",235,76,"L",1984,2007-07-26,2014-04-13
+"Johnny Cueto","Pitcher",6,67,196,1,"cuetojo01",220,71,"R",1986,2008-04-03,2016-09-29
+"Johnny Damon","Left Field",46,207,200,7,"damonjo01",205,74,"L",1973,1995-08-12,2012-08-01
+"Johnny Giavotella","2nd Base",43,181,309,4,"giavojo01",185,68,"R",1987,2011-08-05,2016-08-14
+"Jon Jay","Center Field",135,443,434,8,"jayjo02",195,71,"L",1985,2010-04-26,2016-10-01
+"Jon Lester","Pitcher",0,5,503,1,"lestejo01",240,76,"L",1984,2006-06-10,2016-10-01
+"Jonathan Herrera","Shortstop",59,225,389,6,"herrejo03",180,69,"B",1984,2008-04-30,2015-09-09
+"Jonathan Lucroy","Catcher",101,316,526,2,"lucrojo01",200,72,"R",1986,2010-05-21,2016-10-02
+"Jonathan Sanchez","Pitcher",0,5,786,1,"sanchjo01",200,72,"L",1982,2006-05-28,2013-04-29
+"Jonathon Niese","Pitcher",12,55,633,1,"niesejo01",215,75,"L",1986,2008-09-02,2016-08-23
+"Jonny Gomes","Left Field",73,279,315,7,"gomesjo01",230,73,"R",1980,2003-09-12,2015-10-04
+"Jordan Danks","Left Field",15,67,202,7,"danksjo02",220,77,"L",1986,2012-06-07,2015-08-06
+"Jordan Lyles","Pitcher",6,38,531,1,"lylesjo01",230,76,"R",1990,2011-05-31,2016-10-01
+"Jordan Pacheco","3rd Base",147,475,658,5,"pachejo01",200,73,"R",1986,2011-09-06,2016-05-31
+"Jordan Schafer","Center Field",66,313,799,8,"schafjo02",205,73,"L",1986,2009-04-05,2015-05-10
+"Jordan Zimmermann","Pitcher",11,57,946,1,"zimmejo02",225,74,"R",1986,2009-04-20,2016-10-01
+"Jordany Valdespin","Left Field",46,191,881,7,"valdejo02",190,72,"L",1987,2012-04-23,2015-07-10
+"Jordy Mercer","Shortstop",13,62,585,6,"mercejo03",205,75,"R",1986,2012-05-29,2016-09-29
+"Jorge De La Rosa","Pitcher",2,5,211,1,"delarjo01",215,73,"L",1981,2004-08-14,2016-09-20
+"Jose Altuve","2nd Base",167,576,10,4,"altuvjo01",165,66,"R",1990,2011-07-20,2016-10-02
+"Jose Constanza","Left Field",19,76,177,7,"constjo01",185,69,"L",1983,2011-07-29,2014-09-26
+"Jose Iglesias","Shortstop",8,68,421,6,"iglesjo01",185,71,"R",1990,2011-05-08,2016-10-02
+"Jose Lobaton","Catcher",37,167,514,2,"lobatjo01",205,73,"B",1984,2009-07-05,2016-10-02
+"Jose Lopez","3rd Base",58,236,520,5,"lopezjo01",205,72,"R",1983,2004-07-31,2012-10-03
+"Jose Mijares","Pitcher",0,1,589,1,"mijarjo01",265,71,"L",1984,2008-09-13,2013-09-28
+"Jose Molina","Catcher",56,251,596,2,"molinjo01",250,72,"R",1975,1999-09-06,2014-09-28
+"Jose Quintana","Pitcher",0,3,714,1,"quintjo01",220,73,"R",1989,2012-05-07,2016-09-29
+"Jose Tabata","Right Field",81,333,849,9,"tabatjo01",210,71,"R",1988,2010-06-09,2015-06-25
+"Josh Beckett","Pitcher",1,21,51,1,"beckejo02",230,77,"R",1980,2001-09-04,2014-08-03
+"Josh Collmenter","Pitcher",1,16,171,1,"collmjo01",240,75,"R",1986,2011-04-17,2016-09-29
+"Josh Donaldson","3rd Base",66,274,231,5,"donaljo02",210,73,"R",1985,2010-04-30,2016-10-02
+"Josh Hamilton","Center Field",160,562,352,8,"hamiljo03",240,76,"L",1981,2007-04-02,2015-10-04
+"Josh Harrison","2nd Base",58,249,366,4,"harrijo05",190,68,"R",1987,2011-05-31,2016-09-10
+"Josh Johnson","Pitcher",5,53,442,1,"johnsjo09",250,79,"L",1984,2005-09-10,2013-08-06
+"Josh Outman","Pitcher",1,12,655,1,"outmajo01",205,73,"L",1984,2008-09-02,2014-09-19
+"Josh Reddick","Right Field",148,611,730,9,"reddijo01",195,74,"L",1987,2009-07-31,2016-10-02
+"Josh Roenicke","Pitcher",1,12,755,1,"roenijo01",205,75,"R",1982,2008-09-13,2013-09-26
+"Josh Rutledge","Shortstop",76,277,775,6,"rutlejo01",190,73,"R",1989,2012-07-13,2016-06-14
+"Josh Stinson","Pitcher",0,1,838,1,"stinsjo01",210,76,"R",1988,2011-09-02,2014-06-13
+"Josh Thole","Catcher",75,321,858,2,"tholejo01",205,73,"L",1986,2009-09-03,2016-09-21
+"Josh Tomlin","Pitcher",2,5,863,1,"tomlijo01",190,73,"R",1984,2010-07-27,2016-10-02
+"Josh Vitters","3rd Base",12,99,893,5,"vittejo01",200,74,"R",1989,2012-08-05,2012-10-03
+"Josh Willingham","Left Field",135,519,924,7,"willijo03",230,74,"R",1979,2004-07-06,2014-09-28
+"Juan Francisco","3rd Base",45,192,283,5,"francju02",245,74,"L",1987,2009-09-14,2014-09-28
+"Juan Nicasio","Pitcher",2,18,631,1,"nicasju01",255,76,"R",1986,2011-05-28,2016-10-02
+"Juan Pierre","Left Field",121,394,695,7,"pierrju01",180,70,"L",1977,2000-08-07,2013-09-29
+"Juan Rivera","1st Base",76,312,743,3,"riverju01",220,74,"R",1978,2001-09-04,2012-10-03
+"Juan Uribe","3rd Base",31,162,878,5,"uribeju01",245,72,"R",1979,2001-04-08,2016-07-30
+"Julio Teheran","Pitcher",0,1,852,1,"teherju01",205,74,"R",1991,2011-05-07,2016-10-02
+"Jurickson Profar","2nd Base",3,17,710,4,"profaju01",190,72,"B",1993,2012-09-02,2016-10-02
+"Justin Christian","Left Field",7,56,160,7,"chrisju01",195,73,"R",1980,2008-06-24,2012-09-30
+"Justin Germano","Pitcher",1,17,306,1,"germaju01",210,74,"R",1982,2004-05-22,2014-05-13
+"Justin Hampson","Pitcher",0,1,354,1,"hampsju01",205,73,"L",1980,2006-09-10,2012-10-02
+"Justin Masterson","Pitcher",0,2,553,1,"masteju01",260,78,"R",1985,2008-04-24,2015-08-09
+"Justin Maxwell","Center Field",72,315,563,8,"maxweju01",225,76,"R",1983,2007-09-05,2015-08-31
+"Justin Morneau","1st Base",135,505,609,3,"morneju01",220,76,"L",1981,2003-06-10,2016-10-02
+"Justin Ruggiano","Center Field",90,288,771,8,"ruggiju01",210,73,"R",1982,2007-09-19,2016-08-26
+"Justin Sellers","Shortstop",9,44,811,6,"selleju01",175,70,"R",1986,2011-08-12,2014-09-22
+"Justin Smoak","1st Base",105,483,820,3,"smoakju01",220,76,"B",1986,2010-04-23,2016-09-30
+"Justin Turner","2nd Base",46,171,874,4,"turneju01",205,71,"R",1984,2009-09-08,2016-10-02
+"Justin Upton","Right Field",155,554,877,9,"uptonju01",205,74,"R",1987,2007-08-02,2016-10-02
+"Justin Verlander","Pitcher",0,4,888,1,"verlaju01",225,77,"R",1983,2005-07-04,2016-10-02
+"Kelly Johnson","2nd Base",114,507,443,4,"johnske05",200,73,"L",1982,2005-05-29,2016-10-02
+"Kelly Shoppach","Catcher",51,219,814,2,"shoppke01",220,72,"R",1980,2005-05-28,2013-09-12
+"Kendrys Morales","1st Base",132,484,605,3,"moralke01",220,73,"B",1983,2006-05-23,2016-10-02
+"Kerry Wood","Pitcher",0,1,930,1,"woodke02",210,77,"R",1977,1998-04-12,2012-05-18
+"Kevin Correia","Pitcher",5,47,182,1,"correke01",200,75,"R",1980,2003-07-10,2015-07-04
+"Kevin Frandsen","3rd Base",66,195,285,5,"frandke01",190,72,"R",1982,2006-04-28,2015-10-03
+"Kevin Mattison","Left Field",0,5,560,7,"mattike01",195,73,"L",1985,2012-05-12,2012-05-25
+"Kevin Millwood","Pitcher",0,5,593,1,"millwke01",230,76,"R",1974,1997-07-14,2012-09-12
+"Kevin Youkilis","3rd Base",103,438,937,5,"youklke01",220,73,"R",1979,2004-05-15,2013-06-13
+"Kip Wells","Pitcher",1,12,911,1,"wellski01",205,75,"R",1977,1999-08-02,2012-08-01
+"Kirk Nieuwenhuis","Center Field",71,282,634,8,"nieuwki01",225,75,"L",1987,2012-04-07,2016-10-02
+"Kole Calhoun","Right Field",4,23,120,9,"calhoko01",205,70,"L",1987,2012-05-22,2016-10-02
+"Konrad Schmidt","Catcher",0,7,803,2,"schmiko01",230,70,"R",1984,2010-09-13,2012-10-01
+"Kosuke Fukudome","Left Field",7,41,291,7,"fukudko01",200,72,"L",1977,2008-03-31,2012-06-03
+"Koyie Hill","Catcher",7,39,395,2,"hillko01",205,73,"B",1979,2003-09-05,2014-07-20
+"Kris Medlen","Pitcher",4,33,582,1,"medlekr01",190,70,"B",1985,2009-05-21,2016-05-10
+"Kristopher Negron","Center Field",1,4,629,8,"negrokr01",190,72,"R",1986,2012-06-07,2015-09-08
+"Kurt Suzuki","Catcher",96,408,845,2,"suzukku01",205,71,"R",1983,2007-06-12,2016-09-27
+"Kyle Blanks","1st Base",1,5,75,3,"blankky01",265,78,"R",1986,2009-06-19,2015-06-16
+"Kyle Drabek","Pitcher",0,2,236,1,"drabeky01",205,74,"R",1987,2010-09-15,2016-04-07
+"Kyle Kendrick","Pitcher",5,36,463,1,"kendrky01",220,75,"R",1984,2007-06-13,2015-10-02
+"Kyle Lohse","Pitcher",6,64,516,1,"lohseky01",215,74,"R",1978,2001-06-22,2016-07-19
+"Kyle McClellan","Pitcher",0,1,570,1,"mccleky01",215,74,"R",1984,2008-04-01,2013-06-29
+"Kyle McPherson","Pitcher",0,5,581,1,"mcpheky01",215,76,"R",1987,2012-08-20,2012-09-29
+"Kyle Seager","3rd Base",154,594,809,5,"seageky01",210,72,"L",1987,2011-07-07,2016-10-02
+"Kyle Weiland","Pitcher",0,5,909,1,"weilaky01",195,76,"L",1986,2011-07-10,2012-04-24
+"Lance Berkman","1st Base",21,81,62,3,"berkmla01",220,73,"B",1976,1999-07-16,2013-09-17
+"Lance Lynn","Pitcher",3,50,532,1,"lynnla01",280,77,"R",1987,2011-06-02,2015-10-04
+"Lars Anderson","Left Field",1,8,15,7,"anderla03",215,76,"L",1987,2010-09-06,2012-05-01
+"Laynce Nix","Left Field",28,114,638,7,"nixla01",220,73,"L",1980,2003-07-10,2013-08-03
+"Leonys Martin","Center Field",8,46,546,8,"martile01",200,74,"L",1988,2011-09-02,2016-10-01
+"Lew Ford","Left Field",13,71,278,7,"fordle01",200,72,"R",1976,2003-05-29,2012-09-29
+"Liam Hendriks","Pitcher",0,2,378,1,"hendrli01",200,72,"R",1989,2011-09-06,2016-10-02
+"Livan Hernandez","Pitcher",0,4,384,1,"hernali01",245,74,"R",1975,1996-09-24,2012-09-29
+"Logan Forsythe","2nd Base",86,315,279,4,"forsylo01",195,73,"R",1987,2011-05-04,2016-10-02
+"Logan Morrison","Left Field",68,296,610,7,"morrilo01",240,74,"L",1987,2010-07-27,2016-09-11
+"Logan Schafer","Center Field",7,23,800,8,"schaflo01",200,73,"L",1986,2011-09-02,2016-10-02
+"Lonnie Chisenhall","3rd Base",38,142,158,5,"chiselo01",190,74,"L",1988,2011-06-27,2016-10-02
+"Lorenzo Cain","Center Field",59,222,117,8,"cainlo01",205,74,"R",1986,2010-07-16,2016-09-09
+"Lou Marson","Catcher",44,195,543,2,"marsolo01",205,73,"R",1986,2008-09-28,2013-04-24
+"Lucas Duda","Right Field",96,401,238,9,"dudalu01",255,76,"L",1986,2010-09-01,2016-10-02
+"Lucas Harrell","Pitcher",9,59,364,1,"harrelu01",205,74,"B",1985,2010-07-30,2016-08-16
+"Luis Avilan","Pitcher",1,3,27,1,"avilalu01",225,74,"L",1989,2012-07-14,2016-10-02
+"Luis Cruz","3rd Base",84,283,191,5,"cruzlu01",210,73,"R",1984,2008-09-02,2013-07-22
+"Luis Exposito","Catcher",1,18,259,2,"exposlu01",210,75,"R",1987,2012-05-04,2012-09-09
+"Luis Hernandez","3rd Base",0,2,385,5,"hernalu01",190,70,"B",1984,2007-07-08,2012-08-26
+"Luis Marte","Pitcher",0,1,544,1,"martelu01",200,71,"R",1986,2011-09-01,2012-10-03
+"Luis Mendoza","Pitcher",0,2,584,1,"mendolu01",245,75,"R",1983,2007-09-08,2013-09-06
+"Luis Valbuena","3rd Base",58,265,880,5,"valbulu01",215,70,"L",1985,2008-09-02,2016-07-26
+"Luke Carlin","Catcher",3,14,127,2,"carlilu01",190,70,"B",1980,2008-05-10,2012-05-30
+"Luke Gregerson","Pitcher",0,1,337,1,"gregelu01",205,75,"L",1984,2009-04-06,2016-09-26
+"Luke Hochevar","Pitcher",1,5,399,1,"hochelu01",225,77,"R",1983,2007-09-08,2016-07-24
+"Luke Hughes","3rd Base",3,23,412,5,"hughelu01",205,71,"R",1984,2010-04-28,2012-04-29
+"Luke Scott","1st Base",72,314,807,3,"scottlu01",220,72,"L",1978,2005-04-05,2013-09-27
+"Lyle Overbay","1st Base",30,116,656,3,"overbly01",235,74,"L",1977,2001-09-19,2014-09-28
+"Madison Bumgarner","Pitcher",11,68,103,1,"bumgama01",250,77,"R",1989,2009-09-08,2016-09-30
+"Maicer Izturis","3rd Base",74,289,426,5,"izturma01",185,68,"B",1980,2004-08-27,2014-04-13
+"Maikel Cleto","Pitcher",0,1,165,1,"cletoma01",250,75,"R",1989,2011-06-02,2014-09-26
+"Manny Machado","3rd Base",50,191,533,5,"machama01",185,75,"R",1992,2012-08-09,2016-10-02
+"Manny Parra","Pitcher",0,1,665,1,"parrama01",215,75,"L",1982,2007-07-20,2015-10-01
+"Manny Pina","Catcher",0,2,698,2,"pinama01",215,72,"R",1987,2011-08-03,2016-10-02
+"Marco Estrada","Pitcher",4,40,257,1,"estrama01",200,72,"R",1983,2008-08-20,2016-09-30
+"Marco Scutaro","2nd Base",190,620,808,4,"scutama01",185,70,"R",1975,2002-07-21,2014-07-24
+"Mark Buehrle","Pitcher",3,67,102,1,"buehrma01",240,74,"L",1979,2000-07-16,2015-10-04
+"Mark DeRosa","3rd Base",16,85,216,5,"derosma01",215,73,"R",1975,1998-09-02,2013-09-29
+"Mark Ellis","2nd Base",107,415,248,4,"ellisma01",190,70,"R",1977,2002-04-09,2014-09-27
+"Mark Kotsay","Left Field",37,143,476,7,"kotsama01",220,72,"L",1975,1997-07-11,2013-09-29
+"Mark Reynolds","1st Base",101,457,737,3,"reynoma01",220,74,"R",1983,2007-05-16,2016-09-18
+"Mark Rogers","Pitcher",3,14,757,1,"rogerma01",240,75,"R",1986,2010-09-10,2012-08-31
+"Mark Teixeira","1st Base",113,451,853,3,"teixema01",225,75,"B",1980,2003-04-01,2016-10-02
+"Mark Trumbo","Left Field",146,544,871,7,"trumbma01",225,76,"R",1986,2010-09-11,2016-10-02
+"Marlon Byrd","Center Field",30,143,110,8,"byrdma01",245,72,"R",1977,2002-09-08,2016-05-31
+"Martin Maldonado","Catcher",62,233,539,2,"maldoma01",230,72,"R",1986,2011-09-03,2016-10-01
+"Martin Prado","Left Field",186,617,706,7,"pradoma01",215,72,"R",1983,2006-04-23,2016-10-02
+"Marwin Gonzalez","Shortstop",48,205,326,6,"gonzama01",205,73,"B",1989,2012-04-06,2016-10-02
+"Mat Gamel","1st Base",17,69,297,3,"gamelma01",220,73,"L",1985,2008-09-03,2012-05-01
+"Mat Latos","Pitcher",12,65,491,1,"latosma01",245,78,"R",1987,2009-07-19,2016-09-30
+"Matt Adams","1st Base",21,86,5,3,"adamsma01",260,75,"L",1988,2012-05-20,2016-10-02
+"Matt Belisle","Pitcher",0,3,54,1,"belisma01",230,75,"R",1980,2003-09-07,2016-09-28
+"Matt Cain","Pitcher",13,74,118,1,"cainma01",230,75,"R",1984,2005-08-29,2016-09-21
+"Matt Carpenter","1st Base",87,296,131,3,"carpema01",205,75,"L",1985,2011-06-04,2016-10-02
+"Matt Carson","Left Field",15,66,136,7,"carsoma01",200,74,"R",1981,2009-09-18,2013-09-29
+"Matt Diaz","Left Field",24,108,223,7,"diazma02",215,72,"R",1978,2003-07-19,2013-05-18
+"Matt Dominguez","3rd Base",31,109,229,5,"dominma01",220,74,"R",1989,2011-09-06,2016-06-06
+"Matt Downs","1st Base",36,178,234,3,"downsma01",190,73,"R",1984,2009-06-16,2012-10-03
+"Matt Garza","Pitcher",2,30,302,1,"garzama01",220,76,"R",1983,2006-08-11,2016-09-26
+"Matt Hague","1st Base",16,70,346,3,"haguema01",225,75,"R",1985,2012-04-07,2015-10-01
+"Matt Harrison","Pitcher",0,5,367,1,"harrima01",240,76,"L",1985,2008-07-08,2015-07-27
+"Matt Harvey","Pitcher",6,18,369,1,"harvema01",215,76,"R",1989,2012-07-26,2016-07-04
+"Matt Holliday","Left Field",177,599,403,7,"hollima01",240,76,"R",1980,2004-04-16,2016-10-02
+"Matt Kemp","Center Field",122,403,461,8,"kempma01",210,76,"R",1984,2006-05-28,2016-10-02
+"Matt LaPorta","1st Base",14,58,489,3,"laporma01",215,74,"R",1985,2009-05-03,2012-10-02
+"Matt McBride","Right Field",16,78,568,9,"mcbrima02",215,74,"R",1985,2012-08-04,2016-09-28
+"Matt Moore","Pitcher",0,4,601,1,"moorema02",210,75,"L",1989,2011-09-14,2016-10-02
+"Matt Treanor","Catcher",18,103,868,2,"treanma01",200,72,"R",1976,2004-06-02,2012-09-26
+"Matt Wieters","Catcher",131,526,921,2,"wietema01",230,77,"B",1986,2009-05-29,2016-10-02
+"Matthew Joyce","Right Field",96,399,451,9,"joycema01",205,74,"L",1984,2008-05-05,2016-10-02
+"Mauro Gomez","1st Base",28,102,319,3,"gomezma01",230,74,"R",1984,2012-05-13,2012-10-01
+"Max Scherzer","Pitcher",0,2,801,1,"scherma01",210,75,"R",1984,2008-04-29,2016-10-02
+"Melky Cabrera","Left Field",159,459,114,7,"cabreme01",210,70,"B",1984,2005-07-07,2016-10-02
+"Melky Mesa","Center Field",1,2,586,8,"mesame01",190,73,"R",1987,2012-09-22,2013-07-31
+"Micah Owings","Pitcher",0,2,657,1,"owingmi01",220,77,"R",1982,2007-04-06,2012-04-25
+"Michael Bourn","Center Field",171,624,85,8,"bournmi01",190,71,"L",1982,2006-07-30,2016-10-02
+"Michael Bowden","Pitcher",0,2,86,1,"bowdemi01",215,75,"R",1986,2008-08-30,2013-09-03
+"Michael Brantley","Center Field",159,552,88,8,"brantmi02",200,74,"L",1987,2009-09-01,2016-05-09
+"Michael Cuddyer","Right Field",93,358,195,9,"cuddymi01",220,74,"R",1979,2001-09-23,2015-10-03
+"Michael Martinez","2nd Base",20,115,552,4,"martimi02",180,69,"B",1982,2011-04-03,2016-10-02
+"Michael McKenry","Catcher",56,240,579,2,"mckenmi01",205,70,"R",1985,2010-09-08,2016-07-18
+"Michael Saunders","Center Field",125,507,796,8,"saundmi01",225,76,"L",1986,2009-07-25,2016-10-02
+"Michael Young","1st Base",169,611,942,3,"youngmi02",200,73,"R",1976,2000-09-29,2013-09-29
+"Miguel Batista","Pitcher",0,6,44,1,"batismi01",210,73,"R",1971,1992-04-11,2012-09-11
+"Miguel Cabrera","3rd Base",205,622,115,5,"cabremi01",240,76,"R",1983,2003-06-20,2016-10-02
+"Miguel Cairo","1st Base",28,150,119,3,"cairomi01",225,73,"R",1974,1996-04-17,2012-10-03
+"Miguel Montero","Catcher",139,486,599,2,"montemi01",210,71,"L",1983,2006-09-06,2016-10-02
+"Miguel Olivo","Catcher",70,315,647,2,"olivomi01",230,72,"R",1978,2002-09-15,2014-05-11
+"Mike Aviles","Shortstop",128,512,28,6,"avilemi01",205,70,"R",1981,2008-05-29,2016-08-15
+"Mike Baxter","Right Field",47,179,47,9,"baxtemi01",205,72,"L",1984,2010-09-06,2015-07-08
+"Mike Carp","Left Field",35,164,128,7,"carpmi01",210,72,"L",1986,2009-06-17,2014-08-28
+"Mike Costanzo","1st Base",1,18,183,3,"costami01",205,74,"L",1983,2012-05-13,2012-06-05
+"Mike Dunn","Pitcher",0,1,243,1,"dunnmi01",215,72,"L",1985,2009-09-04,2016-09-30
+"Mike Fiers","Pitcher",3,32,268,1,"fiersmi01",200,74,"R",1985,2011-09-14,2016-09-27
+"Mike Fontenot","2nd Base",28,97,277,4,"fontemi01",165,69,"L",1980,2005-04-13,2012-07-29
+"Mike Leake","Pitcher",18,61,494,1,"leakemi01",170,70,"R",1987,2010-04-11,2016-09-28
+"Mike McClendon","Pitcher",0,2,571,1,"mcclemi01",225,77,"R",1985,2010-08-14,2012-08-20
+"Mike McCoy","2nd Base",9,52,572,4,"mccoymi01",180,69,"R",1981,2009-09-09,2012-10-03
+"Mike Minor","Pitcher",4,55,595,1,"minormi01",210,76,"R",1987,2010-08-09,2014-09-20
+"Mike Morse","Left Field",118,406,611,7,"morsemi01",245,77,"R",1982,2005-05-31,2016-04-12
+"Mike Moustakas","3rd Base",136,563,617,5,"moustmi01",215,72,"L",1988,2011-06-10,2016-05-22
+"Mike Napoli","Catcher",80,352,623,2,"napolmi01",225,73,"R",1981,2006-05-04,2016-10-02
+"Mike Nickeas","Catcher",19,109,632,2,"nickemi01",210,72,"R",1983,2010-09-04,2013-09-10
+"Mike Olt","1st Base",5,33,649,3,"oltmi01",210,74,"R",1988,2012-08-02,2015-10-04
+"Mike Pelfrey","Pitcher",1,6,676,1,"pelfrmi01",240,79,"R",1984,2006-07-08,2016-09-25
+"Mike Trout","Center Field",182,559,870,8,"troutmi01",235,74,"R",1991,2011-07-08,2016-10-02
+"Miles Mikolas","Pitcher",0,3,590,1,"mikolmi01",220,77,"R",1988,2012-05-05,2014-08-25
+"Mitch Maier","Center Field",11,64,536,8,"maiermi01",210,75,"L",1982,2006-09-23,2012-06-30
+"Mitch Moreland","1st Base",90,327,607,3,"morelmi01",230,74,"L",1985,2010-07-29,2016-10-01
+"Moises Sierra","Right Field",33,147,815,9,"sierrmo01",220,73,"R",1988,2012-07-31,2014-09-28
+"Munenori Kawasaki","Shortstop",20,104,456,6,"kawasmu01",175,71,"L",1981,2012-04-07,2016-10-02
+"Nate McLouth","Left Field",64,266,580,7,"mclouna01",190,70,"L",1981,2005-06-29,2014-08-01
+"Nate Schierholtz","Right Field",62,241,802,9,"schiena01",215,74,"L",1984,2007-06-11,2014-09-28
+"Nate Spears","Left Field",0,4,832,7,"spearna01",180,71,"L",1985,2011-09-06,2012-04-21
+"Nathan Adcock","Pitcher",0,1,6,1,"adcocna01",235,76,"R",1988,2011-03-31,2015-07-26
+"Nathan Eovaldi","Pitcher",3,32,252,1,"eovalna01",225,74,"R",1990,2011-08-06,2016-08-10
+"Neftali Feliz","Pitcher",0,2,265,1,"felizne01",235,75,"R",1988,2009-08-03,2016-09-03
+"Neil Walker","2nd Base",132,472,901,4,"walkene01",210,75,"B",1985,2009-09-01,2016-08-27
+"Nick Blackburn","Pitcher",0,2,70,1,"blackni01",240,76,"R",1982,2007-09-03,2012-08-17
+"Nick Green","3rd Base",4,23,334,5,"greenni01",190,71,"R",1978,2004-05-15,2013-05-26
+"Nick Hundley","Catcher",32,204,415,2,"hundlni01",205,73,"R",1983,2008-07-04,2016-09-30
+"Nick Johnson","1st Base",18,87,444,3,"johnsni01",235,75,"L",1978,2001-08-21,2012-06-27
+"Nick Markakis","Right Field",125,420,541,9,"markani01",215,73,"L",1983,2006-04-03,2016-10-02
+"Nick Punto","3rd Base",35,160,712,5,"puntoni01",195,69,"B",1977,2001-09-09,2014-09-27
+"Nick Swisher","Right Field",146,537,848,9,"swishni01",195,72,"B",1980,2004-09-03,2015-10-02
+"Nick Vincent","Pitcher",0,1,892,1,"vinceni01",185,72,"R",1986,2012-06-26,2016-10-01
+"Nolan Reimold","Left Field",21,67,732,7,"reimono01",205,76,"R",1983,2009-05-14,2016-10-01
+"Nyjer Morgan","Center Field",69,289,608,8,"morgany01",180,70,"L",1980,2007-09-01,2014-05-14
+"Omar Infante","2nd Base",152,554,422,4,"infanom01",195,71,"R",1981,2002-09-07,2016-06-06
+"Omar Quintanilla","2nd Base",41,169,715,4,"quintom01",185,69,"L",1981,2005-07-31,2014-05-07
+"Omar Vizquel","2nd Base",36,153,894,4,"vizquom01",180,69,"B",1967,1989-04-03,2012-10-03
+"Omir Santos","Catcher",1,8,793,2,"santoom01",215,72,"R",1981,2008-09-05,2013-04-09
+"Orlando Hudson","2nd Base",53,260,408,4,"hudsoor01",190,72,"B",1977,2002-07-24,2012-10-03
+"Pablo Sandoval","3rd Base",112,396,787,5,"sandopa01",255,71,"B",1986,2008-08-14,2016-04-10
+"Patrick Corbin","Pitcher",4,36,179,1,"corbipa01",210,75,"L",1989,2012-04-30,2016-09-30
+"Paul Goldschmidt","1st Base",147,514,313,3,"goldspa01",225,75,"R",1987,2011-08-01,2016-10-02
+"Paul Janish","Shortstop",31,167,432,6,"janispa01",200,74,"R",1982,2008-05-14,2016-06-20
+"Paul Konerko","1st Base",159,533,473,3,"konerpa01",220,74,"R",1976,1997-09-08,2014-09-28
+"Paul Maholm","Pitcher",4,63,534,1,"maholpa01",245,74,"L",1982,2005-08-30,2014-08-01
+"Pedro Alvarez","3rd Base",128,525,12,5,"alvarpe01",250,75,"L",1987,2010-06-16,2016-10-01
+"Pedro Ciriaco","3rd Base",76,259,162,5,"ciriape01",180,72,"R",1985,2010-09-08,2015-10-04
+"Pedro Florimon","Shortstop",30,137,274,6,"floripe01",185,74,"B",1986,2011-09-10,2016-10-02
+"Pete Kozma","Shortstop",24,72,478,6,"kozmape01",190,72,"R",1988,2011-05-18,2015-10-04
+"Pete Orr","2nd Base",17,54,650,4,"orrpe01",195,73,"L",1979,2005-04-05,2013-09-26
+"Peter Bourjos","Center Field",37,168,84,8,"bourjpe01",185,73,"R",1987,2010-08-03,2016-10-02
+"Phil Hughes","Pitcher",0,2,413,1,"hugheph01",240,77,"R",1986,2007-04-26,2016-06-09
+"Philip Humber","Pitcher",1,5,414,1,"humbeph01",215,75,"R",1982,2006-09-24,2013-09-22
+"Placido Polanco","3rd Base",78,303,701,5,"polanpl01",190,69,"R",1975,1998-07-03,2013-09-28
+"Prince Fielder","1st Base",182,581,267,3,"fieldpr01",275,71,"L",1984,2005-06-13,2016-07-18
+"Quintin Berry","Left Field",75,291,64,7,"berryqu01",195,73,"L",1984,2012-05-23,2015-10-04
+"Rafael Furcal","Shortstop",126,477,293,6,"furcara01",195,68,"B",1977,2000-04-04,2014-06-21
+"Rafael Ortega","Center Field",2,4,651,8,"ortegra01",160,71,"L",1991,2012-09-30,2016-10-02
+"Rajai Davis","Left Field",115,447,207,7,"davisra01",195,70,"R",1980,2006-08-14,2016-10-02
+"Ramiro Pena","Shortstop",1,4,679,6,"penara02",200,71,"B",1985,2009-04-06,2016-07-29
+"Ramon Santiago","2nd Base",47,228,792,4,"santira01",185,71,"B",1979,2002-05-17,2014-09-27
+"Randall Delgado","Pitcher",6,25,213,1,"delgara01",220,76,"R",1990,2011-06-17,2016-10-02
+"Randy Wells","Pitcher",1,4,912,1,"wellsra01",230,77,"R",1982,2008-04-05,2012-06-26
+"Randy Wolf","Pitcher",6,40,929,1,"wolfra02",205,72,"L",1976,1999-06-11,2015-10-04
+"Raul Ibanez","Left Field",92,384,420,7,"ibanera01",225,74,"L",1972,1996-08-01,2014-09-28
+"Ray Olmedo","3rd Base",10,41,648,5,"olmedra01",165,71,"B",1981,2003-05-25,2012-10-03
+"Reed Johnson","Left Field",78,269,445,7,"johnsre02",185,70,"R",1976,2003-04-17,2015-10-03
+"Reid Brignac","Shortstop",2,21,92,6,"brignre01",210,75,"L",1986,2008-07-04,2016-05-26
+"Rex Brothers","Pitcher",0,2,93,1,"brothre01",210,72,"L",1987,2011-06-06,2015-10-04
+"Rhiner Cruz","Pitcher",0,1,193,1,"cruzrh01",210,74,"R",1986,2012-04-07,2013-09-29
+"Rick Ankiel","Center Field",36,158,18,8,"ankieri01",210,73,"L",1979,1999-08-23,2013-06-08
+"Rick Porcello","Pitcher",0,2,704,1,"porceri01",205,77,"R",1988,2009-04-09,2016-09-30
+"Rickie Weeks","2nd Base",135,588,908,4,"weeksri01",220,70,"R",1982,2003-09-15,2016-09-20
+"Ricky Nolasco","Pitcher",9,56,640,1,"nolasri01",235,74,"R",1982,2006-04-05,2016-09-27
+"Ricky Romero","Pitcher",1,5,760,1,"romerri01",210,73,"R",1984,2009-04-09,2013-09-25
+"Rob Brantly","Catcher",29,100,89,2,"brantro01",195,73,"L",1989,2012-08-14,2015-10-04
+"Rob Johnson","Catcher",13,52,446,2,"johnsro07",220,73,"R",1982,2007-09-04,2013-09-14
+"Rob Scahill","Pitcher",0,1,798,1,"scahiro01",220,74,"L",1987,2012-09-11,2016-10-02
+"Robbie Ross","Pitcher",0,2,767,1,"rossro01",215,71,"L",1989,2012-04-08,2016-10-02
+"Robert Andino","2nd Base",81,384,16,4,"andinro01",185,71,"R",1984,2005-09-04,2016-09-10
+"Robinson Cano","2nd Base",196,627,123,4,"canoro01",210,72,"L",1982,2005-05-03,2016-10-02
+"Rod Barajas","Catcher",66,321,36,2,"barajro01",250,74,"R",1975,1999-09-25,2012-10-03
+"Roger Bernadina","Left Field",66,227,63,7,"bernaro01",210,74,"L",1984,2008-06-29,2014-09-28
+"Roman Colon","Pitcher",0,1,173,1,"colonro01",245,77,"R",1979,2004-08-21,2012-06-22
+"Ronny Cedeno","2nd Base",43,166,146,4,"cedenro02",195,72,"R",1983,2005-04-23,2014-06-28
+"Ronny Paulino","Catcher",16,63,669,2,"pauliro01",250,75,"R",1981,2005-09-25,2012-07-08
+"Ross Detwiler","Pitcher",2,45,219,1,"detwiro01",210,75,"R",1986,2007-09-07,2016-09-28
+"Ross Ohlendorf","Pitcher",1,16,646,1,"ohlenro01",240,76,"R",1982,2007-09-11,2016-10-02
+"Roy Halladay","Pitcher",9,53,350,1,"hallaro01",225,78,"R",1977,1998-09-20,2013-09-23
+"Ruben Tejada","Shortstop",134,464,854,6,"tejadru01",200,71,"R",1989,2010-04-07,2016-07-17
+"Russ Canzler","Left Field",25,93,124,7,"canzlru01",220,74,"R",1986,2011-09-15,2012-10-03
+"Russell Martin","Catcher",89,422,547,2,"martiru01",205,70,"R",1983,2006-05-05,2016-10-02
+"Ryan Dempster","Pitcher",3,32,214,1,"dempsry01",215,74,"R",1977,1998-05-23,2013-09-29
+"Ryan Doumit","Catcher",133,484,233,2,"doumiry01",220,73,"B",1981,2005-06-05,2014-09-28
+"Ryan Flaherty","2nd Base",33,153,272,4,"flahery01",220,75,"L",1986,2012-04-07,2016-09-28
+"Ryan Hanigan","Catcher",87,317,356,2,"hanigry01",220,72,"R",1980,2007-09-09,2016-09-29
+"Ryan Howard","1st Base",57,260,406,3,"howarry01",250,76,"L",1979,2004-09-01,2016-10-02
+"Ryan Kalish","Center Field",22,96,454,8,"kalisry01",215,72,"L",1988,2010-07-31,2016-05-11
+"Ryan Langerhans","Left Field",0,1,487,7,"langery01",220,75,"L",1980,2002-04-28,2013-09-29
+"Ryan Lavarnway","Catcher",24,153,492,2,"lavarry01",240,76,"R",1987,2011-08-18,2015-10-04
+"Ryan Ludwick","Left Field",116,422,527,7,"ludwiry01",215,74,"R",1978,2002-06-05,2014-09-27
+"Ryan Mattheus","Pitcher",0,1,559,1,"matthry01",220,75,"R",1983,2011-06-14,2015-10-04
+"Ryan Raburn","2nd Base",35,205,718,4,"raburry01",185,72,"R",1981,2004-09-12,2016-09-24
+"Ryan Roberts","3rd Base",103,439,746,5,"roberry01",185,71,"R",1980,2006-07-30,2014-04-17
+"Ryan Sweeney","Right Field",53,204,847,9,"sweenry01",225,76,"L",1985,2006-09-01,2014-08-26
+"Ryan Theriot","2nd Base",95,352,857,4,"theriry01",185,71,"R",1979,2005-09-13,2012-10-03
+"Ryan Vogelsong","Pitcher",5,54,895,1,"vogelry01",215,76,"R",1977,2000-09-02,2016-10-02
+"Ryan Webb","Pitcher",0,1,906,1,"webbry01",245,78,"R",1986,2009-07-08,2016-06-26
+"Ryan Wheeler","3rd Base",26,109,917,5,"wheelry01",230,75,"L",1988,2012-07-20,2014-07-04
+"Ryan Zimmerman","3rd Base",163,578,945,5,"zimmery01",225,75,"R",1984,2005-09-01,2016-10-02
+"Salvador Perez","Catcher",87,289,688,2,"perezsa02",240,75,"R",1990,2011-08-10,2016-10-02
+"Sam Fuld","Right Field",25,98,292,9,"fuldsa01",180,69,"L",1981,2007-09-05,2015-10-04
+"Sam LeCure","Pitcher",0,1,496,1,"lecursa01",210,72,"R",1984,2010-05-28,2015-10-04
+"Sandy Leon","Catcher",8,30,500,2,"leonsa01",225,70,"B",1989,2012-05-14,2016-10-02
+"Santiago Casilla","Pitcher",1,3,140,1,"garcija01",210,72,"R",1980,2004-08-09,2016-09-30
+"Scott Cousins","Center Field",14,86,184,8,"cousisc01",200,73,"L",1985,2010-09-03,2013-05-09
+"Scott Diamond","Pitcher",1,7,221,1,"diamosc01",205,75,"L",1986,2011-07-18,2016-06-13
+"Scott Feldman","Pitcher",1,4,264,1,"feldmsc01",210,79,"L",1983,2005-08-31,2016-09-20
+"Scott Hairston","Left Field",99,377,348,7,"hairssc01",200,72,"R",1980,2004-05-07,2014-09-28
+"Scott Maine","Pitcher",0,2,537,1,"mainesc01",225,75,"L",1985,2010-08-27,2012-10-01
+"Scott Moore","3rd Base",52,201,602,5,"mooresc02",195,74,"L",1983,2006-09-04,2012-10-02
+"Scott Podsednik","Left Field",60,199,700,7,"podsesc01",185,72,"L",1976,2001-07-06,2012-10-03
+"Scott Rolen","3rd Base",72,294,758,5,"rolensc01",245,76,"R",1975,1996-08-01,2012-10-03
+"Scott Van Slyke","Right Field",9,54,884,9,"vanslsc01",215,76,"R",1986,2012-05-09,2016-08-07
+"Sean Burroughs","3rd Base",2,17,107,5,"burrose01",195,73,"L",1980,2002-04-02,2012-04-30
+"Sean Rodriguez","3rd Base",64,301,753,5,"rodrise01",200,72,"R",1985,2008-04-19,2016-10-01
+"Seth Smith","Left Field",92,383,819,7,"smithse01",210,75,"L",1982,2007-09-16,2016-10-01
+"Shane Loux","Pitcher",0,1,523,1,"louxsh01",225,74,"R",1979,2002-09-10,2012-09-30
+"Shane Robinson","Center Field",42,166,747,8,"robinsh01",170,69,"R",1984,2009-05-07,2016-09-30
+"Shane Victorino","Center Field",152,595,890,8,"victosh01",190,69,"R",1980,2003-04-02,2015-10-04
+"Shaun Marcum","Pitcher",4,38,540,1,"marcush01",195,72,"R",1981,2005-09-06,2015-06-17
+"Shelby Miller","Pitcher",2,3,592,1,"millesh01",225,75,"R",1990,2012-09-05,2016-09-28
+"Shelley Duncan","Left Field",47,232,241,7,"duncash01",215,77,"R",1979,2007-07-20,2013-04-27
+"Skip Schumaker","2nd Base",75,272,805,4,"schumsk01",185,70,"L",1980,2005-06-08,2015-10-04
+"Starlin Castro","Shortstop",183,646,144,6,"castrst01",230,74,"R",1990,2010-05-07,2016-10-01
+"Starling Marte","Left Field",43,167,545,7,"martest01",190,73,"R",1988,2012-07-26,2016-09-27
+"Stephen Drew","Shortstop",64,287,237,6,"drewst01",220,72,"L",1983,2006-07-15,2016-10-02
+"Stephen Fife","Pitcher",2,7,269,1,"fifest01",225,75,"R",1986,2012-07-17,2014-05-04
+"Stephen Strasburg","Pitcher",13,47,839,1,"strasst01",235,76,"R",1988,2010-06-08,2016-09-07
+"Stephen Vogt","Catcher",0,25,896,2,"vogtst01",225,72,"L",1984,2012-04-06,2016-10-02
+"Steve Cishek","Pitcher",0,1,163,1,"cishest01",215,78,"R",1986,2010-09-26,2016-10-01
+"Steve Clevenger","Catcher",40,199,166,2,"clevest01",210,70,"L",1986,2011-09-26,2016-06-29
+"Steve Edlefsen","Pitcher",0,1,246,1,"edlefst01",195,74,"R",1985,2011-08-21,2012-06-08
+"Steve Pearce","Left Field",38,159,671,7,"pearcst01",200,71,"R",1983,2007-09-01,2016-09-12
+"Steven Hill","1st Base",2,10,396,3,"hillst01",200,71,"R",1985,2010-08-15,2012-09-16
+"Steven Lerud","Catcher",2,10,502,2,"lerudst01",220,73,"L",1984,2012-08-30,2013-06-17
+"Steven Tolleson","3rd Base",13,71,862,5,"tollest01",185,71,"R",1983,2010-04-28,2015-05-26
+"Taylor Green","1st Base",19,103,335,3,"greenta01",195,72,"L",1986,2011-08-31,2012-10-03
+"Taylor Teagarden","Catcher",9,57,851,2,"teagata01",210,72,"R",1983,2008-07-18,2015-07-26
+"Ted Lilly","Pitcher",1,15,508,1,"lillyte01",195,72,"L",1976,1999-05-14,2013-06-04
+"Thomas Field","2nd Base",0,2,266,4,"fieldth01",185,70,"R",1987,2011-09-11,2015-05-27
+"Thomas Neal","Left Field",5,23,628,7,"nealth01",220,74,"R",1987,2012-09-02,2013-08-07
+"Tim Collins","Pitcher",0,1,170,1,"colliti01",170,67,"L",1989,2011-03-31,2014-09-28
+"Tim Federowicz","Catcher",1,3,263,2,"federti01",215,70,"R",1987,2011-09-11,2016-10-02
+"Tim Hudson","Pitcher",12,55,409,1,"hudsoti01",175,73,"R",1975,1999-06-08,2015-10-01
+"Tim Lincecum","Pitcher",4,45,510,1,"linceti01",170,71,"L",1984,2007-05-06,2016-08-05
+"Tim Stauffer","Pitcher",0,1,835,1,"staufti01",215,73,"R",1982,2005-05-11,2015-10-01
+"Todd Frazier","3rd Base",115,422,286,5,"frazito01",220,75,"R",1986,2011-05-23,2016-10-02
+"Todd Helton","1st Base",57,240,377,3,"heltoto01",220,74,"L",1973,1997-08-02,2013-09-29
+"Todd Redmond","Pitcher",0,1,731,1,"redmoto01",240,75,"R",1985,2012-08-18,2015-07-02
+"Tom Gorzelanny","Pitcher",2,6,329,1,"gorzeto01",210,74,"R",1982,2005-09-20,2016-07-03
+"Tom Koehler","Pitcher",0,1,471,1,"koehlto01",235,75,"R",1986,2012-09-05,2016-10-02
+"Tommy Hanson","Pitcher",1,49,358,1,"hansoto01",220,78,"R",1986,2009-06-07,2013-09-28
+"Tommy Hunter","Pitcher",0,2,416,1,"hunteto02",250,75,"R",1986,2008-08-01,2016-09-27
+"Tommy Milone","Pitcher",1,5,594,1,"milonto01",220,72,"L",1987,2011-09-03,2016-09-27
+"Tony Abreu","2nd Base",18,70,3,4,"abreuto01",200,70,"B",1984,2007-05-22,2014-07-28
+"Tony Campana","Center Field",46,174,122,8,"campato01",170,68,"L",1986,2011-05-17,2014-09-28
+"Tony Cingrani","Pitcher",0,1,161,1,"cingrto01",210,76,"L",1989,2012-09-09,2016-09-30
+"Tony Cruz","Catcher",32,126,194,2,"cruzto03",215,71,"R",1986,2011-05-24,2016-09-15
+"Tony Watson","Pitcher",0,1,904,1,"watsoto01",225,76,"L",1985,2011-06-08,2016-09-28
+"Torii Hunter","Right Field",167,534,417,9,"hunteto01",220,74,"R",1975,1997-08-22,2015-10-03
+"Travis Blackley","Pitcher",0,2,71,1,"blacktr01",190,75,"L",1982,2004-07-01,2013-09-13
+"Travis Buck","Left Field",16,74,101,7,"bucktr01",230,74,"L",1983,2007-04-02,2012-05-28
+"Travis Ishikawa","1st Base",39,152,424,3,"ishiktr01",220,75,"L",1983,2006-04-18,2015-10-02
+"Travis Snider","Right Field",41,164,822,9,"snidetr01",235,72,"L",1988,2008-08-29,2015-10-04
+"Travis Wood","Pitcher",10,53,931,1,"woodtr01",175,71,"R",1987,2010-07-01,2016-10-02
+"Trayvon Robinson","Left Field",32,145,748,7,"robintr01",200,70,"B",1987,2011-08-05,2012-10-03
+"Trevor Bauer","Pitcher",0,4,45,1,"bauertr01",200,73,"R",1991,2012-06-28,2016-10-01
+"Trevor Cahill","Pitcher",8,67,116,1,"cahiltr01",240,76,"R",1988,2009-04-07,2016-09-30
+"Trevor Plouffe","3rd Base",99,422,699,5,"plouftr01",215,74,"R",1986,2010-05-21,2016-09-06
+"Troy Tulowitzki","Shortstop",52,181,872,6,"tulowtr01",205,75,"R",1984,2006-08-30,2016-10-02
+"Tsuyoshi Nishioka","2nd Base",0,12,636,4,"nishits01",175,73,"B",1984,2011-04-01,2012-08-08
+"Ty Wigginton","1st Base",74,315,922,3,"wiggity01",215,72,"R",1977,2002-05-16,2013-07-05
+"Tyler Chatwood","Pitcher",4,16,152,1,"chatwty01",185,72,"R",1989,2011-04-11,2016-09-28
+"Tyler Cloyd","Pitcher",1,11,167,1,"cloydty01",210,75,"R",1987,2012-08-29,2013-09-29
+"Tyler Colvin","Right Field",122,420,174,9,"colvity01",210,75,"L",1985,2009-09-21,2014-07-30
+"Tyler Flowers","Catcher",29,136,275,2,"flowety01",260,76,"R",1986,2009-09-03,2016-10-02
+"Tyler Graham","Center Field",0,2,331,8,"grahaty01",185,72,"R",1984,2012-09-07,2012-10-02
+"Tyler Greene","2nd Base",70,305,336,4,"greenty02",200,74,"R",1983,2009-04-30,2013-06-02
+"Tyler Moore","Left Field",41,156,603,7,"moorety01",220,74,"R",1987,2012-04-29,2015-10-03
+"Tyler Pastornicky","Shortstop",41,169,667,6,"pastoty01",180,71,"R",1989,2012-04-05,2014-07-25
+"Tyler Skaggs","Pitcher",0,7,818,1,"skaggty01",215,76,"L",1991,2012-08-22,2016-10-01
+"Tyler Thornburg","Pitcher",1,5,861,1,"thornty01",190,71,"R",1988,2012-06-19,2016-10-02
+"Tyson Ross","Pitcher",0,2,768,1,"rossty01",245,78,"R",1987,2010-04-07,2016-04-04
+"Ubaldo Jimenez","Pitcher",0,5,438,1,"jimenub01",210,77,"R",1984,2006-09-26,2016-09-29
+"Vance Worley","Pitcher",3,37,932,1,"worleva01",250,74,"R",1987,2010-07-24,2016-09-22
+"Vernon Wells","Left Field",56,243,913,7,"wellsve01",230,73,"R",1978,1999-08-30,2013-09-29
+"Vicente Padilla","Pitcher",0,1,659,1,"padilvi01",230,72,"R",1977,1999-06-29,2012-10-02
+"Vin Mazzaro","Pitcher",2,4,567,1,"mazzavi01",220,74,"R",1986,2009-06-02,2016-05-05
+"Vinny Rottino","Left Field",9,61,769,7,"rottivi01",215,73,"R",1980,2006-09-01,2012-10-02
+"Wade Davis","Pitcher",1,2,208,1,"daviswa01",225,77,"R",1985,2009-09-06,2016-10-02
+"Wade LeBlanc","Pitcher",1,12,495,1,"leblawa01",215,75,"L",1984,2008-09-03,2016-10-02
+"Wade Miley","Pitcher",11,65,591,1,"mileywa01",220,72,"L",1986,2011-08-20,2016-10-01
+"Wandy Rodriguez","Pitcher",4,61,754,1,"rodriwa01",195,71,"B",1979,2005-05-23,2015-07-28
+"Welington Castillo","Catcher",45,170,142,2,"castiwe01",220,70,"R",1987,2010-08-11,2016-09-30
+"Wesley Wright","Pitcher",0,2,936,1,"wrighwe01",185,70,"R",1985,2008-03-31,2015-10-04
+"Wil Nieves","Catcher",25,83,635,2,"nievewi01",190,71,"R",1977,2002-07-21,2015-04-29
+"Wilin Rosario","Catcher",107,396,763,2,"rosarwi01",220,71,"R",1989,2011-09-06,2015-10-04
+"Will Middlebrooks","3rd Base",77,267,588,5,"middlwi01",220,75,"R",1988,2012-05-02,2016-07-24
+"Will Rhymes","2nd Base",28,123,739,4,"rhymewi01",170,68,"L",1983,2010-07-25,2012-08-05
+"Will Venable","Right Field",110,417,887,9,"venabwi01",205,75,"L",1982,2008-08-29,2016-07-06
+"Willie Bloomquist","Shortstop",98,324,77,6,"bloomwi01",200,71,"R",1977,2002-09-01,2015-06-28
+"Willie Harris","2nd Base",5,44,365,4,"harriwi01",195,69,"L",1978,2001-09-02,2012-06-24
+"Wilson Betemit","3rd Base",89,341,66,5,"betemwi01",220,74,"B",1981,2001-09-18,2013-09-12
+"Wilson Ramos","Catcher",22,83,726,2,"ramoswi01",255,73,"R",1987,2010-05-02,2016-09-26
+"Wilson Valdez","Shortstop",40,194,882,6,"valdewi01",170,71,"R",1978,2004-09-07,2012-10-03
+"Wily Peralta","Pitcher",1,11,684,1,"peralwi01",255,73,"R",1989,2012-04-22,2016-10-01
+"Xavier Avery","Left Field",21,94,25,7,"averyxa01",190,72,"L",1990,2012-05-13,2012-10-01
+"Xavier Cedeno","Pitcher",0,1,147,1,"cedenxa01",215,72,"L",1986,2011-09-16,2016-08-29
+"Xavier Nady","Left Field",28,152,622,7,"nadyxa01",215,74,"R",1978,2000-09-30,2014-05-04
+"Xavier Paul","Left Field",27,86,668,7,"paulxa01",205,72,"L",1985,2009-05-07,2014-08-27
+"Yadier Molina","Catcher",159,505,597,2,"molinya01",205,71,"R",1982,2004-06-03,2016-10-02
+"Yamaico Navarro","Left Field",8,50,627,7,"navarya01",215,71,"R",1987,2010-08-20,2013-05-28
+"Yan Gomes","1st Base",20,98,316,3,"gomesya01",215,74,"R",1987,2012-05-17,2016-10-02
+"Yasmani Grandal","Catcher",57,192,332,2,"grandya01",235,73,"B",1988,2012-06-02,2016-10-02
+"Yoenis Cespedes","Left Field",142,487,149,7,"cespeyo01",220,70,"R",1985,2012-03-28,2016-10-01
+"Yonder Alonso","1st Base",150,549,9,3,"alonsyo01",230,73,"L",1987,2010-09-01,2016-10-02
+"Yorvit Torrealba","Catcher",44,194,864,2,"torreyo01",200,71,"R",1978,2001-09-05,2013-09-25
+"Yovani Gallardo","Pitcher",11,67,295,1,"gallayo01",205,74,"R",1986,2007-06-18,2016-09-30
+"Yu Darvish","Pitcher",1,3,204,1,"darviyu01",220,77,"R",1986,2012-04-09,2016-09-30
+"Yunel Escobar","Shortstop",141,558,255,6,"escobyu01",215,74,"R",1982,2007-06-02,2016-10-02
+"Yuniesky Betancourt","2nd Base",49,215,65,4,"betanyu01",205,70,"R",1982,2005-07-28,2013-09-29
+"Yusmeiro Petit","Pitcher",0,1,690,1,"petityu01",255,73,"R",1984,2006-05-14,2016-09-26
+"Zach Duke","Pitcher",0,1,240,1,"dukeza01",210,74,"L",1983,2005-07-02,2016-09-29
+"Zach Lutz","1st Base",1,11,530,3,"lutzza01",220,73,"R",1986,2012-04-24,2013-09-28
+"Zack Cozart","Shortstop",138,561,186,6,"cozarza01",195,72,"R",1985,2011-07-07,2016-09-10
+"Zack Greinke","Pitcher",7,33,339,1,"greinza01",200,74,"R",1983,2004-05-22,2016-09-21
