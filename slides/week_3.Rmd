@@ -649,8 +649,11 @@ system.time(logistic_fit <- stan(model_code=logistic_model, chains=3, iter=1000,
                                       height=scaled_height,
                                       weight=scaled_weight) ))
 ```
+
+------------------
+
 ```{r results}
-logistic_summary <- summary(logistic_fit)$summary
+logistic_summary <- rstan::summary(logistic_fit)$summary
 print(logistic_summary)
 ```
 
@@ -660,10 +663,25 @@ print(logistic_summary)
 stan_plot(logistic_fit, pars="gamma")
 ```
 
+----------------
+
+Recall the *mean* of $\theta_i$ is
+$$\begin{aligned}
+\mu_i = \frac{1}{1 + \exp(-\gamma_{p_i} - \alpha_h h_i - \alpha_w w_i)} .
+\end{aligned}$$
+
+```{r logistic_mu}
+gamma_samples <- rstan::extract(logistic_fit)$gamma
+colnames(gamma_samples) <- levels(batplus$PriPos)
+mu_samples <- 1/(1+exp(-gamma_samples))
+boxplot(mu_samples, ylab="posterior distrn, mean batting avg", las=3)
+```
+
+
 ## No effect of height or weight
 
 ```{r logistic_alpha}
-stan_plot(logistic__fit, pars=c("alpha_w", "alpha_h")) + geom_vline(xintercept=0)
+stan_plot(logistic_fit, pars=c("alpha_w", "alpha_h")) + geom_vline(xintercept=0)
 ```
 
 ## Same $\theta$ as before?
@@ -674,3 +692,13 @@ old_post_theta <- batting$post_mean[match(batplus$Player, batting$Player)]
 plot(old_post_theta, new_post_theta, xlab="theta, model 1", ylab="theta, model 2")
 abline(0,1, col='red')
 ```
+
+
+## Conclusions
+
+1. We don't have good evidence that batting average varies substantially
+   with height or weight.
+
+2. Changing the model from a Beta prior on class means
+   to a logistic transform of a linear model
+   did not substantially affect the results.
