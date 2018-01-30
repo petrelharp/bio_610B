@@ -38,6 +38,7 @@ Week 3 (*1/23*)
 
 Week 4 (*1/30*)
 
+: [(slides)](slides/week_4.slides.html) Assessing power, model choice, and using simulation: looking more at shrinkage,
 : Count data: using Poisson regression and hierarchical modeling
     to fit overdispersion.  Model selection by crossvalidation.
     **(K ch 24)**
