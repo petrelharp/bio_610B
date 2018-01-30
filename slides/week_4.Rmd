@@ -232,9 +232,9 @@ $$\begin{aligned}
     Z_i &\sim \Poisson(\mu_i) \\
     \mu_i &= \exp(X_i) \\
     X_i &\sim \Normal(y_i, \sigma) \\
-    y_i &= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
-        &\qquad \left. {} 
-            + c_{g_i} \times \text{exposure}_i \right)
+    y_i &= a_{g_i} + b \times \text{age}_i  \\
+        &\qquad {} 
+            + c_{g_i} \times \text{exposure}_i
 \end{aligned}$$
 
 :::
