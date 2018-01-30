@@ -1,0 +1,743 @@
+---
+title: "Poisson regression, sparsification, and model selection"
+author: "Peter Ralph"
+date: "29 January 2018 -- Advanced Biological Statistics"
+---
+
+```{r setup, include=FALSE}
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+library(tidyverse)
+library(rstan)
+library(matrixStats)
+options(mc.cores = parallel::detectCores())
+```
+
+
+
+# Count data
+
+## A hypothetical situation:
+
+1. We have **counts** of transcript numbers,
+
+2. from some individuals of different **ages**
+   and past **exposures** to solar irradiation,
+
+3. of two **genotypes**.
+
+. . .
+
+*Model:*
+
+* Counts are **Poisson**,
+
+* with mean that depends on age and exposure,
+
+* but effect of exposure depends on genotype.
+
+. . .
+
+* But actually, counts are *overdispersed*, so make the means *random*,
+   and lognormally distributed.
+
+
+-------------------------
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype.
+
+4. But actually, counts are *overdispersed*, so make the means *random*,
+   and lognormally distributed.
+
+:::
+:::::::::: {.column width="50%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+\end{aligned}$$
+
+:::
+:::::::::::
+
+
+
+-------------------------
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype.
+
+4. But actually, counts are *overdispersed*, so make the means *random*,
+   and lognormally distributed.
+
+:::
+:::::::::: {.column width="50%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &= a + b \times \text{age}_i + c \times \text{exposure}_i 
+\end{aligned}$$
+
+:::
+:::::::::::
+
+
+
+-------------------------
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype.
+
+4. But actually, counts are *overdispersed*, so make the means *random*,
+   and lognormally distributed.
+
+:::
+:::::::::: {.column width="50%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &= \exp\left( a_{g_i} + b \times \text{age}_i + c_{g_i} \times \text{exposure}_i \right)
+\end{aligned}$$
+
+:::
+:::::::::::
+
+
+-------------------------
+
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype.
+
+4. But actually, counts are *overdispersed*, so make the means *random*,
+   and lognormally distributed.
+
+:::
+:::::::::: {.column width="50%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &= \exp(W_i) \\
+    W_i &\sim \Normal(y_i, \sigma) \\
+    y_i &= a_{g_i} + b \times \text{age}_i + c_{g_i} \times \text{exposure}_i
+\end{aligned}$$
+
+:::
+:::::::::::
+
+
+-------------------------
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype.
+
+4. But actually, counts are *overdispersed*, so make the means *random*,
+   and lognormally distributed.
+
+:::
+:::::::::: {.column width="50%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &\sim \log\Normal(y_i, \sigma) \\
+    y_i &= a_{g_i} + b \times \text{age}_i + c_{g_i} \times \text{exposure}_i 
+\end{aligned}$$
+
+:::
+:::::::::::
+
+## Simulate this.
+
+::: {.columns}
+::::::::: {.column width="70%"}
+
+
+
+:::
+:::::::::: {.column width="30%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &\sim \log\Normal(y_i, \sigma) \\
+    y_i &= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
+        &\qquad \left. {} 
+            + c_{g_i} \times \text{exposure}_i \right)
+\end{aligned}$$
+
+:::
+:::::::::::
+
+
+
+## Simulate this.
+
+::: {.columns}
+::::::::: {.column width="70%"}
+
+
+```{r sim_counts, cache=TRUE}
+true_params <- list(a=c(0, 0.2),
+                    b=1/20,
+                    c=c(1/30, -1/15),
+                    sigma=1.0)
+nsamples <- 500
+data <- data.frame(genotype=sample(c(1,2), nsamples, 
+                                   replace=TRUE),
+                   age = rgamma(nsamples, 3, 0.1),
+                   exposure = rexp(nsamples, 0.2))
+data$y <- with(data, true_params$a[genotype] +
+                      true_params$b * age +
+                      true_params$c[genotype] * exposure)
+data$mu <- exp(rnorm(nrow(data), mean=data$y, 
+                     sd=true_params$sigma))
+data$counts <- rpois(nsamples, data$mu)
+```
+
+:::
+:::::::::: {.column width="30%"}
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &\sim \log\Normal(y_i, \sigma) \\
+    y_i &= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
+        &\qquad \left. {} 
+            + c_{g_i} \times \text{exposure}_i \right)
+\end{aligned}$$
+
+:::
+:::::::::::
+
+
+
+## Write a Stan block
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype;
+
+4. means are *random*, and lognormally distributed.
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &\sim \log\Normal(y_i, \sigma) \\
+    y_i &= a_{g_i} + b \times \text{age}_i \\
+        &\qquad {} + c_{g_i} \times \text{exposure}_i 
+\end{aligned}$$
+
+:::
+:::::::::: {.column width="50%"}
+
+```
+data {
+    // what we know
+}
+parameters {
+    // what we want to find out
+}
+model {
+    // how they relate
+}
+```
+
+:::
+:::::::::::
+
+
+## The result
+
+::: {.columns}
+::::::::: {.column width="50%"}
+
+
+1. Counts are **Poisson**,
+
+2. with mean that depends on age and exposure,
+
+3. but effect of exposure depends on genotype;
+
+4. means are *random*, and lognormally distributed.
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &\sim \log\Normal(y_i, \sigma) \\
+    y_i &= a_{g_i} + b \times \text{age}_i \\
+        &\qquad {} + c_{g_i} \times \text{exposure}_i 
+\end{aligned}$$
+
+:::
+:::::::::: {.column width="50%"}
+
+```
+data {
+    // what we know
+}
+parameters {
+    // what we want to find out
+}
+model {
+    // how they relate
+}
+```
+
+:::
+:::::::::::
+
+
+# Stochastic minute
+
+## The Poisson distribution
+
+If $N \sim \Poisson(\mu)$ then $N \ge 0$ and
+$$\begin{aligned}
+    \P\{N = k\} = \frac{\mu^k}{k!} e^{-\mu}
+\end{aligned}$$
+
+- $N$ is a nonnegative integer (i.e., a *count*)
+
+- $\E[N] = \var[N] = \mu$
+
+- If a machine makes widgets very fast,
+  producing on average one broken widget per minute (and many good ones),
+  each breaking independent of the others,
+  then the number of broken widgets in $\mu$ minutes is $\Poisson(\mu)$.
+
+- If busses arrive randomly every $\Exp(1)$ minutes,
+  then the number of busses to arrive in $\mu$ minutes
+  is $\Poisson(\mu)$.
+
+
+# Two models
+
+## Step back: a simple model
+
+::: {.columns}
+:::::::: {.column width="30%"}
+
+Forget that we know how the data were generated.
+
+Let's fit a *standard* Poisson model.
+
+:::
+:::::::::: {.column width="70%"}
+
+```{r simple_poisson, cache=TRUE}
+simple_block <- "
+data {
+    int N;
+    int counts[N];
+    vector[N] age;
+    vector[N] exposure;
+    int genotype[N];  // between 0 and 1
+}
+parameters {
+    vector[2] a;
+    real b;
+    vector[2] c;
+}
+model {
+    vector[N] mu;
+    mu = exp(a[genotype] + b * age 
+             + c[genotype] .* exposure);
+    counts ~ poisson(mu);
+    a ~ normal(0, 5);
+    b ~ normal(0, 5);
+    c ~ normal(0, 5);
+}"
+```
+
+:::
+:::::::::::
+
+------------
+
+*Note:* scaling the data helps Stan find the right scale to move on.
+
+```{r run_simple_pois, cache=TRUE, depends=c("sim_counts", "simple_poisson")}
+scaled_data <- with(data, list(N=length(counts),
+                               counts=counts,
+                               age=(age - mean(age))/sd(age),
+                               exposure=(exposure - mean(exposure))/sd(exposure),
+                               genotype=genotype))
+fit1 <- stan(model_code=simple_block, 
+             data=scaled_data,
+             control=list(max_treedepth=12),
+             iter=1000, chains=3)
+```
+
+-----------
+
+```{r printit}
+print(fit1)
+```
+
+## Aside: what happens during "warmup"?
+
+```{r the_warmup}
+stan_trace(fit1, pars=c("a","b","c","lp__"), inc_warmup=TRUE)
+```
+
+## The usual plot (without warmup)
+
+```{r not_warmup}
+stan_trace(fit1, pars=c("a","b","c","lp__"), inc_warmup=FALSE)
+```
+
+## Goodness of fit
+
+Let's simulate up data *under this model* to check for goodness of fit.
+
+. . .
+
+We expect to **not** see a good fit. (*Why?*)
+
+
+## 100 datasets from the posterior distribution
+
+
+::: {.columns}
+:::::::: {.column width="60%"}
+
+```{r post_sims1}
+post1 <- extract(fit1)
+params1 <- list(a=colMeans(post1$a),
+                b=mean(post1$b),
+                c=colMeans(post1$c))
+mu1 <- with(list2env(scaled_data), 
+                  exp(params1$a[genotype] 
+                      + params1$b * age
+                      + params1$c[genotype] * exposure))
+# 100 datasets:
+sim1 <- replicate(100, rpois(length(mu1), mu1))
+```
+
+:::
+:::::::::: {.column width="40%"}
+
+```
+model {
+    vector[N] mu;
+    mu = exp(a[genotype] 
+             + b * age 
+             + c[genotype] 
+               .* exposure);
+    counts ~ poisson(mu);
+```
+
+:::
+:::::::::::
+
+## The true data are overdispersed relative to our simulations
+
+```{r plot_post_sims1}
+plot(data$counts[order(mu1)], ylab="counts", ylim=range(sim1), type='n')
+segments(x0=seq_len(nrow(data)),
+         y0=rowMins(sim1)[order(mu1)],
+         y1=rowMaxs(sim1)[order(mu1)])
+points(data$counts[order(mu1)], pch=20, col='red')
+legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated range"), col=c('red', 'black'))
+```
+
+
+## Including overdispersion
+
+A *random mean* adds a level of randomness
+
+```{r full_poisson}
+full_block <- "
+data {
+    int N;
+    int counts[N];
+    vector[N] age;
+    vector[N] exposure;
+    int genotype[N];
+}
+parameters {
+    vector[2] a;
+    real b;
+    vector[2] c;
+    vector<lower=0>[N] mu;
+    real<lower=0> sigma;
+}
+model {
+    vector[N] y;
+    y = a[genotype] + b * age + c[genotype] .* exposure;
+    counts ~ poisson(mu);
+    mu ~ lognormal(y, sigma);
+    a ~ normal(0, 5);
+    b ~ normal(0, 5);
+    c ~ normal(0, 5);
+    sigma ~ normal(0, 5);
+}"
+```
+
+---------------
+
+```{r fit_fullmodel, cache=TRUE, depends=c("sim_counts", "full_poisson")}
+fit2 <- stan(model_code=full_block, 
+             data=scaled_data,
+             iter=1000, chains=3)
+```
+
+----------------
+
+```{r print_fullmodel}
+print(fit2)
+```
+
+
+----------------
+
+```{r trace_fullmodel}
+stan_trace(fit2, pars=c("a", "b", "c", "sigma", "lp__"))
+```
+
+
+## Posterior predictive simulations, again
+
+
+::: {.columns}
+:::::::: {.column width="60%"}
+
+```{r post_sims2}
+post2 <- extract(fit2)
+# 100 datasets:
+kk <- sample.int(nrow(post2$a), 100)
+sims <- lapply(kk, function (k) { 
+                a <- post2$a[k,]
+                b <- post2$b[k]
+                c <- post2$c[k,]
+                sigma <- post2$sigma[k]
+                y <- with(list2env(scaled_data), 
+                          a[genotype] +
+                          b * age +
+                          c[genotype] * exposure)
+                mu <- exp(rnorm(length(y), 
+                                mean=y, sd=sigma))
+                rpois(length(mu), mu)
+         })
+sim2 <- do.call(cbind, sims)
+```
+
+:::
+:::::::::: {.column width="40%"}
+
+```
+model {
+    vector[N] y;
+    y = a[genotype] + b * age + c[genotype] .* exposure;
+    counts ~ poisson(mu);
+    mu ~ lognormal(y, sigma);
+}
+```
+
+:::
+:::::::::::
+
+## Now we cover the true data
+
+```{r plot_post_sims2}
+plot(data$counts[order(mu1)], ylab="counts", ylim=range(sim2), type='n')
+segments(x0=seq_len(nrow(data)),
+         y0=rowMins(sim2)[order(mu1)],
+         y1=rowMaxs(sim2)[order(mu1)])
+points(data$counts[order(mu1)], pch=20, col='red')
+legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated range"), col=c('red', 'black'))
+```
+
+
+# Model comparison
+
+## How to *compare* the two models?
+
+Two models:
+
+1. `counts ~ poisson(exp(a + b * age + c * exposure))`
+
+2. `counts ~ poisson(logNormal(a + b * age + c * exposure))`
+
+. . .
+
+We just saw some plots that showed that the true data
+lay outside the range of the simulated data from (1)
+but not (2).
+
+. . .
+
+That was *not* a formal test.
+
+
+## We need a statistic!
+
+*Brainstorm:* how can we quantify what we just saw?
+
+*Goal:* come up with a single number that quantifies
+how much the observed data "looks like" the posterior predictive samples.
+
+*Then,* the model with a better score *fits* better.
+
+
+## Implementation
+
+```{r pps_model_choice}
+```
+
+
+## How'd we do, by the way?
+
+We still haven't looked to see how close the true parameters were to the inferred values.
+Here are posterior distributions from the full model,
+with the true values in red.
+```{r true_fit, echo=FALSE}
+# a[g] + b * (age - ma)/sa + c[g] * (exp - me)/se
+# = a[g] - b * ma / sa - c[g] * me / se + (b/sa) * age  + (c[g]/se) * exp
+layout(matrix(1:6, nrow=2))
+with(data, {
+    hist(post2$a[,1] - post2$b * mean(age)/sd(age) - post2$c[,1] * mean(exposure)/sd(exposure), 
+         breaks=50, main='a[1]')
+    abline(v=true_params$a[1], col='red', lwd=2)
+    hist(post2$a[,2] - post2$b * mean(age)/sd(age) - post2$c[,2] * mean(exposure)/sd(exposure), 
+         breaks=50, main='a[2]')
+    abline(v=true_params$a[2], col='red', lwd=2)
+    hist(post2$b/sd(age), breaks=50, main='b')
+    abline(v=true_params$b, col='red', lwd=2)
+    hist(post2$c[,1]/sd(exposure), breaks=50, main='c[1]')
+    abline(v=true_params$c[1], col='red', lwd=2)
+    hist(post2$c[,2]/sd(exposure), breaks=50, main='c[2]')
+    abline(v=true_params$c[2], col='red', lwd=2)
+    hist(post2$sigma, breaks=50, main='sigma')
+    abline(v=true_params$sigma, col='red', lwd=2)
+ })
+```
+
+
+# Stan interlude
+
+## The important program blocks
+
+```
+data {
+    // what we know: the input
+    // declarations only
+}
+parameters {
+    // what we want to know about:
+    // defines the space Stan random walks in
+    // declarations only
+}
+model {
+    // stuff to calculate the priors and the likelihoods
+    // happens every step
+}
+```
+
+
+## The program blocks
+
+```
+functions {
+    // user-defined functions
+}
+data {
+    // what we know: the input
+    // declarations only
+}
+transformed data {
+    // calculations to do once, at the start
+}
+parameters {
+    // what we want to know about:
+    // defines the space Stan random walks in
+    // declarations only
+}
+transformed parameters {
+    // other things that we want the posterior distribution of
+    // happens every step
+}
+model {
+    // stuff to calculate the priors and the likelihoods
+    // happens every step
+}
+generated quantities {
+    // more things we want the posterior distribution of
+    // but that don't affect the random walk
+}
+```
+
+## On priors
+
+Under the hood,
+```
+    z ~ poisson(mu);
+```
+is equivalent to
+```
+    target += poisson_lpdf(z | mu);
+```
+(`lpdf` = log posterior density function).
+
+. . .
+
+So, if you *don't* put a prior on something,
+it implicitly has a *uniform* prior (i.e., a flat prior).
+
+## Error messages
+
+These are important.
+Pay attention to them, and fix the problems.
+
+
+## Parameterization matters
+
+More on this later.
+
