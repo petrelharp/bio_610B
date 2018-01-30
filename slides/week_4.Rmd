@@ -16,6 +16,26 @@ library(matrixStats)
 options(mc.cores = parallel::detectCores())
 ```
 
+# Overview
+
+## Summary
+
+*So far* we looked at fitting probabilities of *binary* events
+predicted by various sorts of explanatory variables - for instance, "logistic regression".
+
+Grouping means together using hyperpriors induced *shrinkage*,
+allowing sharing of information between groups.
+
+*Simulation* is also useful for debugging and, vaguely, checking model fit.
+
+## Next up
+
+Next we'll hit many of the same topics
+in a slightly different context: when the data are *counts*
+rather than *proportions*.
+("How many birds are there?" instead of "How many of the birds are red?")
+
+We'll also see how to use simulation to do *formal* model comparisons.
 
 
 # Count data
@@ -189,11 +209,19 @@ $$\begin{aligned}
 :::
 :::::::::::
 
-## Simulate this.
+## Simulate these and compare.
 
 ::: {.columns}
 ::::::::: {.column width="70%"}
 
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\mu_i) \\
+    \mu_i &= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
+        &\qquad \left. {} 
+            + c_{g_i} \times \text{exposure}_i \right)
+\end{aligned}$$
 
 
 :::
@@ -202,7 +230,8 @@ $$\begin{aligned}
 
 $$\begin{aligned}
     Z_i &\sim \Poisson(\mu_i) \\
-    \mu_i &\sim \log\Normal(y_i, \sigma) \\
+    \mu_i &= \exp(X_i) \\
+    X_i &\sim \Normal(y_i, \sigma) \\
     y_i &= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
         &\qquad \left. {} 
             + c_{g_i} \times \text{exposure}_i \right)

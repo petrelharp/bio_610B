@@ -1657,6 +1657,16 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   <p class="date">29 January 2018 – Advanced Biological Statistics</p>
 </section>
 
+<section><section id="overview" class="title-slide slide level1"><h1>Overview</h1></section><section id="summary" class="slide level2">
+<h2>Summary</h2>
+<p><em>So far</em> we looked at fitting probabilities of <em>binary</em> events predicted by various sorts of explanatory variables - for instance, “logistic regression”.</p>
+<p>Grouping means together using hyperpriors induced <em>shrinkage</em>, allowing sharing of information between groups.</p>
+<p><em>Simulation</em> is also useful for debugging and, vaguely, checking model fit.</p>
+</section><section id="next-up" class="slide level2">
+<h2>Next up</h2>
+<p>Next we’ll hit many of the same topics in a slightly different context: when the data are <em>counts</em> rather than <em>proportions</em>. (“How many birds are there?” instead of “How many of the birds are red?”)</p>
+<p>We’ll also see how to use simulation to do <em>formal</em> model comparisons.</p>
+</section></section>
 <section><section id="count-data" class="title-slide slide level1"><h1>Count data</h1></section><section id="a-hypothetical-situation" class="slide level2">
 <h2>A hypothetical situation:</h2>
 <ol type="1">
@@ -1764,22 +1774,28 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 \end{aligned}\]</span></p>
 </div>
 </div>
-</section><section id="simulate-this." class="slide level2">
-<h2>Simulate this.</h2>
+</section><section id="simulate-these-and-compare." class="slide level2">
+<h2>Simulate these and compare.</h2>
 <div class="columns">
 <div class="column" style="width:70%;">
-
+<p><span class="math display">\[\begin{aligned}
+    Z_i &amp;\sim \Poisson(\mu_i) \\
+    \mu_i &amp;= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
+        &amp;\qquad \left. {} 
+            + c_{g_i} \times \text{exposure}_i \right)
+\end{aligned}\]</span></p>
 </div><div class="column" style="width:30%;">
 <p><span class="math display">\[\begin{aligned}
     Z_i &amp;\sim \Poisson(\mu_i) \\
-    \mu_i &amp;\sim \log\Normal(y_i, \sigma) \\
+    \mu_i &amp;= \exp(X_i) \\
+    X_i &amp;\sim \Normal(y_i, \sigma) \\
     y_i &amp;= \exp\left(a_{g_i} + b \times \text{age}_i \right.\\
         &amp;\qquad \left. {} 
             + c_{g_i} \times \text{exposure}_i \right)
 \end{aligned}\]</span></p>
 </div>
 </div>
-</section><section id="simulate-this.-1" class="slide level2">
+</section><section id="simulate-this." class="slide level2">
 <h2>Simulate this.</h2>
 <div class="columns">
 <div class="column" style="width:70%;">
