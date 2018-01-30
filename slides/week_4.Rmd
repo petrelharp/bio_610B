@@ -348,15 +348,49 @@ $$\begin{aligned}
 :::::::::: {.column width="50%"}
 
 ```
-data {
-    // what we know
+new_block <- "data {
+    int N; // number of obs
+    vector[N] age;
+    int geno[N];
+    vector[N] expo;
+    int counts[N];
+    int ngeno;
 }
 parameters {
-    // what we want to find out
+    real<lower=0> mu[N]; // per-indiv 'mean'
+    vector[ngeno] a;
+    real b;
+    vector[ngeno] c;
+    real<lower=0> sigma;
 }
 model {
-    // how they relate
-}
+    vector[N] y;
+    y = a[geno] + b * age + c[geno] .* expo;
+    // for (i in 1:N) {
+    //     y[i] = a[geno[i]] + b * age[i] + c[geno[i]] * expo[i];
+    // }
+    counts ~ poisson(mu);
+    mu ~ lognormal(y, sigma);
+    a ~ normal(0, 10);
+    b ~ normal(0, 10);
+    c ~ normal(0, 10);
+    sigma ~ normal(0, 10);
+}"
+
+data_list <- list(
+            N = nrow(data),
+            age = data$age,
+            geno = data$genotype,
+            expo = data$exposure,
+            counts = data$counts,
+            ngeno = length(unique(data$genotype)))
+
+
+
+new_fit <- stan(model_code=new_block, 
+             data=data_list,
+             control=list(max_treedepth=12),
+             iter=100, chains=3)
 ```
 
 :::

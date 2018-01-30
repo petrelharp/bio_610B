@@ -1869,15 +1869,49 @@ model {
         &amp;\qquad {} + c_{g_i} \times \text{exposure}_i 
 \end{aligned}\]</span></p>
 </div><div class="column" style="width:50%;">
-<pre><code>data {
-    // what we know
+<pre><code>new_block &lt;- &quot;data {
+    int N; // number of obs
+    vector[N] age;
+    int geno[N];
+    vector[N] expo;
+    int counts[N];
+    int ngeno;
 }
 parameters {
-    // what we want to find out
+    real&lt;lower=0&gt; mu[N]; // per-indiv 'mean'
+    vector[ngeno] a;
+    real b;
+    vector[ngeno] c;
+    real&lt;lower=0&gt; sigma;
 }
 model {
-    // how they relate
-}</code></pre>
+    vector[N] y;
+    y = a[geno] + b * age + c[geno] .* expo;
+    // for (i in 1:N) {
+    //     y[i] = a[geno[i]] + b * age[i] + c[geno[i]] * expo[i];
+    // }
+    counts ~ poisson(mu);
+    mu ~ lognormal(y, sigma);
+    a ~ normal(0, 10);
+    b ~ normal(0, 10);
+    c ~ normal(0, 10);
+    sigma ~ normal(0, 10);
+}&quot;
+
+data_list &lt;- list(
+            N = nrow(data),
+            age = data$age,
+            geno = data$genotype,
+            expo = data$exposure,
+            counts = data$counts,
+            ngeno = length(unique(data$genotype)))
+
+
+
+new_fit &lt;- stan(model_code=new_block, 
+             data=data_list,
+             control=list(max_treedepth=12),
+             iter=100, chains=3)</code></pre>
 </div>
 </div>
 </section></section>
