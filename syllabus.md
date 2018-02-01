@@ -6,7 +6,7 @@ date: "9 January 2018"
 
 
 -  **Class:** 10-12, Tuesday/Thursday.
--  **Office Hours:** Wednesday 12-1 and Friday 11-12 in 282 Onyx
+-  **Office Hours:** Wednesday 12-1 and Friday 10-11 in 282 Onyx
 -  **Instructor:** Peter Ralph (plr@uoregon.edu)
 -  **Office:** 6 Deady Hall and/or 282 Onyx (email to arrange)
 
