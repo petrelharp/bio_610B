@@ -1,0 +1,815 @@
+# Homework #1 :: solutions
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(matrixStats)
+library(rstan)
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+```
+
+*Note:* This is a *partial* solution, focused on technical aspects.
+I generally expect your reports to have a bit more words,
+describing what you're doing and why.
+
+# Set-up
+
+Here's some useful functions we'll have use for later.
+
+```{r helper_functions}
+max_col <- function (x) {
+    # return vector of indices corresp to which column has the largest value
+    #   faster than apply(, 1, which.max)
+    out <- rep(1, NROW(x))
+    maxs <- x[,1]
+    for (k in seq_len(NCOL(x))[-1]) {
+        yes <- (x[,k] > maxs)
+        out[yes] <- k
+        maxs[yes] <- x[yes,k]
+    }
+    return(out)
+}
+stopifnot( { x <- matrix(rnorm(120), ncol=15); all(max_col(x) == apply(x, 1, which.max)) } )
+
+segplot <- function (x, labels=colnames(x), ...) {
+    splot(far_left=colMins(x), 
+          left=colQuantiles(x, probs=0.025), 
+          mid=colMeans(x), 
+          right=colMaxs(x, probs=0.975), 
+          far_right=colMaxs(x),
+          labels=labels, ...)
+}
+splot <- function (far_left, left, mid, right, far_right, labels, 
+                   yvals=length(mid):1, 
+                   xlim=range(far_left, left, mid, right, far_right, finite=TRUE), 
+                   add=FALSE, col='red', pt.col='black',
+                   ...) {
+    # make those nice horizontal line plots
+    par(mar=c(par("mar"), 9)[c(1,5,3,4)])
+    if (!add) { 
+        plot(0, ylab='', yaxt='n', type='n', ylim=range(yvals), xlim=xlim, ...) 
+        axis(2, at=yvals, labels=labels, las=2)
+    }
+    segments(x0=far_left, x1=far_right, y0=yvals)
+    segments(x0=left, x1=right,
+             y0=yvals, col=col, lwd=2)
+    points(mid, yvals, pch=20, col=pt.col)
+}
+
+```
+
+
+
+# The data
+
+We first read in the data, and for later use relabel the mitochondria as region `0`.
+
+```{r read_data, cache=TRUE}
+altai <- read.table("data/altai.counts.gz", header=TRUE, stringsAsFactors=FALSE)
+denis <- read.table("data/denisova.counts.gz", header=TRUE, stringsAsFactors=FALSE)
+
+geno <- rbind(altai, denis)
+geno$id <- factor(c(rep("altai", nrow(altai)), rep("denis", nrow(denis))))
+rm(altai, denis)
+
+bases <- c("A","T","C","G")
+geno$region[geno$region == "mt"] <- 0
+geno$region <- as.numeric(geno$region)
+geno$coverage <- rowSums(geno[,bases])
+geno$major <- factor(bases[max_col(geno[,bases])], levels=bases)
+geno$major_coverage <- geno[,bases][cbind(1:nrow(geno), as.numeric(geno$major))]
+```
+
+
+First, let's look at the distribution of total coverages:
+```{r total_coverage}
+layout(1:2)
+hist(subset(geno,id=="altai" & region>0)$coverage, breaks=30, 
+     main="Altai coverage, nuclear", xlab='coverage')
+hist(subset(geno,id=="altai" & region==0)$coverage, breaks=30, 
+     main="Altai coverage, mitochondria", xlab='coverage')
+hist(subset(geno,id=="denis" & region>0)$coverage, breaks=30, 
+     main="Densiovan coverage, nuclear", xlab='coverage')
+hist(subset(geno,id=="denis" & region==0)$coverage, breaks=30, 
+     main="Densiovan coverage, mitochondria", xlab='coverage')
+```
+
+Here's another look at range of coverage, this time separated by region.
+Here the points give mean coverages,
+while the black and red lines give min/max and the middle 90% quantile, respectively.
+We see that coverage varies substantially by region.
+```{r cov_by_region, fig.height=3*fig.dim}
+coverage_stats <- geno %>% 
+    group_by(region,id) %>% 
+    summarize(mean=mean(coverage), 
+              sd=sd(coverage), 
+              min=min(coverage), 
+              max=max(coverage), 
+              q5=quantile(coverage,.05), 
+              q95=quantile(coverage,.95))
+
+with(coverage_stats, {
+       y <- region + 110*as.numeric(id);
+       plot(mean, y, xlim=range(max,min), pch=20, xlab='coverage', 
+            ylab='region', yaxt='n');
+       abline(h=105, lty=3);
+       segments(x0=min, x1=max, y0=y);
+       segments(x0=q5, x1=q95, y0=y, lwd=2, col='red')
+       points(mean, y,pch=20) } )
+
+```
+
+It looks like the nuclear genomes have some issues: such large coverages
+may well be a sign of problems.
+If we restrict to smaller coverages, we see that maximum coverage tails off gradually
+without a single natural cutoff.
+We will (somewhat arbitrarily) discard anything on the nuclear genome
+with coverage greater or equal to 200.
+```{r altai_coverage}
+hist(subset(geno,id == "altai" & region>0 & coverage < 250)$coverage, breaks=30, 
+     main="Altai coverage, nuclear", xlab='coverage')
+hist(subset(geno,id == "denis" & region>0 & coverage < 250)$coverage, breaks=30, 
+     main="Densiovan coverage, nuclear", xlab='coverage')
+
+geno <- subset(geno, region == 0 | coverage < 200)
+```
+
+Here is a table, and also a plot, of mean base frequencies,
+separated by (mitochondria/not), sample, and major allele:
+```{r overall_error}
+errors <- geno %>% mutate(mt=(region==0)) %>%
+            group_by(mt, id, major) %>% 
+            summarise(A=mean(A/coverage),
+                      T=mean(T/coverage),
+                      C=mean(C/coverage),
+                      G=mean(G/coverage))
+errors$overall <- rowSums(errors[,bases]) - apply(errors[,bases], 1, max)
+errors
+
+plot(as.vector(4 * (match(errors$major, bases)-1) + col(errors[,bases]) - 1), 
+     unlist(errors[,bases]), 
+     col=c("black","red")[as.numeric(errors$id)],
+     pch=c(1,5)[1+errors$mt], xlim=c(0, 20),
+     log='y', xlab='', xaxt='n', ylab='frequency')
+abline(v=4*(1:4)-0.5, lty=3)
+axis(1, at=4*(0:3)+1.5, labels=bases, line=2, lwd=0, tick=FALSE)
+axis(1, at=0:15, labels=rep(bases,4), line=0.5, lwd=0, tick=FALSE)
+legend("topright", pch=c(1,1,5), col=c('black','red','black'),
+       legend=c(levels(errors$id), "mito"))
+
+```
+
+It looks like error rates range from `r min(errors$overall)`,
+for Densiova mitochondria having a `C`,
+to `r max(errors$overall)`, 
+for Altai mitochondria having a `G`.
+There also looks to be substantial heterogeneity by base, 
+reliable differences between the samples, and between nuclear/mitochondria.
+The overall error rate for the Denisovan was 
+`r with(subset(geno, id=="denis"), 1 - sum(major_coverage)/sum(coverage))`,
+and for the Altai Neanderthal it was
+`r with(subset(geno, id=="altai"), 1 - sum(major_coverage)/sum(coverage))`.
+On average, the error rate in the mitochondria was
+`r mean(subset(errors, !mt)$overall / subset(errors, mt)$overall)`
+times lower.
+
+# Simulation
+
+Now we'll simulate data.
+Motivated by the table above,
+we'll pick error rates to be around 0.0035,
+with some differences by sample, major allele, 
+and different between the mitochondria and nuclear regions
+(but the same otherwise).
+
+```{r sim_data}
+sim_rates <- list(
+                  id=c("altai"=0.004, "denis"=0.0035),
+                  region_fac=c(0.5, rep(1, length(unique(geno$region))-1)),
+                  major_fac=1+rnorm(4,0,0.05)
+              )
+sim_geno <- geno[,c("region","id","coverage","major")]
+sim_geno$error_rate <- with(sim_geno, 
+                            sim_rates$id[id] * 
+                                sim_rates$region_fac[region+1L] * 
+                                sim_rates$major_fac[as.numeric(major)])
+sim_geno$major_coverage <- rbinom(nrow(sim_geno), size=sim_geno$coverage,
+                                  prob=1-sim_geno$error_rate)
+```
+
+# Summation
+
+The fact mentioned says that if
+$$\begin{aligned}
+    X &\sim \Binom(10, 1/3) \\
+    Y &\sim \Binom(12, 1/3) \\
+    Z &= X + Y
+\end{aligned}$$
+then
+$$\begin{aligned}
+    Z \sim \Binom(22, 1/3)
+\end{aligned}$$
+because if you flip a coin 10 times and count up the number of heads ($X$),
+then flip it 12 more times and count up the number of heads ($Y$),
+then (a) the total number of heads ($X+Y$) is the same as if you'd just flipped it 22 times,
+and (b) that's all the information you need to know about it.
+
+This means it suffices to collapse the data into a single table
+of how often we saw the *right* and the *wrong* base, by category,
+where "category" is a combination of sample ID, region, and true base.
+
+Here we compute that table.
+The "minor" column refers to the sum of all less-frequently-seen bases,
+(i.e., not the "major" allele),
+which we are assuming are in error.
+```{r get_counts}
+counts <- geno %>% 
+            group_by(id, major, region) %>% 
+            summarise(A=sum(A),
+                      T=sum(T),
+                      C=sum(C),
+                      G=sum(G),
+                      coverage=sum(coverage),
+                      minor=sum(coverage)-sum(major_coverage))
+```
+
+We'll also want the same thing for the simulated data.
+```{r sim_get_counts}
+sim_counts <- sim_geno %>%
+                group_by(id, major, region) %>% 
+                summarise(coverage=sum(coverage),
+                          minor=sum(coverage)-sum(major_coverage))
+```
+
+# The model(s)
+
+## One error rate
+
+First let's formulate and fit a simple model
+where every site has the *same* error rate.
+We'll put a uniform prior on that error rate.
+If $Z$ is the total number of erroneous bases,
+and $N$ is the total coverage, then
+$$\begin{aligned}
+    Z &\sim \Binom(N, \theta) \\
+    \theta &\sim \Beta(1,1) .
+\end{aligned}$$
+Since this is a Beta-Binomial model,
+we don't need to use Stan,
+and can find the posterior distribution on $\theta$ explicitly
+as Beta($1+Z$, $1+N-Z$).
+
+We'll do it anyways, just to practice.
+```{r simple_model}
+simple_block <- "
+data {
+    int coverage;
+    int minor;
+}
+parameters {
+    real<lower=0, upper=1> theta;
+}
+model {
+    minor ~ binomial(coverage, theta);
+    // theta ~ uniform(0,1);  // uniform is the same as not present
+}
+"
+```
+
+### Simulated data
+
+First we'll fit to the simulated data:
+```{r fit_sim_simple, cache=TRUE}
+simple_sim_data <- list(coverage=sum(sim_counts$coverage),
+                        minor=sum(sim_counts$minor))
+simple_sim_fit <- stan(model_code=simple_block,
+                       data=simple_sim_data,
+                       iter=1e3, chains=3)
+simple_sim_samples <- extract(simple_sim_fit)
+print(simple_sim_fit)
+```
+
+The average error rate, weighted by coverage, that we simulated under was 
+`r sum(sim_geno$coverage*sim_geno$error_rate)/sum(sim_geno$coverage)`:
+we should get close to that here.
+The posterior mean is `r mean(simple_sim_samples$theta)`
+and a 95% credible interval is from 
+`r quantile(simple_sim_samples$theta, .025)`
+to 
+`r quantile(simple_sim_samples$theta, .975)`.
+This agrees with the analytical answer,
+which has the posterior mean of a Beta(`r 1 + simple_sim_data$minor`, 
+`r 1 + simple_sim_data$coverage - simple_sim_data$minor`) as
+`r (1 + simple_sim_data$minor)/(1 + simple_sim_data$coverage)`,
+with a 95% credible interval of
+`r qbeta(0.025, 1 + simple_sim_data$minor, 1 + simple_sim_data$coverage - simple_sim_data$minor)`
+to
+`r qbeta(0.975, 1 + simple_sim_data$minor, 1 + simple_sim_data$coverage - simple_sim_data$minor)`.
+
+### Real data
+
+Now, the real data:
+```{r fit_simple, cache=TRUE}
+simple_data <- list(coverage=sum(counts$coverage),
+                        minor=sum(counts$minor))
+simple_fit <- stan(model_code=simple_block,
+                       data=simple_data,
+                       iter=1e3, chains=3)
+simple_samples <- extract(simple_fit)
+print(simple_fit)
+```
+
+The average error rate, weighted by coverage, that we simulated under was 
+`r sum(geno$coverage*geno$error_rate)/sum(geno$coverage)`:
+we should get close to that here.
+The posterior mean is `r mean(simple_samples$theta)`
+and a 95% credible interval is from 
+`r quantile(simple_samples$theta, .025)`
+to 
+`r quantile(simple_samples$theta, .975)`.
+This agrees with the analytical answer,
+which has the posterior mean of a Beta(`r 1 + simple_data$minor`, 
+`r 1 + simple_data$coverage - simple_data$minor`) as
+`r (1 + simple_data$minor)/(1 + simple_data$coverage)`,
+with a 95% credible interval of
+`r qbeta(0.025, 1 + simple_data$minor, 1 + simple_data$coverage - simple_data$minor)`
+to
+`r qbeta(0.975, 1 + simple_data$minor, 1 + simple_data$coverage - simple_data$minor)`.
+
+
+
+## Error rates by sample
+
+Now we'll fit a model where each sample has a different error rate.
+We could do this separately, using the Beta-Binomial again,
+but just for practice, we'll do them jointly.
+Also, since we don't even know what scale the concentration parameter for the prior should be on,
+we'll put a hyperprior on it.
+Now, $Z_s$ and $N_s$ are the total number of erroneous bases and coverage for sample $s$, respectively
+(where $s$ is ``Altai'' or ``Densiovan'').
+$$\begin{aligned}
+    Z_s &\sim \Binom(N_s, \theta_s) \\
+    \theta_s &\sim \Beta(\mu \kappa, (1-\mu) \kappa) \\
+    \mu &\sim \Beta(1,1) \\
+    \kappa &\sim \Normal^+(0, \sigma) \\
+    \sigma &\sim \Exp(1/10000)
+\end{aligned}$$
+
+Here's the block
+```{r sample_model}
+sample_block <- "
+data {
+    int coverage[2];
+    int minor[2];
+}
+parameters {
+    real<lower=0, upper=1> theta[2];
+    real<lower=0, upper=1> mu;
+    real<lower=0> kappa;
+    real<lower=0> sigma;
+}
+model {
+    minor ~ binomial(coverage, theta);
+    theta ~ beta(mu * kappa, (1-mu) * kappa);
+    // mu ~ beta(1,1); // omit
+    kappa ~ normal(0, sigma);
+    sigma ~ exponential(.0001);
+}
+"
+```
+
+### Simulated data
+
+Again, first we'll fit to the simulated data:
+```{r fit_sim_sample, cache=TRUE}
+sample_sim_data <- as.list(sim_counts %>% 
+                           group_by(id) %>% 
+                           summarize(coverage=sum(coverage), minor=sum(minor)))
+sample_sim_fit <- stan(model_code=sample_block,
+                       data=sample_sim_data,
+                       iter=1e3, chains=3)
+sample_sim_samples <- extract(sample_sim_fit)
+print(sample_sim_fit)
+```
+
+Looks like we might want to run for more iterations;
+also, the value of $\kappa$ here is of order 10,000,
+so it might be pushing up against the prior.
+
+The average error rates, weighted by coverage, that we simulated under were
+`r tapply(sim_geno$coverage*sim_geno$error_rate, sim_geno$id, sum)/tapply(sim_geno$coverage, sim_geno$id, sum)`
+for the Altai Neanderthal and the Denisovan, respectively.
+we should get close to that here.
+The posterior means here are `r colMeans(sample_sim_samples$theta)`
+and a 95% credible interval is from 
+`r colQuantiles(sample_sim_samples$theta, probs=.025)`
+to 
+`r colQuantiles(sample_sim_samples$theta, probs=.975)`
+(respectively).
+
+
+
+### Real data
+
+Now, for the real data.
+```{r fit_sample, cache=TRUE}
+sample_data <- as.list(counts %>% 
+                           group_by(id) %>% 
+                           summarize(coverage=sum(coverage), minor=sum(minor)))
+sample_fit <- stan(model_code=sample_block,
+                       data=sample_data,
+                       iter=1e3, chains=3)
+sample_samples <- extract(sample_fit)
+print(sample_fit)
+```
+
+The observed error rates were
+`r sample_data$minor/sample_data$coverage` for the Altai Neanderthal and Denisovan respectively;
+we should get close to that here.
+The posterior means here are `r colMeans(sample_samples$theta)`
+and a 95% credible interval is from 
+`r colQuantiles(sample_samples$theta, probs=.025)`
+to 
+`r colQuantiles(sample_samples$theta, probs=.975)`
+(respectively).
+
+
+## Different error rates by base
+
+Now the question is: we know that error rates differ between the samples;
+but given this, do they differ by base?
+We will do this by allowing the nucleotide-specific error rates
+to be arbitrary, and different, between the two samples;
+we could build in something so that the *relative* error rates of `A`, `C`, `G`, and `T`
+are similar between the samples, but we won't.
+
+Here $\mu$ is the per-sample mean error rate,
+and $\theta$ represents the deviations of each base about this mean.
+$$\begin{aligned}
+    Z_{s,b} &\sim \Binom(N_{s,b}, \theta_{s,b}) \\
+    \theta_{s,b} &\sim \Beta(\mu_s \kappa_s, (1-\mu_s) \kappa_s) \\
+    \mu_s &\sim \Beta(1, 1) \\
+    \kappa_s &\sim \Normal(0, \sigma) \\
+    \sigma &\sim \Exp(10^{-5})
+\end{aligned}$$
+
+Here's a block for this:
+```{r sb_model}
+sb_block <- "
+data {
+    int coverage[8];
+    int minor[8];  // number of errors
+    int id[8];     // which sample
+    int major[8];  // which base is the true one
+}
+parameters {
+    real<lower=0, upper=1> theta[8];
+    vector<lower=0, upper=1>[2] mu;
+    vector<lower=0>[2] kappa;
+    real<lower=0> sigma;
+}
+model {
+    minor ~ binomial(coverage, theta);
+    theta ~ beta(mu[id] .* kappa[id], (1-mu[id]) .* kappa[id]);
+    // mu ~ beta(1,1); // omit
+    kappa ~ normal(0, sigma);
+    sigma ~ exponential(.00001);
+}
+"
+```
+
+
+### Simulated data
+
+Again, first we'll fit to the simulated data:
+```{r fit_sim_sb, cache=TRUE}
+sb_sim_data <- sim_counts %>% 
+                       group_by(id, major) %>% 
+                       summarize(coverage=sum(coverage), minor=sum(minor))
+sb_sim_fit <- stan(model_code=sb_block,
+                       data=list(
+                                 coverage=sb_sim_data$coverage,
+                                 minor=sb_sim_data$minor,
+                                 id=as.numeric(sb_sim_data$id),
+                                 major=as.numeric(sb_sim_data$major)),
+                       iter=1e3, chains=3)
+```
+```{r fit_sim_sb_summary}
+sb_sim_samples <- extract(sb_sim_fit)
+rstan::summary(sb_sim_fit)$summary
+```
+
+There's starting to be more parameters to compare to,
+so we'll be a bit more organized.
+Here is a table of true values,
+along with posterior means and boundaries of 95% credible intervals:
+```{r compare_sim_sb}
+sb_tab <- sim_geno %>% group_by(id, major) %>% 
+    summarize(error_rate=sum(error_rate*coverage)/sum(coverage))
+sb_tab$posterior_mean <- colMeans(sb_sim_samples$theta)
+sb_tab$post_q.025 <- colQuantiles(sb_sim_samples$theta, prob=.025)
+sb_tab$post_q.975 <- colQuantiles(sb_sim_samples$theta, prob=.975)
+sb_tab
+```
+We can see that the true values are within the credible intervals in every case.
+
+Here are the results for higher-level parameters:
+```{r sim_sb_hyper, fig.width=3*fig.dim}
+theta_names <- paste(sb_sim_data$id, sb_sim_data$major, sep=":")
+mu_names <- paste("mean,", levels(sb_sim_data$id))
+kappa_names <- paste("concentration,", levels(sb_sim_data$id))
+
+segplot(cbind(sb_sim_samples$theta, sb_sim_samples$mu), c(theta_names, mu_names))
+segplot(cbind(sb_sim_samples$kappa, sb_sim_samples$sigma), c(kappa_names, "sigma"))
+```
+
+### Real data
+
+
+Now, for the real data:
+```{r fit_sb, cache=TRUE}
+sb_data <- counts %>% 
+               group_by(id, major) %>% 
+               summarize(coverage=sum(coverage), minor=sum(minor))
+sb_fit <- stan(model_code=sb_block,
+                   data=list(
+                             coverage=sb_data$coverage,
+                             minor=sb_data$minor,
+                             id=as.numeric(sb_data$id),
+                             major=as.numeric(sb_data$major)),
+                   iter=1e3, chains=3)
+```
+```{r fit_sb_summary}
+sb_samples <- extract(sb_fit)
+rstan::summary(sb_fit)$summary
+```
+
+Here is a table of estimated error rates,
+along with posterior means and boundaries of 95% credible intervals:
+```{r compare_sb}
+sb_tab <- geno %>% group_by(id, major) %>% 
+    summarize(observed_error=1-sum(major_coverage)/sum(coverage))
+sb_tab$posterior_mean <- colMeans(sb_samples$theta)
+sb_tab$post_q.025 <- colQuantiles(sb_samples$theta, prob=.025)
+sb_tab$post_q.975 <- colQuantiles(sb_samples$theta, prob=.975)
+sb_tab
+```
+Here we see that Stan is still inferring the error rates
+to be nearly exactly what we'd guess just from the empirical proportion
+(as makes sense, since we have a lot of data).
+
+Here are the results for higher-level parameters:
+```{r sb_hyper, fig.width=3*fig.dim}
+segplot(cbind(sb_samples$theta, sb_samples$mu), c(theta_names, mu_names))
+segplot(cbind(sb_samples$kappa, sb_samples$sigma), c(kappa_names, "sigma"))
+```
+
+It looks like the per-base error rates are somewhat similar between the two samples
+- it is higher for `C` and `G` for both -
+but the pattern seen in both is different.
+This is to be expected, because a major source of DNA damage is deamination of cytosines to uracil,
+that gets read as thiamene.
+
+## Differences by region
+
+We'd now like to continue the above analysis,
+but allowing error rates to differ by *region*.
+We'll do this by just adding another level of the hierarchy
+corresponding to region,
+so that what we had previously as $\theta_{s,b}$ will now be $\nu_{s,b}$, 
+the *mean* error rate in sample $s$ with true base $b$,
+but the actual error rate in a particular region
+will be a random deviate from that.
+
+$$\begin{aligned}
+    Z_{s,b,r} &\sim \Binom(N_{s,b,r}, \theta_{s,b,r}) \\
+    \theta_{s,b,r} &\sim \Beta(\nu_{s,b} \gamma{s,b}, (1-\nu_{s,b}) \gamma{s,b}) \\
+    \nu_{s,b} &\sim \Beta(\mu_s \kappa_s, (1-\mu_s) \kappa_s) \\
+    \gamma_{s,b} &\sim \Normal(0, \sigma_\gamma) \\
+    \mu_s &\sim \Beta(1, 1) \\
+    \kappa_s &\sim \Normal(0, \sigma_\mu) \\
+    \sigma_\gamma &\sim \Exp(10^{-5})
+    \sigma_\mu &\sim \Exp(10^{-5})
+\end{aligned}$$
+
+Here's a block for this:
+```{r big_model}
+big_block <- "
+data {
+    int N;   // this will be 808
+    int coverage[N];
+    int minor[N];  // number of errors
+    int id[N];     // which sample
+    int major[N];  // which base is the true one
+    int region[N];
+}
+parameters {
+    real<lower=0, upper=1> theta[N];
+    matrix<lower=0, upper=1>[2,4] nu;
+    matrix<lower=0>[2,4] gamma;
+    vector<lower=0, upper=1>[2] mu;
+    vector<lower=0>[2] kappa;
+    real<lower=0> sigma_gamma;
+    real<lower=0> sigma_kappa;
+}
+model {
+    real alpha;
+    real beta;
+    minor ~ binomial(coverage, theta);
+    for (k in 1:N) {
+        theta[k] ~ beta(nu[id[k], major[k]] * gamma[id[k], major[k]],
+                        (1 - nu[id[k], major[k]]) * gamma[id[k], major[k]]);
+    }
+    for (s in 1:2) {
+        nu[s,] ~ beta(mu[s] .* kappa[s], (1-mu[s]) .* kappa[s]);
+        gamma[s,] ~ normal(0, sigma_gamma);
+    }
+    // mu ~ beta(1,1); :: omit
+    kappa ~ normal(0, sigma_kappa);
+    sigma_gamma ~ exponential(.00001);
+    sigma_kappa ~ exponential(.00001);
+}
+"
+```
+
+### Simulated data
+
+Once again, first we'll fit to the simulated data:
+```{r fit_sim_big, cache=TRUE}
+big_sim_fit <- stan(model_code=big_block,
+                       data=list(
+                                 N=nrow(sim_counts),
+                                 coverage=sim_counts$coverage,
+                                 minor=sim_counts$minor,
+                                 id=as.numeric(sim_counts$id),
+                                 major=as.numeric(sim_counts$major),
+                                 region=1L + as.integer(sim_counts$region)),
+                       iter=1e3, chains=3)
+```
+```{r fit_sim_big_summary}
+big_sim_samples <- extract(big_sim_fit)
+```
+
+We now compute the table of true values,
+along with posterior means and boundaries of 95% credible intervals,
+but rather than view it numerically, we'll plot it.
+There is one plot for each sample,
+and purple points depict the true values.
+```{r compare_sim_big}
+all_theta_names <- paste(sim_counts$id, sim_counts$major, sim_counts$region, sep=":")
+all_nu_names <- paste("mean,", outer(levels(sim_counts$id), levels(sim_counts$major), paste))
+all_gamma_names <- paste("concentration,", outer(levels(sim_counts$id), levels(sim_counts$major), paste))
+all_mu_names <- paste("mean,", levels(sim_counts$id))
+all_kappa_names <- paste("concentration,", levels(sim_counts$id))
+
+big_tab <- sim_geno %>% group_by(id, major, region) %>% 
+    summarize(error_rate=sum(error_rate*coverage)/sum(coverage))
+big_tab$posterior_mean <- colMeans(big_sim_samples$theta)
+big_tab$post_q.025 <- colQuantiles(big_sim_samples$theta, prob=.025)
+big_tab$post_q.25 <- colQuantiles(big_sim_samples$theta, prob=.25)
+big_tab$post_q.75 <- colQuantiles(big_sim_samples$theta, prob=.75)
+big_tab$post_q.975 <- colQuantiles(big_sim_samples$theta, prob=.975)
+```
+```{r big_tab_sim_plot, fig.height=8*fig.dim, fig.width=4*fig.dim}
+layout(t(1:2))
+with(subset(big_tab, id=="altai"), {
+     splot(post_q.025, post_q.25, posterior_mean, post_q.75, post_q.975, 
+           labels=sub("[^:]*:","",all_theta_names[big_tab$id=="altai"]),
+           main='error rates, Altai neanderthal') 
+     points(error_rate, length(error_rate):1, col='purple')
+   })
+with(subset(big_tab, id=="denis"), {
+     splot(post_q.025, post_q.25, posterior_mean, post_q.75, post_q.975, 
+           labels=sub("[^:]*:","",all_theta_names[big_tab$id=="denis"]),
+           main='error rates, Denisovan')
+     points(error_rate, length(error_rate):1, col='purple')
+   })
+```
+We can see that the true values are within the credible intervals in every case.
+
+Here are the results for higher-level parameters:
+```{r sim_big_hyper, fig.height=3*fig.dim}
+segplot(cbind(big_sim_samples$mu, matrix(big_sim_samples$nu, nrow=nrow(big_sim_samples$mu))), 
+        c(all_mu_names,all_nu_names))
+segplot(cbind(big_sim_samples$kappa, 
+              matrix(big_sim_samples$gamma, nrow=nrow(big_sim_samples$kappa)), 
+              big_sim_samples$sigma_gamma, big_sim_samples$sigma_kappa), 
+        c(all_kappa_names, all_gamma_names, "sigma_gamma", "sigma_kappa"))
+```
+
+## Real data, finally
+
+
+Now, for the real data, with the big model!
+```{r fit_big, cache=TRUE}
+big_fit <- stan(model_code=big_block,
+                       data=list(
+                                 N=nrow(counts),
+                                 coverage=counts$coverage,
+                                 minor=counts$minor,
+                                 id=as.numeric(counts$id),
+                                 major=as.numeric(counts$major),
+                                 region=1L + as.integer(counts$region)),
+                       iter=1e3, chains=3)
+```
+```{r fit_big_summary}
+big_samples <- extract(big_fit)
+```
+I've looked at the summary, and convergence looks good;
+the table is too big to reproduce here.
+
+Here are the estimated error rates, as depicted above.
+There is one plot for each sample;
+different bases are grouped together, and then ordered by region.
+```{r compare_big}
+big_tab <- geno %>% group_by(id, major, region) %>% 
+    summarize(error_rate=sum(error_rate*coverage)/sum(coverage))
+big_tab$posterior_mean <- colMeans(big_samples$theta)
+big_tab$post_q.025 <- colQuantiles(big_samples$theta, prob=.025)
+big_tab$post_q.25 <- colQuantiles(big_samples$theta, prob=.25)
+big_tab$post_q.75 <- colQuantiles(big_samples$theta, prob=.75)
+big_tab$post_q.975 <- colQuantiles(big_samples$theta, prob=.975)
+```
+```{r big_tab_plot, fig.height=8*fig.dim, fig.width=4*fig.dim}
+layout(t(1:2))
+with(subset(big_tab, id=="altai"), {
+     splot(post_q.025, post_q.25, posterior_mean, post_q.75, post_q.975, 
+           labels=sub("[^:]*:","",all_theta_names[big_tab$id=="altai"]),
+           main='error rates, Altai neanderthal') 
+   })
+with(subset(big_tab, id=="denis"), {
+     splot(post_q.025, post_q.25, posterior_mean, post_q.75, post_q.975, 
+           labels=sub("[^:]*:","",all_theta_names[big_tab$id=="denis"]),
+           main='error rates, Denisovan')
+   })
+```
+
+Here are the results for higher-level parameters:
+```{r big_hyper, fig.height=3*fig.dim}
+segplot(cbind(big_samples$mu, matrix(big_samples$nu, nrow=nrow(big_samples$mu))), 
+        c(all_mu_names,all_nu_names))
+segplot(cbind(big_samples$kappa, 
+              matrix(big_samples$gamma, nrow=nrow(big_samples$kappa)), 
+              big_samples$sigma_gamma, big_samples$sigma_kappa), 
+        c(all_kappa_names, all_gamma_names, "sigma_gamma", "sigma_kappa"))
+```
+
+There is substantial heterogeneity between regions.
+Let's look at the results in another way: with the four bases grouped together for each region.
+```{r big_tab_plot2, fig.height=6*fig.dim, fig.width=4*fig.dim}
+layout(t(1:2))
+for (sample_id in levels(big_tab$id)) {
+    for (b in bases) {
+        with(subset(big_tab, id==sample_id & major == b), {
+             splot(post_q.025, post_q.25, posterior_mean, post_q.75, post_q.975, 
+                   xlim=range(big_tab$post_q.025, big_tab$post_q.975),
+                   labels=gsub("[^:]*:","",all_theta_names[big_tab$id==sample_id & big_tab$major==b]),
+                   main=paste('error rates,', sample_id),
+                   pt.col=match(b, bases), col=match(b,bases),
+                   add=(b != bases[1]))
+           })
+    }
+    legend("topright", pch=20, col=1:4, legend=bases)
+}
+```
+
+
+# Conclusions
+
+In all cases, our methods worked well on the simulated data,
+correctly inferring the true error rates
+with an appropriate margin of error.
+
+The two samples had substantially different overall error probabilities,
+of about 
+`r round(colMeans(sample_samples$theta)[1],4)` for the Altai Neanderthal
+and 
+`r round(colMeans(sample_samples$theta)[2],4)` for the Densiovan.
+However, error rates differed substantially according to what the true nucleotide was,
+a pattern that didn't become clear until we split out error rates by region of the genome.
+Then, we found that both overall error rates
+and the pattern of error rates (i.e., relative error rates of `A`, `T`, `C`, and `G`)
+differed substantially between regions,
+as well as between samples.
+In both samples, the error rates of `C-G` bases was higher,
+although this was much more pronounced in the Neanderthal.
+This is to be expected, because of deamination-induced DNA damage affecting `C-G` bases;
+this signature is good evidence that we are in fact getting ancient DNA.
+Furthermore, the way that overall error rates varied between regions was strongly correlated between samples,
+despite these having lived about 25,000 years apart.
+(In fact, the "regions" of the two samples don't exactly line up,
+so this correlation is probably stronger than it appears in the final figure above.)
+This implies that some regions of the genome are more error-prone than others;
+one reason for this is that different parts of the genome are more or less covered by heterochromatin (which protects DNA),
+and these patterns of heterochromatin are conserved over evolutionary time.
+Puzzlingly, in some regions we see that the `C` and `G` error rates are substantially different,
+despite the prediction that these should be the same, as every `C` is reverse-complement paired to a `G` and vice-versa.
+Finally, the error rates in the mitochondria look like many other regions in both samples:
+perhaps on the low side, but not surprisingly different.
+(Perhaps you did a statistical test of this: if so, good.)
+

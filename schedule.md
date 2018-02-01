@@ -26,7 +26,7 @@ Week 2 (*1/16*)
     hierarchical models for binary responses, shrinkage.
     **(K ch. 7, 9 and Intro to Stan)** 
 
-    - **Short report:** (due 1/26) [Error rates in ancient DNA](hws/week_2.html)
+    - **Short report:** (due 1/26) [Error rates in ancient DNA](hws/week_2.html) :: [solution](hws/week_2_soln.html)
 
 Week 3 (*1/23*)
 
