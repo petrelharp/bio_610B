@@ -751,6 +751,50 @@ how much the observed data "looks like" the posterior predictive samples.
 
 *Then,* the model with a better score *fits* better.
 
+```{r plot_model_fit, echo=FALSE, fig.width=3*fig.dim}
+layout(t(1:2))
+plot(data$counts[order(mu1)], ylab="counts", ylim=c(1,1000), # ylim=range(sim1,data$counts), 
+     type='n', main='Poisson regression')
+segments(x0=seq_len(nrow(data)),
+         y0=rowMins(sim1)[order(mu1)],
+         y1=rowMaxs(sim1)[order(mu1)])
+points(data$counts[order(mu1)], pch=20, col='red', cex=0.5)
+legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated range"), col=c('red', 'black'))
+
+plot(data$counts[order(mu1)], ylab="counts", ylim=c(0,1000), # ylim=range(sim2,data$counts), 
+     type='n', main='logNormal-Poisson')
+segments(x0=seq_len(nrow(data)),
+         y0=rowMins(sim2)[order(mu1)],
+         y1=rowMaxs(sim2)[order(mu1)])
+points(data$counts[order(mu1)], pch=20, col='red', cex=0.5)
+legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated range"), col=c('red', 'black'))
+```
+
+-----------------
+
+Same plot, zoomed in:
+
+```{r plot_model_fit2, echo=FALSE, fig.width=3*fig.dim, fig.height=2*fig.dim}
+layout(t(1:2))
+plot(data$counts[order(mu1)], ylab="counts", ylim=c(1,400), # ylim=range(sim1,data$counts), 
+     type='n', main='Poisson regression')
+segments(x0=seq_len(nrow(data)),
+         y0=rowMins(sim1)[order(mu1)],
+         y1=rowMaxs(sim1)[order(mu1)])
+points(data$counts[order(mu1)], pch=20, col='red', cex=0.5)
+legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated range"), col=c('red', 'black'))
+
+plot(data$counts[order(mu1)], ylab="counts", ylim=c(0,400), # ylim=range(sim2,data$counts), 
+     type='n', main='logNormal-Poisson')
+segments(x0=seq_len(nrow(data)),
+         y0=rowMins(sim2)[order(mu1)],
+         y1=rowMaxs(sim2)[order(mu1)])
+points(data$counts[order(mu1)], pch=20, col='red', cex=0.5)
+legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated range"), col=c('red', 'black'))
+```
+
+
+
 
 ## Implementation
 
