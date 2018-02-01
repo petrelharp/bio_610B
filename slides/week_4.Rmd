@@ -481,6 +481,7 @@ fit1 <- stan(model_code=simple_block,
 -----------
 
 ```{r printit}
+post1 <- extract(fit1)
 print(fit1)
 ```
 
@@ -495,6 +496,40 @@ stan_trace(fit1, pars=c("a","b","c","lp__"), inc_warmup=TRUE)
 ```{r not_warmup}
 stan_trace(fit1, pars=c("a","b","c","lp__"), inc_warmup=FALSE)
 ```
+
+## How'd we do?
+
+Here are posterior distributions of the parameters,
+with the true values in red.
+```{r true_fit_1, echo=FALSE}
+# a[g] + b * (age - ma)/sa + c[g] * (exp - me)/se
+# = a[g] - b * ma / sa - c[g] * me / se + (b/sa) * age  + (c[g]/se) * exp
+post1$true_a <- with(data, post1$a - cbind(post1$b,post1$b) * mean(age)/sd(age) - post1$c * mean(exposure)/sd(exposure))
+layout(matrix(1:6, nrow=2, byrow=TRUE))
+with(data, {
+    hist(post1$true_a[,1], breaks=50, main='a[1]', 
+         xlim=range(post1$true_a[,1], true_params$a[1]))
+    abline(v=true_params$a[1], col='red', lwd=2)
+    hist(post1$true_a[,2], breaks=50, main='a[2]',
+         xlim=range(post1$true_a[,2], true_params$a[2]))
+    abline(v=true_params$a[2], col='red', lwd=2)
+    hist(post1$b/sd(age), breaks=50, main='b',
+         xlim=range(true_params$b, post1$b/sd(age)))
+    abline(v=true_params$b, col='red', lwd=2)
+    hist(post1$c[,1]/sd(exposure), breaks=50, main='c[1]',
+         xlim=range(post1$c[,1]/sd(exposure), true_params$c[1]))
+    abline(v=true_params$c[1], col='red', lwd=2)
+    hist(post1$c[,2]/sd(exposure), breaks=50, main='c[2]',
+         xlim=range(post1$c[,2]/sd(exposure), true_params$c[2]))
+    abline(v=true_params$c[2], col='red', lwd=2)
+ })
+```
+
+. . .
+
+*What happened?*
+
+
 
 ## Goodness of fit
 
@@ -512,7 +547,6 @@ We expect to **not** see a good fit. (*Why?*)
 :::::::: {.column width="60%"}
 
 ```{r post_sims1}
-post1 <- extract(fit1)
 params1 <- list(a=colMeans(post1$a),
                 b=mean(post1$b),
                 c=colMeans(post1$c))
@@ -595,6 +629,7 @@ fit2 <- stan(model_code=full_block,
 ----------------
 
 ```{r print_fullmodel}
+post2 <- extract(fit2)
 print(fit2)
 ```
 
@@ -606,6 +641,34 @@ stan_trace(fit2, pars=c("a", "b", "c", "sigma", "lp__"))
 ```
 
 
+## How'd we do *now*?
+
+We still haven't looked to see how close the true parameters were to the inferred values.
+Here are posterior distributions from the full model,
+with the true values in red.
+```{r true_fit, echo=FALSE}
+# a[g] + b * (age - ma)/sa + c[g] * (exp - me)/se
+# = a[g] - b * ma / sa - c[g] * me / se + (b/sa) * age  + (c[g]/se) * exp
+layout(matrix(1:6, nrow=2, byrow=TRUE))
+with(data, {
+    hist(post2$a[,1] - post2$b * mean(age)/sd(age) - post2$c[,1] * mean(exposure)/sd(exposure), 
+         breaks=50, main='a[1]')
+    abline(v=true_params$a[1], col='red', lwd=2)
+    hist(post2$a[,2] - post2$b * mean(age)/sd(age) - post2$c[,2] * mean(exposure)/sd(exposure), 
+         breaks=50, main='a[2]')
+    abline(v=true_params$a[2], col='red', lwd=2)
+    hist(post2$b/sd(age), breaks=50, main='b')
+    abline(v=true_params$b, col='red', lwd=2)
+    hist(post2$c[,1]/sd(exposure), breaks=50, main='c[1]')
+    abline(v=true_params$c[1], col='red', lwd=2)
+    hist(post2$c[,2]/sd(exposure), breaks=50, main='c[2]')
+    abline(v=true_params$c[2], col='red', lwd=2)
+    hist(post2$sigma, breaks=50, main='sigma')
+    abline(v=true_params$sigma, col='red', lwd=2)
+ })
+```
+
+
 ## Posterior predictive simulations, again
 
 
@@ -613,7 +676,6 @@ stan_trace(fit2, pars=c("a", "b", "c", "sigma", "lp__"))
 :::::::: {.column width="60%"}
 
 ```{r post_sims2}
-post2 <- extract(fit2)
 # 100 datasets:
 kk <- sample.int(nrow(post2$a), 100)
 sims <- lapply(kk, function (k) { 
@@ -693,34 +755,6 @@ how much the observed data "looks like" the posterior predictive samples.
 ## Implementation
 
 ```{r pps_model_choice}
-```
-
-
-## How'd we do, by the way?
-
-We still haven't looked to see how close the true parameters were to the inferred values.
-Here are posterior distributions from the full model,
-with the true values in red.
-```{r true_fit, echo=FALSE}
-# a[g] + b * (age - ma)/sa + c[g] * (exp - me)/se
-# = a[g] - b * ma / sa - c[g] * me / se + (b/sa) * age  + (c[g]/se) * exp
-layout(matrix(1:6, nrow=2))
-with(data, {
-    hist(post2$a[,1] - post2$b * mean(age)/sd(age) - post2$c[,1] * mean(exposure)/sd(exposure), 
-         breaks=50, main='a[1]')
-    abline(v=true_params$a[1], col='red', lwd=2)
-    hist(post2$a[,2] - post2$b * mean(age)/sd(age) - post2$c[,2] * mean(exposure)/sd(exposure), 
-         breaks=50, main='a[2]')
-    abline(v=true_params$a[2], col='red', lwd=2)
-    hist(post2$b/sd(age), breaks=50, main='b')
-    abline(v=true_params$b, col='red', lwd=2)
-    hist(post2$c[,1]/sd(exposure), breaks=50, main='c[1]')
-    abline(v=true_params$c[1], col='red', lwd=2)
-    hist(post2$c[,2]/sd(exposure), breaks=50, main='c[2]')
-    abline(v=true_params$c[2], col='red', lwd=2)
-    hist(post2$sigma, breaks=50, main='sigma')
-    abline(v=true_params$sigma, col='red', lwd=2)
- })
 ```
 
 
