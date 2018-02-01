@@ -799,6 +799,70 @@ legend("topleft", pch=c(20,NA), lty=c(NA,1), legend=c("observed", "simulated ran
 ## Implementation
 
 ```{r pps_model_choice}
+gof <- function (z, x) {
+    # z is a vector of observed counts
+    # x is a (length(z) x N) matrix of simulated data
+    sqrt(mean( ((z - rowMeans(x)) / rowSds(x))^2 ))
+}
+# TEST THIS
+z0 <- rnorm(5); x0 <- matrix(rnorm(50), nrow=5)
+ans0 <- gof(z0, x0)
+ans1 <- 0
+for (i in 1:5) {
+    ans1 <- ans1 + (z0[i] - mean(x0[i,]))^2 / var(x0[i,])
+}
+ans1 <- sqrt(ans1/length(z0))
+stopifnot(abs(ans0 - ans1) < 5*.Machine$double.eps)
+
+gof_simple <- gof(data$counts, sim1)
+gof_full <- gof(data$counts, sim2)
+```
+The "simple" model, that did not model overdispersion
+has a goodness of fit score of `r gof_simple`,
+substantially larger than the lognormal model, which had a score
+of `r gof_full`.
+The score communicates how far the observed data are from the mean of the simulated data,
+in units of standard deviations.
+
+## But does the model fit?
+
+To see if model 2 actually *does* describe the data well,
+we'll find the distribution of goodness-of-fit scores
+based on simulation: simulate some *more* datasets,
+compute the GOF score for each,
+and see where the observed value lies within that distribution.
+
+On the next slide is a histogram of 100 GOF scores from simulated data;
+the red line shows the observed value.
+
+-------------
+
+```{r gof_sims, echo=-(1:3)}
+# 100 MORE datasets:
+kk <- sample.int(nrow(post2$a), 100)
+sims <- lapply(kk, function (k) { 
+                a <- post2$a[k,]
+                b <- post2$b[k]
+                c <- post2$c[k,]
+                sigma <- post2$sigma[k]
+                y <- with(list2env(scaled_data), 
+                          a[genotype] +
+                          b * age +
+                          c[genotype] * exposure)
+                mu <- exp(rnorm(length(y), 
+                                mean=y, sd=sigma))
+                rpois(length(mu), mu)
+         })
+more_sim2 <- do.call(cbind, sims)
+
+gof_scores <- sapply(1:ncol(more_sim2), function (k) {
+                         z <- more_sim2[,k]
+                         x <- sim2
+                         gof(z, x)
+         } )
+hist(gof_scores)
+abline(v=gof_full, col='red', lwd=2)
+legend("topright", lty=2, col='red', legend="observed value")
 ```
 
 
