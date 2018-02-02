@@ -1,0 +1,27 @@
+# Short Report, Week 4: Coverage
+
+In this report, you will continue to analyze the same dataset as before:
+raw sequencing data of ancient DNA from the Neanderthal and Denisovan individuals
+of the Denisovan cave in the Altai mountains of Siberia.
+The question you should answer is:
+Does total coverage vary with nearby GC content, and if so, on what scale?
+Answer this for each individual and compare;
+you should also assess goodness of fit of your final model.
+
+Here are my suggestions for how do do this:
+
+1. Measure GC content as percentage of bases within $\pm K$ 
+   that have true nucleotide `G` or `C`. (*hint:* running mean)
+   Do this for several choices of $K$, large and small, 
+   and include all of them in your model
+   as potential predictors.
+
+2. Don't use the entire dataset: it will be too slow. Start out with a small,
+   randomly chosen subset of the data, 
+   and then increase the size of the subset until you get tight estimates.
+
+3. Look up `poisson_log( )` in the Stan reference.
+
+
+*Note:* You may assume that all bases in the dataset are consecutive along the genome.
+(This is mostly true.)

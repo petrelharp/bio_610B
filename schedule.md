@@ -17,7 +17,7 @@ Week 1 (*1/9*)
     The beta-binomial distribution: putting a prior on the probability of success.
     **(K ch. 4, 5, 6)**
 
-    - **Short report:** (due 1/16) [MLE for beta-binomial](hws/week_1.html) :: [solution](hws/week_1_soln.html)
+    - **Homework:** (due 1/16) [MLE for beta-binomial](hws/week_1.html) :: [solution](hws/week_1_soln.html)
     - **Demo:** (from 1/11) [Beta-binomial analysis](demos/beta_binom.html)
 
 Week 2 (*1/16*)
@@ -26,7 +26,7 @@ Week 2 (*1/16*)
     hierarchical models for binary responses, shrinkage.
     **(K ch. 7, 9 and Intro to Stan)** 
 
-    - **Short report:** (due 1/26) [Error rates in ancient DNA](hws/week_2.html) :: [solution](hws/week_2_soln.html)
+    - **Homework:** (due 1/26) [Error rates in ancient DNA](hws/week_2.html) :: [solution](hws/week_2_soln.html)
 
 Week 3 (*1/23*)
 
@@ -42,6 +42,8 @@ Week 4 (*1/30*)
 : Count data: using Poisson regression and hierarchical modeling
     to fit overdispersion.  Model selection by crossvalidation.
     **(K ch 24)**
+
+    - **Homework:** (due 2/9) [Coverage](hws/week_4.html)
 
 
 Week 5 (*2/6*)
