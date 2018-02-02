@@ -1,4 +1,4 @@
-# Homework #1 :: solutions
+# Homework #2 :: solutions
 
 
 ```{r setup, include=FALSE}
@@ -88,7 +88,6 @@ geno$major_coverage <- geno[,bases][cbind(1:nrow(geno), as.numeric(geno$major))]
 
 First, let's look at the distribution of total coverages:
 ```{r total_coverage}
-layout(1:2)
 hist(subset(geno,id=="altai" & region>0)$coverage, breaks=30, 
      main="Altai coverage, nuclear", xlab='coverage')
 hist(subset(geno,id=="altai" & region==0)$coverage, breaks=30, 
@@ -324,9 +323,6 @@ simple_samples <- extract(simple_fit)
 print(simple_fit)
 ```
 
-The average error rate, weighted by coverage, that we simulated under was 
-`r sum(geno$coverage*geno$error_rate)/sum(geno$coverage)`:
-we should get close to that here.
 The posterior mean is `r mean(simple_samples$theta)`
 and a 95% credible interval is from 
 `r quantile(simple_samples$theta, .025)`
