@@ -51,7 +51,7 @@ $$\begin{aligned}
 ## Comparison of means
 
 If the predictor, $X$, is *discrete*
-then we are doing a $t$-test.
+then we are doing a $t$-test, or ANOVA, or something.
 
 . . .
 
@@ -97,20 +97,43 @@ system.time( stantt <- stan(model_code=stt_block,
 --------------------------
 
 ```{r summary_stantt}
-summary(stantt)
+rstan::summary(stantt)
 ```
 
 
 ## Standard linear regression
 
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+
 Simulate data
 
-```{r simdata}
+```r
+truth <- list(b0=1.0, b1=3.0, sigma=0.5)
+n <- 200
+x <- rnorm(n, mean=0, sd=3)
+y <- ( truth$b0 + truth$b1 * x 
+        + rnorm(n, mean=0, sd=truth$sigma) )
+```
+
+:::
+::: {.column width="50%"}
+
+
+```{r simdata, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
 truth <- list(b0=1.0, b1=3.0, sigma=0.5)
 n <- 200
 x <- rnorm(n, mean=0, sd=3)
 y <- truth$b0 + truth$b1 * x + rnorm(n, mean=0, sd=truth$sigma)
+plot(x,y)
+abline(truth$b0, truth$b1, col='red')
 ```
+
+:::
+::::::::::::::
+
+
 
 ------------------
 
@@ -146,7 +169,7 @@ system.time( stanlr <- stan(model_code=slr_block,
 
 
 ```{r summary_stanlr}
-summary(stanlr)
+rstan::summary(stanlr)
 ```
 
 
@@ -236,14 +259,12 @@ range(predict(the_lm) - y)
 
 # Stochastic minute
 
-## the Cauchy distribution
+---------------
 
 If $X \sim \Cauchy(\text{center}=\mu, \text{scale}=\sigma)$, then $X$ has probability density
 $$\begin{aligned}
     f(x \given \mu, \sigma) = \frac{1}{\pi\left( 1 + \left( \frac{x - \mu}{\sigma} \right)^2 \right)} .
 \end{aligned}$$
-
-. . .
 
 > 1. The Cauchy is a good example of a distribution with "heavy tails":
 >    rare, very large values.
@@ -264,6 +285,13 @@ $$\begin{aligned}
 
 *Wait, what?!?*
 
+. . .
+
+A single value has the *same distribution* as the mean of 1,000 of them?
+
+. . .
+
+Let's look:
 ```{r cauchy_mean}
 meanplot <- function (rf, n=1e3, m=100) {
     x <- matrix(rf(n*m), ncol=m)
@@ -291,7 +319,7 @@ $X \sim \Cauchy(0,1)$
 meanplot(rcauchy)
 ```
 
-## Another way to look at it
+## Another way to look at it: extreme values
 
 ```{r max_values}
 n <- 100
@@ -300,7 +328,7 @@ lines(c(cummax(rnorm(n))), col='black')
 legend("bottomright", lty=1, col=c('black', 'red'), legend=c('normal', 'cauchy'))
 ```
 
-## Another way to look at it
+## Another way to look at it: extreme values
 
 ```{r max_values2}
 n <- 1000
@@ -309,7 +337,7 @@ lines(c(cummax(rnorm(n))), col='black')
 legend("bottomright", lty=1, col=c('black', 'red'), legend=c('normal', 'cauchy'))
 ```
 
-## Another way to look at it
+## Another way to look at it: extreme values
 
 ```{r max_values3}
 n <- 1e6
@@ -375,19 +403,44 @@ system.time( stanct <- stan(model_code=sct_block,
 rstan::summary(stanct)
 ```
 
+-----------
+
+Because we *correctly model* the noise,
+using Stan,
+we are not thrown off by large values.
 
 
 ## Robust regression
 
+:::::::::::::: {.columns}
+::: {.column width="50%"}
 
 Simulate data
 
-```{r simdata_rr}
+```r
+truth <- list(b0=1.0, b1=3.0, sigma=0.5)
+n <- 200
+x <- rnorm(n, mean=0, sd=3)
+y <- ( truth$b0 + truth$b1 * x 
+        + rcauchy(n, location=0, 
+                  scale=truth$sigma) )
+```
+
+:::
+::: {.column width="50%"}
+
+```{r simdata_rr, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
 truth <- list(b0=1.0, b1=3.0, sigma=0.5)
 n <- 200
 x <- rnorm(n, mean=0, sd=3)
 y <- truth$b0 + truth$b1 * x + rcauchy(n, location=0, scale=truth$sigma)
+plot(x,y)
+abline(truth$b0, truth$b1, col='red')
 ```
+
+:::
+::::::::::::::
+
 
 ------------------
 
@@ -425,6 +478,12 @@ system.time( stanrr <- stan(model_code=srr_block,
 ```{r summary_stanrr}
 rstan::summary(stanrr)
 ```
+
+## Compare the results.
+
+Make a table and/or a graph of estimates and confidence intervals
+obtained by (a) ordinary linear regression
+and (b) robust regression as we have done here.
 
 
 # Problem #2: too many variables
