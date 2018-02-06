@@ -48,7 +48,7 @@ Week 4 (*1/30*)
 
 Week 5 (*2/6*)
 
-: Continuous ("metric") data: groupwise means, univariate regression, robust regression
+: [(slides)](slides/week_5.slides.html) Continuous ("metric") data: groupwise means, univariate regression, robust regression
     by adjusting the noise distribution, multivariate regression and variable selection; the Horseshoe.
     **(K ch 16, 17, 18)**
 
