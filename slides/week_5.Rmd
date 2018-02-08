@@ -502,9 +502,10 @@ in 6 different conditions
 ::: {.column width="50%"}
 
 
-```{r simdata_ra, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
+```{r simdata_ra, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim}
 m <- 20
-truth <- list(b=200 + rnorm(m, sd=5), sigma=2.0)
+truth <- list(b=200 + rnorm(m, sd=5), 
+              sigma=2.0)
 n <- 200
 x <- sample(1:m, size=n, replace=TRUE)
 y <- pmax(0, truth$b[x]
@@ -556,13 +557,37 @@ points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
 ::: {.column width="50%"}
 
 
-```r
+```{r do_anova, cache=TRUE}
+anova_block <- "
 data {
+    int N; // number of obs
+    int m; // number of groups
+    vector[N] y; // leaf mass
+    int g[N]; // group ID
 }
 parameters {
+    vector[m] b;  // group 'means'
+    vector<lower=0>[m] sigma; // group 'SD's
+    real<lower=0> eta;  // variability in group means
 }
 model {
-}
+    y ~ cauchy(b[g], sigma[g]);
+    // lognormal, encouraging all group sigmas to be the same,
+    // but trying not to constrain them if they want to be different
+    sigma ~ lognormal(0, 1);
+    b ~ normal(0, eta); // unsure of scale, so put a hyperprior on it
+    eta ~ normal(0, 15);
+}"
+
+## note we subtract the median of y
+anova_data <- list(N=length(y),
+                   m=length(unique(x)),
+                   y=y - median(y),
+                   g=x)
+
+anova_fit <- stan(model_code=anova_block,
+                  data=anova_data,
+                  iter=1e3)
 ```
 
 :::
@@ -578,6 +603,12 @@ points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
 
 :::
 ::::::::::::::
+
+--------------
+
+```{r anova_run_summary}
+rstan::summary(anova_fit)
+```
 
 --------------
 
