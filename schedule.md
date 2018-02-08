@@ -49,13 +49,13 @@ Week 4 (*1/30*)
 Week 5 (*2/6*)
 
 : [(slides)](slides/week_5.slides.html) Continuous ("metric") data: groupwise means, univariate regression, robust regression
-    by adjusting the noise distribution, multivariate regression and variable selection; the Horseshoe.
+    by adjusting the noise distribution, friends of ANOVA.
     **(K ch 16, 17, 18)**
 
 
 Week 6 (*2/13*)
 
-: Friends of ANOVA: sources of variance.  An in-depth applied example, cumulative.
+: Sparsifying priors and variable selection. An in-depth applied example, cumulative.
     **(K ch 19, 20)**
 
 Week 7 *(2/20)*
