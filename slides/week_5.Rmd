@@ -193,6 +193,50 @@ to Stan.
 
 *Note:* `%*%` in R, and `*` in Stan, are *matrix multiplication*.
 
+------------------
+
+Standard linear regression
+```{r mlr}
+system.time( mlr <- lm(y ~ x) )
+summary(mlr)
+```
+
+-----------------
+
+with Stan
+```{r stanmlr, cache=TRUE}
+
+mlr_block <- "
+data {
+    int N;
+    matrix[N,4] x;
+    vector[N] y;
+}
+parameters {
+    real b0;
+    vector[4] b1;
+    real<lower=0> sigma;
+}
+model {
+    y ~ normal(to_vector(b0 + x * b1), sigma);
+    b0 ~ normal(0, 10);
+    b1 ~ normal(0, 10);
+    sigma ~ normal(0, 10);
+}"
+system.time( stanmlr <- stan(model_code=mlr_block,
+                            data=list(N=nrow(x), x=x, 
+                                      y=as.vector(y)), iter=1e3) )
+
+```
+
+----------------
+
+
+```{r summary_stanmlr}
+rstan::summary(stanmlr)
+```
+
+
 
 # Testing with crossvalidation
 
@@ -219,7 +263,26 @@ Write down the math, then code it up.
 
 -----------------
 
-(*Do this for multivariate regression.*)
+```{r do_crossval}
+five_groups <- sample(rep(1:5, each=nrow(x)/5))
+
+do_crossval <- function (k) {
+    # fit using not group k
+    subset_lm <- lm( y ~ x, subset=(five_groups != k))
+    # predict on group k
+    yhat <- predict(subset_lm, 
+                    newdata=list(x=x[five_groups == k,]))
+    # compute crossvalidation accuracy
+    S <- sqrt( mean( ( y[five_groups == k] - yhat  )^2 ) )
+    return(S)
+}
+
+crossvals <- sapply(1:5, do_crossval)
+```
+The mean crossvalidation score for ordinary linear regression
+was `r mean(crossvals)`,
+with a standard deviation of `r sd(crossvals)`.
+
 
 
 ## What is overfitting?
@@ -410,12 +473,156 @@ using Stan,
 we are not thrown off by large values.
 
 
-## Robust regression
+# Today's goals
+
+## Today's goals
+
+1. Formulate and carry out robust Bayesian ANOVA
+
+2. Use crossvalidation to compare robust regression to ordinary regression
+
+
+# Robust ANOVA
+
+## Metric data from groups
+
+Suppose we have numerical observations coming from $m$ different groups,
+and want to know if the *means* are different between groups, and by how much.
+
+. . .
 
 :::::::::::::: {.columns}
 ::: {.column width="50%"}
 
-Simulate data
+e.g., dry leaf mass after 10d of growth
+in 6 different conditions
+
+
+:::
+::: {.column width="50%"}
+
+
+```{r simdata_ra, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
+m <- 20
+truth <- list(b=200 + rnorm(m, sd=5), sigma=2.0)
+n <- 200
+x <- sample(1:m, size=n, replace=TRUE)
+y <- pmax(0, truth$b[x]
+              + rcauchy(n, location=0, 
+                      scale=truth$sigma) )
+```
+
+
+:::
+::::::::::::::
+
+
+-----------------
+
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+dry leaf mass after 10d of growth
+in 6 different conditions
+
+```r
+boxplot(y ~ x, main='all data')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+boxplot(y ~ x, subset=abs(y-200)<20, xlab='treatment', main='abs(y-200) < 10')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+```
+
+
+:::
+::: {.column width="50%"}
+
+```{r plotdata_ra, fig.width=1.5*fig.dim, fig.height=2*fig.dim, echo=FALSE}
+layout(1:2)
+boxplot(y ~ x, main='all data')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+boxplot(y ~ x, subset=abs(y-200)<20, xlab='treatment', main='abs(y-200) < 10')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+```
+
+:::
+::::::::::::::
+
+
+-------------------
+
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+
+```r
+data {
+}
+parameters {
+}
+model {
+}
+```
+
+:::
+::: {.column width="50%"}
+
+```{r plotdata_ra2, fig.width=1.5*fig.dim, fig.height=2*fig.dim, echo=FALSE}
+layout(1:2)
+boxplot(y ~ x, main='all data')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+boxplot(y ~ x, subset=abs(y-200)<20, xlab='treatment', main='abs(y-200) < 10')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+```
+
+:::
+::::::::::::::
+
+--------------
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+
+*What do we want to know?*
+
+1. Do the treatments affect mean growth?
+
+2. How much does leaf mass in treatment 8 differ from group 12?
+
+3. How much variation is explained by treatment?
+
+:::
+::: {.column width="50%"}
+
+
+*How do we find it out?*
+
+:::
+::::::::::::::
+
+
+## Do treatments affect growth?
+
+
+## How much do treatments 8 and 12 differ?
+
+
+## How much variation is explained by treatment?
+
+
+
+# Robust regression
+
+## Some data
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+
+Relative axon growth
+for neurons after $x$ hours:
 
 ```r
 truth <- list(b0=1.0, b1=3.0, sigma=0.5)
@@ -486,6 +693,61 @@ obtained by (a) ordinary linear regression
 and (b) robust regression as we have done here.
 
 
+## Crossvalidation plan
+
+1. Put aside 20% of the data for *testing*.
+
+2. Refit the model.
+
+3. Predict the test data; compute
+   $$\begin{aligned}
+    S = \sqrt{\frac{1}{M} \sum_{k=1}^M (\hat y_i - y_i)^2}
+   \end{aligned}$$
+
+4. Repeat for the other four 20%s.
+
+5. Compare.
+
+
+## For ordinary linear regression
+
+```{r do_crossval_again}
+five_groups <- sample(rep(1:5, each=NROW(x)/5))
+
+do_crossval <- function (k) {
+    # fit using not group k
+    subset_lm <- lm( y ~ x, subset=(five_groups != k))
+    # predict on group k
+    yhat <- predict(subset_lm, 
+                    newdata=list(x=x[five_groups == k]))
+    # compute crossvalidation accuracy
+    S <- sqrt( mean( ( y[five_groups == k] - yhat  )^2 ) )
+    return(S)
+}
+
+crossvals <- sapply(1:5, do_crossval)
+```
+The mean crossvalidation score for ordinary linear regression
+was `r mean(crossvals)`;
+the five values were `r crossvals`.
+
+
+## For Stan
+
+```{r five_stans, cache=TRUE}
+five_stans <- lapply(1:5, function (k) {
+                         use_these <- (five_groups != k)
+                         stan(model_code=srr_block,
+                              data=list(N=sum(use_these),
+                                        x=x[use_these],
+                                        y=y[use_these]),
+                              iter=1e3) } )
+```
+
+## Your turn
+
+
+
 # Problem #2: too many variables
 
 
@@ -520,6 +782,17 @@ Format:
 
      x2 a matrix with 64 columns
 ```
+
+---------------
+
+The dataset has
+
+- 442 diabetes patients
+- 10 main variables: age, gender, body mass index, average blood pressure (map), 
+  and six blood serum measurements (tc, ldl, hdl, tch, ltg, glu)
+- 45 interactions, e.g. `age:ldl`
+- 9 quadratic effects, e.g. `age^2`
+- measure of disease progression taken one year later, `y`
 
 ## Crossvalidation
 
