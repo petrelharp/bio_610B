@@ -52,6 +52,7 @@ Week 5 (*2/6*)
     by adjusting the noise distribution, friends of ANOVA.
     **(K ch 16, 17, 18)**
 
+    - **Homework:** (due 2/19) [Pipefish](hws/week_6.html)
 
 Week 6 (*2/13*)
 
