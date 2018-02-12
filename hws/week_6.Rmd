@@ -1,0 +1,24 @@
+# Short report, Week 6: robust regression
+
+In this report you will analyze some RNA-seq data from Gulf Pipefish.
+The data come from brood pouch tissue of 12 adult males, half of whom were pregnant.
+The data file, [pipefish_RNAseq_CPM.tsv](data/pipefish_RNAseq_CPM.tsv), 
+contains one row for each gene; the first and last two columns give some information about the gene,
+while the second through thirteenth columns give normalized RNA-seq data (in copies per million) for each gene in the 12 samples.
+These column names give the fish's ID; those with "P" in their name are pregnant, and those with "N" in their name are not.
+The data have been curated somewhat, removing some unreliable genes.
+
+You should write a report addressing the following:
+
+1. Describe the data, briefly, and assess whether variation is likely to be well-explained by Gaussian noise.
+
+2. How much does gene expression typically differ between pregnant and non-pregnant males, relative to inter-individual variation?
+   Fit a robust model with separate mean expression values for pregnant and non-pregnant fish,
+   and use inference on the priors of those means to answer this question.
+   (Explanation: the question is about the *distribution* of mean differences between pregnant and non-pregnant fish,
+   which is what the prior describes.)
+   *Note:* if you don't scale the data before giving it to Stan, you'll probably run into severe convergence and speed issues.
+
+3. Pick 10 genes to make a "pregnancy test" for male pipefish that would take data of this form (but only for the ten genes you choose),
+   and make the test by fitting a robust logistic regression model for pregnancy using those ten genes.
+
