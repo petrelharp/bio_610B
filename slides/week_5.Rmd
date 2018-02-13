@@ -1,5 +1,5 @@
 ---
-title: "Metric data: regression and relatives"
+title: "Metric data: robustness and differences of 'means'"
 author: "Peter Ralph"
 date: "5 February 2018 -- Advanced Biological Statistics"
 ---
@@ -473,14 +473,6 @@ using Stan,
 we are not thrown off by large values.
 
 
-# Today's goals
-
-## Today's goals
-
-1. Formulate and carry out robust Bayesian ANOVA
-
-2. Use crossvalidation to compare robust regression to ordinary regression
-
 
 # Robust ANOVA
 
@@ -556,6 +548,76 @@ points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
 :::::::::::::: {.columns}
 ::: {.column width="50%"}
 
+Each group has a different location and scale;
+noise about these is Cauchy;
+group locations are random deviations;
+group scale parameters are random deviations from a common scale.
+
+
+$$\begin{aligned}
+    Y_i &\sim \Cauchy(b_{g_i}, \sigma_{g_i}) \\
+    \sigma_g &\sim \log\Normal(\mu, 1) \\
+    b_g &\sim \Normal(0, \eta) \\
+    \eta &\sim \Normal(0, 15) \\
+    \mu &\sim \Normal(0, 1)
+\end{aligned}$$
+
+:::
+::: {.column width="50%"}
+
+```{r plotdata_ra4, fig.width=1.5*fig.dim, fig.height=2*fig.dim, echo=FALSE}
+layout(1:2)
+boxplot(y ~ x, main='all data')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+boxplot(y ~ x, subset=abs(y-200)<20, xlab='treatment', main='abs(y-200) < 10')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+```
+
+:::
+::::::::::::::
+
+
+-------------------
+
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
+$$\begin{aligned}
+    Y_i &\sim \Cauchy(b_{g_i}, \sigma_{g_i}) \\
+    \sigma_g &\sim \log\Normal(\mu, 1) \\
+    b_g &\sim \Normal(z, \eta) \\
+    z &\sim \Normal(0, 10) \\
+    \eta &\sim \Normal(0, 15) \\
+    \mu &\sim \Exp(1)
+\end{aligned}$$
+
+*Changes:*
+
+1. Added common mean, $z$.
+
+2. Put "shrinkage" prior on $\mu$.
+
+:::
+::: {.column width="50%"}
+
+```{r plotdata_ra3, fig.width=1.5*fig.dim, fig.height=2*fig.dim, echo=FALSE}
+layout(1:2)
+boxplot(y ~ x, main='all data')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+boxplot(y ~ x, subset=abs(y-200)<20, xlab='treatment', main='abs(y-200) < 10')
+points(seq_along(truth$b), truth$b, pch=20, cex=2.0, col='red')
+```
+
+:::
+::::::::::::::
+
+-------------------
+
+
+:::::::::::::: {.columns}
+::: {.column width="50%"}
+
 
 ```{r do_anova, cache=TRUE}
 anova_block <- "
@@ -567,16 +629,26 @@ data {
 }
 parameters {
     vector[m] b;  // group 'means'
-    vector<lower=0>[m] sigma; // group 'SD's
-    real<lower=0> eta;  // variability in group means
+    real z;  // overall mean
+    // group 'SD's
+    vector<lower=0>[m] sigma; 
+    // variability in group means
+    real<lower=0> eta;  
+    // log-mean of sigma
+    real mu; 
 }
 model {
     y ~ cauchy(b[g], sigma[g]);
     // lognormal, encouraging all group sigmas to be the same,
     // but trying not to constrain them if they want to be different
-    sigma ~ lognormal(0, 1);
-    b ~ normal(0, eta); // unsure of scale, so put a hyperprior on it
+    sigma ~ lognormal(mu, 1);
+    // unsure of scale for b, 
+    // so put a hyperprior on it
+    b ~ normal(z, eta);
+    z ~ normal(0, 15);
     eta ~ normal(0, 15);
+    // encourage mu to be near zero if reasonable
+    mu ~ exponential(1);
 }"
 
 ## note we subtract the median of y
@@ -587,7 +659,8 @@ anova_data <- list(N=length(y),
 
 anova_fit <- stan(model_code=anova_block,
                   data=anova_data,
-                  iter=1e3)
+                  iter=1e3,
+                  control=list(adapt_delta=0.85))
 ```
 
 :::
@@ -630,6 +703,14 @@ rstan::summary(anova_fit)
 
 *How do we find it out?*
 
+1. See if any credible intervals overlap?
+   And, see if credible interval for eta > 0.
+
+2. Posterior distribution of `b[12] - b[8]`: if `>0` then `b[12] > b[8]`; if zero is in it then `b[12] = b[8]`.
+
+3. Compare `sigma` to `eta`.
+   Or take the ratio of MADs before and after subtracting `b[-]`.
+
 :::
 ::::::::::::::
 
@@ -642,230 +723,4 @@ rstan::summary(anova_fit)
 
 ## How much variation is explained by treatment?
 
-
-
-# Robust regression
-
-## Some data
-
-:::::::::::::: {.columns}
-::: {.column width="50%"}
-
-
-Relative axon growth
-for neurons after $x$ hours:
-
-```r
-truth <- list(b0=1.0, b1=3.0, sigma=0.5)
-n <- 200
-x <- rnorm(n, mean=0, sd=3)
-y <- ( truth$b0 + truth$b1 * x 
-        + rcauchy(n, location=0, 
-                  scale=truth$sigma) )
-```
-
-:::
-::: {.column width="50%"}
-
-```{r simdata_rr, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
-truth <- list(b0=1.0, b1=3.0, sigma=0.5)
-n <- 200
-x <- rnorm(n, mean=0, sd=3)
-y <- truth$b0 + truth$b1 * x + rcauchy(n, location=0, scale=truth$sigma)
-plot(x,y)
-abline(truth$b0, truth$b1, col='red')
-```
-
-:::
-::::::::::::::
-
-
-------------------
-
-Standard linear regression
-```{r slrr}
-system.time( slr2 <- lm(y ~ x) )
-summary(slr2)
-```
-
------------------
-
-with Stan
-```{r stanrr, cache=TRUE}
-srr_block <- "
-data { 
-    int N;
-    vector[N] x;
-    vector[N] y;
-}
-parameters {
-    real b0;
-    real b1;
-    real<lower=0> sigma;
-}
-model {
-    y ~ cauchy(b0 + b1*x, sigma);
-}"
-system.time( stanrr <- stan(model_code=srr_block,
-                            data=list(N=length(x), x=x, y=y), iter=1e3) )
-```
-
-----------------
-
-
-```{r summary_stanrr}
-rstan::summary(stanrr)
-```
-
-## Compare the results.
-
-Make a table and/or a graph of estimates and confidence intervals
-obtained by (a) ordinary linear regression
-and (b) robust regression as we have done here.
-
-
-## Crossvalidation plan
-
-1. Put aside 20% of the data for *testing*.
-
-2. Refit the model.
-
-3. Predict the test data; compute
-   $$\begin{aligned}
-    S = \sqrt{\frac{1}{M} \sum_{k=1}^M (\hat y_i - y_i)^2}
-   \end{aligned}$$
-
-4. Repeat for the other four 20%s.
-
-5. Compare.
-
-
-## For ordinary linear regression
-
-```{r do_crossval_again}
-five_groups <- sample(rep(1:5, each=NROW(x)/5))
-
-do_crossval <- function (k) {
-    # fit using not group k
-    subset_lm <- lm( y ~ x, subset=(five_groups != k))
-    # predict on group k
-    yhat <- predict(subset_lm, 
-                    newdata=list(x=x[five_groups == k]))
-    # compute crossvalidation accuracy
-    S <- sqrt( mean( ( y[five_groups == k] - yhat  )^2 ) )
-    return(S)
-}
-
-crossvals <- sapply(1:5, do_crossval)
-```
-The mean crossvalidation score for ordinary linear regression
-was `r mean(crossvals)`;
-the five values were `r crossvals`.
-
-
-## For Stan
-
-```{r five_stans, cache=TRUE}
-five_stans <- lapply(1:5, function (k) {
-                         use_these <- (five_groups != k)
-                         stan(model_code=srr_block,
-                              data=list(N=sum(use_these),
-                                        x=x[use_these],
-                                        y=y[use_these]),
-                              iter=1e3) } )
-```
-
-## Your turn
-
-
-
-# Problem #2: too many variables
-
-
-## Example data
-
-![from Efron, Hastie, Johnstone, \& Tibshirani](lars_diabetes_data.png)
-
------------
-
-```{r lars_data}
-library(lars)
-data(diabetes)
-class(diabetes$x2) <- "matrix"
-```
-```
-diabetes                 package:lars                  R Documentation
-
-Blood and other measurements in diabetics
-
-Description:
-
-     The ‘diabetes’ data frame has 442 rows and 3 columns. These are
-     the data used in the Efron et al "Least Angle Regression" paper.
-
-Format:
-
-     This data frame contains the following columns:
-
-     x a matrix with 10 columns
-
-     y a numeric vector
-
-     x2 a matrix with 64 columns
-```
-
----------------
-
-The dataset has
-
-- 442 diabetes patients
-- 10 main variables: age, gender, body mass index, average blood pressure (map), 
-  and six blood serum measurements (tc, ldl, hdl, tch, ltg, glu)
-- 45 interactions, e.g. `age:ldl`
-- 9 quadratic effects, e.g. `age^2`
-- measure of disease progression taken one year later, `y`
-
-## Crossvalidation
-
-First let's split the data into testing and training just once:
-```{r split_data}
-test_indices <- (rbinom(length(diabetes$y), size=1, prob=0.2) == 1)
-test_d <- cbind(data.frame(y=diabetes$y[test_indices]),
-                diabetes$x2[test_indices,])
-training_d <- cbind(data.frame(y=diabetes$y[!test_indices]),
-                diabetes$x2[!test_indices,])
-```
-
-## Ordinary linear regression
-
-```{r ols}
-ols <- lm(y ~ ., data=training_d)
-summary(ols)
-```
-
--------------
-
-```{r crossval_ols}
-ols_pred <- predict(ols, newdata=test_d)
-ols_mse <- sqrt(mean((ols_pred - test_d$y)^2))
-```
-With ordinary linear regression, we got a root-mean-square-error of `r ols_mse`.
-
-------------
-
-```{r plot_ols}
-plot(test_d$y, ols_pred, xlab="true values", ylab="OLS predicted")
-abline(0,1)
-```
-
-
-## A sparsifying prior
-
-We have a lot of predictors: 64 of them.
-A good guess is that only a few are really useful.
-So, we can put a *sparsifying* prior on the coefficients,
-i.e., the $\beta$s in
-$$\begin{aligned}
-    y = \beta_0 + \beta_1 x_1 + \cdots \beta_n x_n + \epsilon
-\end{aligned}$$
 
