@@ -660,7 +660,7 @@ anova_data <- list(N=length(y),
 anova_fit <- stan(model_code=anova_block,
                   data=anova_data,
                   iter=1e3,
-                  control=list(adapt_delta=0.85))
+                  control=list(adapt_delta=0.99))
 ```
 
 :::
