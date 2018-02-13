@@ -56,7 +56,7 @@ Week 5 (*2/6*)
 
 Week 6 (*2/13*)
 
-: Sparsifying priors and variable selection. An in-depth applied example, cumulative.
+: [(slides)](slides/week_6.slides.html) Sparsifying priors and variable selection. An in-depth applied example, cumulative.
     **(K ch 19, 20)**
 
 Week 7 *(2/20)*
