@@ -717,10 +717,103 @@ rstan::summary(anova_fit)
 
 ## Do treatments affect growth?
 
+First let's simply see if the credible intervals overlap.
+Many of these don't overlap even close,
+so it sure looks like some of the treatments were different
+from other ones.
+
+```{r overlapping_intervals}
+quietgg(stan_plot(anova_fit, pars="b"))
+```
+
+---------------
+
+Now, let's look at `eta`, which is the SD parameter
+on the prior for `b`, the group location parameters.
+If `eta` is zero, then all the `b`s are the same.
+
+It looks like `eta` has a wide posterior distribution,
+but all the posterior support is quite far from zero,
+indicating that the group locations are different between the groups.
+
+```{r look_at_eta}
+rstan::summary(anova_fit, pars="eta")$summary
+```
+
+------------
+
+```{r eta_hist}
+stan_hist(anova_fit, pars="eta", bins=30)
+```
+
+
 
 ## How much do treatments 8 and 12 differ?
+
+Here we look at the posterior distribution of `b[12] - b[8]`.
+
+```{r post_b_diff}
+bsamps <- extract(anova_fit)$b
+diff_samps <- bsamps[,12] - bsamps[,8]
+hist(diff_samps, main="posterior of b[12] - b[8]", xlab='b[12] - b[8]')
+```
+
+-----------
+
+The posterior mean difference is `r mean(diff_samps)`
+but a 95% credible interval goes from `r quantile(diff_samps, prob=.025)` to 
+`r quantile(diff_samps, prob=.975)`.
+Since zero is in the credible interval,
+we can't really tell from the data if there is a real difference here,
+but if there is, it's probably less than 5 or so.
+
 
 
 ## How much variation is explained by treatment?
 
+We want to compare `eta` (which describes how much
+different treatments affect leaf mass)
+to the values of `sigma` (which describe how much leaf mass varies
+within each treatment).
+
+First we need to check how much `sigma` vary.
+
+```{r look_at_sigma}
+quietgg(stan_plot(anova_fit, pars="sigma"))
+```
+
+-------------
+
+The posterior distributions of different groups' sigma values
+overlap a lot; so we'll look at the posterior distribution
+of the mean sigma value to describe how much within-group variation there is.
+
+```{r mean_sigma}
+mean_sigmas <- rowMeans(extract(anova_fit, pars="sigma")$sigma)
+hist(mean_sigmas)
+```
+
+It looks like `sigma` is between 2 and 4, roughly.
+
+-----------
+
+We really want to know how big `eta` tends to be relative to `sigma`
+
+```{r ratio_distrn}
+eta_samples <- extract(anova_fit)$eta
+ratio_samples <- eta_samples / mean_sigmas
+hist(ratio_samples)
+```
+
+-----------
+
+The posterior mean ratio of `eta` to `sigma` is `r mean(ratio_samples)`,
+with a 95% credible interval of
+`r quantile(ratio_samples, probs=.025)`
+to
+`r quantile(ratio_samples, probs=.975)`.
+In other words, it looks like
+differences in leaf mass between treatments
+are almost twice the typical differences between plants
+that had the same treatment.
 
