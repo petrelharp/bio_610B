@@ -412,18 +412,18 @@ contour(xx, yy, -log10(xy), add=TRUE)
 :::
 :::::::::::
 
-# A strongly sparsifying prior
+## A strongly sparsifying prior
 
-## The "horseshoe"
 
 
 :::::::::::::: {.columns}
 ::: {.column width="50%"}
 
+The "horseshoe":
 
 $$\begin{aligned}
-    \beta &\sim \Cauchy(0, \sigma) \\
-    \sigma &\sim \Cauchy(0, \tau) \\
+    \beta_j &\sim \Normal(0, \lambda_j) \\
+    \lambda_j &\sim \Cauchy(0, \tau) \\
     \tau &\sim \Unif(0, 1) 
 \end{aligned}$$
 
@@ -432,17 +432,17 @@ $$\begin{aligned}
 
 ```
 parameters {
-    real d_beta;
-    real d_sigma;
+    vector[p] d_beta;
+    vector[p] d_lambda;
     real<lower=0, upper=1> tau;
 }
 transformed parameters {
-    real beta;
-    beta = d_beta * d_sigma * tau;
+    vector[p] beta;
+    beta = d_beta .* d_lambda * tau;
 }
 model {
-    d_beta ~ cauchy(0, 1);
-    d_sigma ~ cauchy(0, 1);
+    d_beta ~ normal(0, 1);
+    d_lambda ~ cauchy(0, 1);
     // tau ~ uniform(0, 1); // uniform
 }
 ```
@@ -450,41 +450,225 @@ model {
 :::
 :::::::::::
 
-# Crossvalidation
+# The Cauchy as a scale mixture
 
-## For ordinary linear regression
+## Inverse square-root gamma scaling
 
-```{r do_crossval_again}
-five_groups <- sample(rep(1:5, each=NROW(x)/5))
+It turns out that if
 
-do_crossval <- function (k) {
-    # fit using not group k
-    subset_lm <- lm( y ~ x, subset=(five_groups != k))
-    # predict on group k
-    yhat <- predict(subset_lm, 
-                    newdata=list(x=x[five_groups == k]))
-    # compute crossvalidation accuracy
-    S <- sqrt( mean( ( y[five_groups == k] - yhat  )^2 ) )
-    return(S)
+$$\begin{aligned}
+    \beta &\sim \Normal(0, 1/\sqrt{\lambda}) \\
+    \lambda &\sim \Gam(1/2, 1/2)
+\end{aligned}$$
+
+then
+
+$$\begin{aligned}
+    \beta &\sim \Cauchy(0, 1).
+\end{aligned}$$
+
+. . .
+
+*What black magic is this??*
+
+. . .
+
+1. It says so [here](https://betanalpha.github.io/assets/case_studies/fitting_the_cauchy.html).
+
+2. If you like to do integrals, you can check mathematically.
+
+3. Or, you can check with *simulation*.
+
+
+
+# Using the horseshoe
+
+## What's an appropriate noise distribution?
+
+```{r show_y, echo=FALSE, fig.width=3*fig.dim, fig.height=1.5*fig.dim}
+layout(t(1:2))
+hist(diabetes$y, breaks=30, main="diabetes, response")
+qqnorm(diabetes$y)
+qqline(diabetes$y)
+```
+
+## Aside: quantile-quantile plots
+
+The idea is to plot the *quantiles* of each distribution against each other.
+
+If these are *datasets*, this means just plotting their *sorted values* against each other.
+
+```{r qq, fig.width=3*fig.dim}
+x <- rnorm(1e4)
+y <- rbeta(1e4, 2, 2)
+
+layout(t(1:3))
+plot(sort(x), sort(y))
+qqplot(x, y, main="qqplot")
+qqnorm(y, main="qnorm")
+```
+
+
+## Regression with a horseshoe prior
+
+Uses a [reparameterization](https://betanalpha.github.io/assets/case_studies/fitting_the_cauchy.html) of the Cauchy as a scale mixture of normals.
+
+
+```{r horseshoe_model, cache=TRUE}
+horseshoe_block <- "
+data {
+    int N;
+    int p;
+    vector[N] y;
+    matrix[N,p] x;
 }
-
-crossvals <- sapply(1:5, do_crossval)
+parameters {
+    real b0;
+    vector[p] d_beta;
+    vector[p] d_a;
+    vector<lower=0>[p] d_b;
+    real<lower=0, upper=1> tau;
+    real<lower=0> sigma;
+}
+transformed parameters {
+    vector[p] beta;
+    vector[N] f;
+    beta = d_beta .* d_a .* sqrt(d_b) * tau;
+    f = b0 + x * beta;
+}
+model {
+    y ~ normal(f, sigma);
+    // HORSESHOE PRIOR:
+    d_beta ~ normal(0, 1);
+    d_a ~ normal(0, 1);
+    d_b ~ inv_gamma(0.5, 0.5);
+    // tau ~ uniform(0, 1); // uniform
+    // priors on noise distribution:
+    sigma ~ normal(0, 10);
+}"
 ```
-The mean crossvalidation score for ordinary linear regression
-was `r mean(crossvals)`;
-the five values were `r crossvals`.
 
+------------------
 
-## For Stan
+Note the data have already been normalized,
+with the exception of $y$:
 
-```{r five_stans, cache=TRUE}
-five_stans <- lapply(1:5, function (k) {
-                         use_these <- (five_groups != k)
-                         stan(model_code=srr_block,
-                              data=list(N=sum(use_these),
-                                        x=x[use_these],
-                                        y=y[use_these]),
-                              iter=1e3) } )
+```{r data_summary}
+summary(training_d)
 ```
 
-## Your turn
+------------------
+
+```{r run_horseshoe, cache=TRUE, depends="horseshoe_model"}
+horseshoe_fit <- stan(model_code=horseshoe_block,
+                      data=list(N=nrow(training_d),
+                                p=ncol(training_d)-1,
+                                y=(training_d$y 
+                                   - median(training_d$y))
+                                  /mad(training_d$y),
+                                x=as.matrix(training_d[,-1])),
+                      iter=1000,
+                      control=list(adapt_delta=0.999,
+                                   max_treedepth=15))
+```
+
+--------------
+
+```{r summary_hs}
+(hs_summary <- rstan::summary(horseshoe_fit, pars=c("b0", "sigma", "beta")))
+```
+
+--------------
+
+First compare the resulting regression parameters to OLS values.
+
+```{r compare_betas, echo=1:5, fig.width=3*fig.dim}
+hs_samples <- extract(horseshoe_fit, pars=c("b0", "sigma", "beta"))
+# rescale to real units
+post_med_intercept <- median(hs_samples$b0) * mad(training_d$y) + median(training_d$y)
+post_med_sigma <- median(hs_samples$sigma) * mad(training_d$y)
+post_med_slopes <- colMedians(hs_samples$beta) * mad(training_d$y)
+
+ols_ses <- summary(ols)$coefficients[,2]
+
+layout(t(1:2))
+plot(coef(ols), xlab="coefficient", 
+     ylab="estimate", main="OLS", pch=20)
+segments(x0=1:65,
+         y0=coef(ols) - 2 * ols_ses,
+         y1=coef(ols) + 2 * ols_ses,
+         col=adjustcolor("black", 0.5))
+plot(c(post_med_intercept, post_med_slopes), 
+     xlab='coefficient', ylab="estimate",
+     col='red', pch=20, main="sparse")
+segments(x0=1, 
+         y0=mad(training_d$y) * quantile(hs_samples$b0, probs=0.025) + median(training_d$y), 
+         y1=mad(training_d$y) * quantile(hs_samples$b0, probs=0.975) + median(training_d$y), 
+         col=adjustcolor('red', 0.5))
+segments(x0=2:65, 
+         y0=mad(training_d$y) * colQuantiles(hs_samples$beta, probs=0.025), 
+         y1=mad(training_d$y) * colQuantiles(hs_samples$beta, probs=0.975),
+         col=adjustcolor('red', 0.5))
+```
+
+
+--------------
+
+The coefficient estimates from OLS are *wierd*.
+
+```{r what_coefs, echo=FALSE}
+options(scipen=3)
+coef_df <- data.frame(ols=coef(ols), stan=c(c(b0=post_med_intercept), post_med_slopes))
+coef_df[c(1,1+order(abs(coef_df$ols[-1]), decreasing=TRUE)),]
+```
+
+--------------
+
+And, quite different than what Stan gets.
+
+```{r what_coefs2, echo=FALSE}
+options(scipen=3)
+coef_df <- data.frame(ols=coef(ols), stan=c(c(b0=post_med_intercept), post_med_slopes))
+coef_df[c(1,1+order(abs(coef_df$stan[-1]), decreasing=TRUE)),]
+```
+
+
+
+--------------
+
+Now let's look at out-of-sample prediction error,
+using the posterior median coefficient estimates:
+
+```{r pred_stan}
+pred_stan <- function (x) {
+    post_med_intercept + as.matrix(x) %*% post_med_slopes
+}
+pred_y <- pred_stan(test_d[,-1])
+stan_pred_error <- sqrt(mean((test_d$y - pred_y)^2))
+stan_mse_resid <- sqrt(mean((training_d$y - pred_stan(training_d[,-1]))^2))
+
+plot(test_d$y, pred_y, xlab="true values", ylab="predicted values", main="test data")
+abline(0,1)
+```
+
+## Conclusions?
+
+
+1. Our "sparse" model is certainly more sparse, and arguably more interpretable.
+
+2. It has a root-mean-square prediction error of 
+    `r stan_pred_error`
+    on the *test* data, and
+    `r stan_mse_resid`
+    on the training data.
+
+3. This is substantially better than ordinary linear regression, 
+   which had a root-mean-square prediction error of `r ols_mse` on the test data,
+   and a root-mean-square-error of `r sqrt(mean(resid(ols)^2))` on the training data.
+
+
+. . .
+
+The sparse model is more interpretable,
+and more generalizable.
+
