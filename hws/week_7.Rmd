@@ -1,0 +1,30 @@
+# Short report, week 7: sparse regression
+
+For this report, I have written R code ([here](week_7_code.R))
+analyzing the "diabetes" dataset that we used in class
+as an example for sparse regression.
+The data file, that you will need, is found [here](data/diabetes.tab.txt).
+You should take the code, run it,
+and write a report summarizing the analysis.
+Fitting the Stan models takes about 20 minutes on my computer;
+for your convenience, if you save these two files -
+[data/diabetes_crossval_fits.RData](data/diabetes_crossval_fits.RData) and [data/diabetes_big_fit.RData](data/diabetes_big_fit.RData) -
+in the directory where you run the code, you won't need to re-fit these.
+The report should not have R code in it:
+it should be written as for for statistically literate clinicians
+who had produced the data,
+and are interested in the practical conclusions
+(but who also want to know how the conclusions were reached).
+The main task is to produce a predictive model of diabetes progression.
+Most (or maybe all) of the computations you should need are done in the script,
+but you may do other computations of your own if you wish.
+
+The report should:
+
+1. Describe the data.
+
+2. Explain the method of analysis.
+
+3. Communicate the final predictive model,
+   including uncertainty.
+
