@@ -61,7 +61,7 @@ Week 6 (*2/13*)
 
 Week 7 *(2/20)*
 
-: Dimension reduction: overview of the goal and taxonomy of various approaches (PCA, CCA, t-sne, etc).
+: [(slides)](slides/week_7.slides.html) Dimension reduction: overview of the goal and taxonomy of various approaches (PCA, CCA, t-sne, etc).
     Deconvolution. Regularization as a penalty and as a (Bayesian) prior.
     **(Reference to Quinn & Keough)**
 

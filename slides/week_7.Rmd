@@ -1,0 +1,266 @@
+---
+title: "Dimension reduction: methods for visualization"
+author: "Peter Ralph"
+date: "19 February 2018 -- Advanced Biological Statistics"
+---
+
+```{r setup, include=FALSE}
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+library(lars)
+library(tidyverse)
+library(rstan)
+library(matrixStats)
+options(mc.cores = parallel::detectCores())
+```
+
+# Overview
+
+## Building models
+
+So far we've focused on *building models* for the data.
+
+. . .
+
+Models involve *parameters*, that are often the target of our inference.
+
+. . .
+
+We put *priors* on parameters, for several reasons:
+
+1. To be able to communicate uncertainty using the *posterior*.
+
+2. To incorporate prior information.
+
+3. To "strongly encourage" certain model requirements (e.g., sparsity).
+
+
+## Some remaining topics: branching out
+
+1. Dimension reduction and visualization (e.g., PCA)
+
+2. Clustering and categorization
+
+3. Time series
+
+4. Spatial and network models
+
+. . .
+
+These all involve new *models*
+and mew ways of using *priors*
+to achieve analysis goals.
+
+
+# Optimization
+
+## Another trick up Stan's sleeve
+
+In addition to sampling from the posterior distribution,
+Stan can do *optimization*:
+hill climb to the top.
+
+. . .
+
+**Definition:** the *maximum a posteriori* (MAP) estimate
+is the set of parameter values that maximize the posterior likelihood.
+
+. . .
+
+Recall that
+$$\begin{aligned}
+    \text{posterior} = \text{prior} \times \text{likelihood} .
+\end{aligned}$$
+... so this is closely related to the *maximum likelihood* estimate (MLE).
+
+---------------------
+
+```
+optimizing                package:rstan                R Documentation
+
+Obtain a point estimate by maximizing the joint posterior
+
+Description:
+
+     Obtain a point estimate by maximizing the joint posterior from the
+     model defined by class ‘stanmodel’.
+
+Usage:
+
+     ## S4 method for signature 'stanmodel'
+     optimizing(object, data = list(), 
+         seed = sample.int(.Machine$integer.max, 1), init = 'random', 
+         check_data = TRUE, sample_file = NULL, 
+         algorithm = c("LBFGS", "BFGS", "Newton"),
+         verbose = FALSE, hessian = FALSE, as_vector = TRUE, 
+         draws = 0, constrained = TRUE, ...)   
+     
+Arguments:
+
+  object: An object of class ‘stanmodel’.
+
+    data: A named ‘list’ or ‘environment’ providing the data for the
+          model or a character vector for all the names of objects used
+          as data.  See the Note section in ‘stan’.
+
+```
+
+## How to do it
+
+::: {.columns}
+::::::::: {.column width=50%}
+
+```r
+pois_block <- "
+data {
+    int N; // number of obs
+    int Z[N]; // counts
+}
+parameters {
+    real<lower=0> lambda;
+}
+model {
+    Z ~ poisson(lambda);
+}
+"
+pois_model <- stan_model(
+                model_code=pois_block)
+
+Z <- rpois(20, 5)
+pois_opt <- optimizing(pois_model,
+                       data=list(N=20,
+                                 Z=Z))
+```
+
+
+
+:::
+::::::::: {.column width=50%}
+
+```{r pois_opt, echo=FALSE, cache=TRUE}
+pois_block <- "
+data {
+    int N; // number of obs
+    int Z[N]; // counts
+}
+parameters {
+    real<lower=0> lambda;
+}
+model {
+    Z ~ poisson(lambda);
+}
+"
+pois_model <- stan_model(model_code=pois_block)
+
+Z <- rpois(20, 5)
+(pois_opt <- optimizing(pois_model,
+                        data=list(N=20,
+                                  Z=Z)))
+```
+
+
+:::
+:::::::::
+
+
+## It is fast
+
+::: {.columns}
+::::::::: {.column width=50%}
+
+
+```{r pois_timing, cache=TRUE}
+timings <- lapply(10^(1:5), 
+    function (N) {
+        Z <- rpois(N, 5)
+        a <- system.time(
+                 optimizing(pois_model,
+                            data=list(N=N,
+                                      Z=Z)))
+        b <- system.time(
+                 stan(model_code=pois_block,
+                      data=list(N=N,
+                                Z=Z)))
+        list(optim=a, mcmc=b) } )
+```
+
+:::
+::::::::: {.column width=50%}
+
+```{r plot_pois_stan, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
+matplot(10^(1:5), 
+        do.call(rbind, lapply(timings, sapply, "[[", "elapsed")),
+        type='l', lty=1, log='x',
+        xlab="number of points", ylab="seconds, elapsed")
+```
+
+:::
+:::::::::
+
+-----------------------
+
+The downside of *point estimates* is
+
+. . .
+
+that you've got no estimate of *uncertainty*.
+
+
+## Another shortcut: "variational Bayes"
+
+
+```{r pois_vb, echo=FALSE, cache=TRUE}
+Z <- rpois(1e5, 5)
+(pois_vb <- vb(pois_model,
+               data=list(N=1e5,
+                         Z=Z)))
+```
+
+------------------
+
+```{r show_vb}
+pois_vb
+```
+
+
+
+# Exercises
+
+## Write models, optimize
+
+Let's practice *writing models*,
+and compare the resuls of `stan( )` to `optimizing( )`.
+
+----------------------
+
+1. Write down a model on the whiteboard.
+
+2. Explain the model, how to find what you want from it,
+   to another pair of people.
+
+3. Code up the Stan model.
+
+4. Simulate some test data.
+
+5. Run `optimizing( )` to get point estimates.
+
+
+## Pick a situation
+
+1. Number of mosquitos caught in traps
+   at 20 different time points at 4 locations;
+   temperature and rainfall are also measured.
+
+2. Transpiration rates of 5 trees each of 100 strains,
+   along with genotype at five SNPs putatively linked to stomatal efficiency.
+
+3. Presence or absence of *Wolbachia* parasites
+   in fifty flies are sampled from each of 100 populations,
+   along with the sex and transcription levels of ten immune-related genes of each fly.
+
+*Modifications:* 
+(a) change the numbers - 1,000 SNPs instead of five?
+(b) make it robust (to outliers)!
