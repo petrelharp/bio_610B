@@ -65,6 +65,8 @@ Week 7 *(2/20)*
     Deconvolution. Regularization as a penalty and as a (Bayesian) prior.
     **(Reference to Quinn & Keough)**
 
+    - **Homework:** (due 2/27) [Diabetes](hws/week_7.html)
+
 Week 8 *(2/27)*
 
 : Clustering and categorization: softmax regression; applied example.
