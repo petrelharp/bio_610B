@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Peter Ralph">
+  <title>Dimension reduction: methods for visualization</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <style type="text/css">
+  
+  .reveal { font-size: 30px; }
+  
+  .reveal h1 { font-size: 1.5em; } 
+  
+  .reveal h2 { font-size: 1.2em; } 
+  
+  .reveal .slides { text-align: left; }
+  
+  .reveal .slides figure { text-align: center; }
+  
+  .reveal figcaption { display: none; }
+  
+  </style>
+  \[
+  %%
+  % Add your macros here; they'll be included in pdf and html output.
+  %%
+  
+  \newcommand{\R}{\mathbb{R}}    % reals
+  \newcommand{\E}{\mathbb{E}}    % expectation
+  \renewcommand{\P}{\mathbb{P}}  % probability
+  \DeclareMathOperator{\logit}{logit}
+  \DeclareMathOperator{\logistic}{logistic}
+  \DeclareMathOperator{\sd}{sd}
+  \DeclareMathOperator{\var}{var}
+  \DeclareMathOperator{\Normal}{Normal}
+  \DeclareMathOperator{\Poisson}{Poisson}
+  \DeclareMathOperator{\Beta}{Beta}
+  \DeclareMathOperator{\Binom}{Binomial}
+  \DeclareMathOperator{\Gam}{Gamma}
+  \DeclareMathOperator{\Exp}{Exponential}
+  \DeclareMathOperator{\Cauchy}{Cauchy}
+  \DeclareMathOperator{\Unif}{Unif}
+  
+  
+  \newcommand{\given}{\;\vert\;}
+  \]
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Dimension reduction: methods for visualization</h1>
+  <p class="author">Peter Ralph</p>
+  <p class="date">19 February 2018 – Advanced Biological Statistics</p>
+</section>
+
+<section><section id="overview" class="title-slide slide level1"><h1>Overview</h1></section><section id="building-models" class="slide level2">
+<h2>Building models</h2>
+<p>So far we’ve focused on <em>building models</em> for the data.</p>
+<div class="fragment">
+<p>Models involve <em>parameters</em>, that are often the target of our inference.</p>
+</div>
+<div class="fragment">
+<p>We put <em>priors</em> on parameters, for several reasons:</p>
+<ol type="1">
+<li><p>To be able to communicate uncertainty using the <em>posterior</em>.</p></li>
+<li><p>To incorporate prior information.</p></li>
+<li><p>To “strongly encourage” certain model requirements (e.g., sparsity).</p></li>
+</ol>
+</div>
+</section><section id="some-remaining-topics-branching-out" class="slide level2">
+<h2>Some remaining topics: branching out</h2>
+<ol type="1">
+<li><p>Dimension reduction and visualization (e.g., PCA)</p></li>
+<li><p>Clustering and categorization</p></li>
+<li><p>Time series</p></li>
+<li><p>Spatial and network models</p></li>
+</ol>
+<div class="fragment">
+<p>These all involve new <em>models</em> and mew ways of using <em>priors</em> to achieve analysis goals.</p>
+</div>
+</section></section>
+<section><section id="optimization" class="title-slide slide level1"><h1>Optimization</h1></section><section id="another-trick-up-stans-sleeve" class="slide level2">
+<h2>Another trick up Stan’s sleeve</h2>
+<p>In addition to sampling from the posterior distribution, Stan can do <em>optimization</em>: hill climb to the top.</p>
+<div class="fragment">
+<p><strong>Definition:</strong> the <em>maximum a posteriori</em> (MAP) estimate is the set of parameter values that maximize the posterior likelihood.</p>
+</div>
+<div class="fragment">
+<p>Recall that <span class="math display">\[\begin{aligned}
+    \text{posterior} = \text{prior} \times \text{likelihood} .
+\end{aligned}\]</span> … so this is closely related to the <em>maximum likelihood</em> estimate (MLE).</p>
+</div>
+</section><section class="slide level2">
+
+<pre><code>optimizing                package:rstan                R Documentation
+
+Obtain a point estimate by maximizing the joint posterior
+
+Description:
+
+     Obtain a point estimate by maximizing the joint posterior from the
+     model defined by class ‘stanmodel’.
+
+Usage:
+
+     ## S4 method for signature &#39;stanmodel&#39;
+     optimizing(object, data = list(), 
+         seed = sample.int(.Machine$integer.max, 1), init = &#39;random&#39;, 
+         check_data = TRUE, sample_file = NULL, 
+         algorithm = c(&quot;LBFGS&quot;, &quot;BFGS&quot;, &quot;Newton&quot;),
+         verbose = FALSE, hessian = FALSE, as_vector = TRUE, 
+         draws = 0, constrained = TRUE, ...)   
+     
+Arguments:
+
+  object: An object of class ‘stanmodel’.
+
+    data: A named ‘list’ or ‘environment’ providing the data for the
+          model or a character vector for all the names of objects used
+          as data.  See the Note section in ‘stan’.
+</code></pre>
+</section><section id="how-to-do-it" class="slide level2">
+<h2>How to do it</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">pois_block &lt;-<span class="st"> &quot;</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="st">data {</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="st">    int N; // number of obs</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">    int Z[N]; // counts</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="st">}</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="st">parameters {</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="st">    real&lt;lower=0&gt; lambda;</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="st">}</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="st">model {</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="st">    Z ~ poisson(lambda);</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="st">}</span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">pois_model &lt;-<span class="st"> </span><span class="kw">stan_model</span>(</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">                <span class="dt">model_code=</span>pois_block)</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">Z &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">20</span>, <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb2-17" data-line-number="17">pois_opt &lt;-<span class="st"> </span><span class="kw">optimizing</span>(pois_model,</a>
+<a class="sourceLine" id="cb2-18" data-line-number="18">                       <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span><span class="dv">20</span>,</a>
+<a class="sourceLine" id="cb2-19" data-line-number="19">                                 <span class="dt">Z=</span>Z))</a></code></pre></div>
+</div><div class="column" style="width:50%;">
+<pre><code>## Initial log joint probability = 78.1921
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance</code></pre>
+<pre><code>## $par
+##   lambda 
+## 6.150003 
+## 
+## $value
+## [1] 100.4236
+## 
+## $return_code
+## [1] 0</code></pre>
+</div>
+</div>
+</section><section id="it-is-fast" class="slide level2">
+<h2>It is fast</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">timings &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">10</span><span class="op">^</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">    <span class="cf">function</span> (N) {</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">        Z &lt;-<span class="st"> </span><span class="kw">rpois</span>(N, <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">        a &lt;-<span class="st"> </span><span class="kw">system.time</span>(</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">                 <span class="kw">optimizing</span>(pois_model,</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">                            <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span>N,</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">                                      <span class="dt">Z=</span>Z)))</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">        b &lt;-<span class="st"> </span><span class="kw">system.time</span>(</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">                 <span class="kw">stan</span>(<span class="dt">model_code=</span>pois_block,</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">                      <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span>N,</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11">                                <span class="dt">Z=</span>Z)))</a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">        <span class="kw">list</span>(<span class="dt">optim=</span>a, <span class="dt">mcmc=</span>b) } )</a></code></pre></div>
+<pre><code>## Initial log joint probability = -35.4992
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance
+## Initial log joint probability = 217.053
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance
+## Initial log joint probability = 2972.9
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance
+## Initial log joint probability = 28752.7
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance
+## Initial log joint probability = 295465
+## Optimization terminated normally: 
+##   Convergence detected: relative gradient magnitude is below tolerance</code></pre>
+</div><div class="column" style="width:50%;">
+<p><img src="figure/week_7/plot_pois_stan-1.png" title="plot of chunk plot_pois_stan" alt="plot of chunk plot_pois_stan" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</section><section class="slide level2">
+
+<p>The downside of <em>point estimates</em> is</p>
+<div class="fragment">
+<p>that you’ve got no estimate of <em>uncertainty</em>.</p>
+</div>
+</section><section id="another-shortcut-variational-bayes" class="slide level2">
+<h2>Another shortcut: “variational Bayes”</h2>
+<pre><code>## ------------------------------------------------------------
+## EXPERIMENTAL ALGORITHM:
+##   This procedure has not been thoroughly tested and may be unstable
+##   or buggy. The interface is subject to change.
+## ------------------------------------------------------------
+## 
+## 
+## 
+## Gradient evaluation took 0.002431 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 24.31 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Begin eta adaptation.
+## Iteration:   1 / 250 [  0%]  (Adaptation)
+## Iteration:  50 / 250 [ 20%]  (Adaptation)
+## Iteration: 100 / 250 [ 40%]  (Adaptation)
+## Iteration: 150 / 250 [ 60%]  (Adaptation)
+## Iteration: 200 / 250 [ 80%]  (Adaptation)
+## Success! Found best value [eta = 1] earlier than expected.
+## 
+## Begin stochastic gradient ascent.
+##   iter       ELBO   delta_ELBO_mean   delta_ELBO_med   notes 
+##    100     -2e+05             1.000            1.000
+##    200     -2e+05             0.507            1.000
+##    300     -2e+05             0.338            0.013
+##    400     -2e+05             0.254            0.013
+##    500     -2e+05             0.203            0.001   MEDIAN ELBO CONVERGED
+## 
+## Drawing a sample of size 1000 from the approximate posterior... 
+## COMPLETED.</code></pre>
+<pre><code>## Inference for Stan model: f559a4f52ec33e0ff0a8f08350a487f1.
+## 1 chains, each with iter=1000; warmup=0; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=1000.
+## 
+##        mean   sd 2.5%  25%  50%  75% 97.5%
+## lambda 5.03 0.01 5.01 5.03 5.03 5.04  5.05
+## lp__   0.00 0.00 0.00 0.00 0.00 0.00  0.00
+## 
+## Approximate samples were drawn using VB(meanfield) at Mon Feb 19 21:47:45 2018.</code></pre>
+<pre><code>## We recommend genuine &#39;sampling&#39; from the posterior distribution for final inferences!</code></pre>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">pois_vb</a></code></pre></div>
+<pre><code>## Inference for Stan model: f559a4f52ec33e0ff0a8f08350a487f1.
+## 1 chains, each with iter=1000; warmup=0; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=1000.
+## 
+##        mean   sd 2.5%  25%  50%  75% 97.5%
+## lambda 5.03 0.01 5.01 5.03 5.03 5.04  5.05
+## lp__   0.00 0.00 0.00 0.00 0.00 0.00  0.00
+## 
+## Approximate samples were drawn using VB(meanfield) at Mon Feb 19 21:47:45 2018.</code></pre>
+<pre><code>## We recommend genuine &#39;sampling&#39; from the posterior distribution for final inferences!</code></pre>
+</section></section>
+<section><section id="exercises" class="title-slide slide level1"><h1>Exercises</h1></section><section id="write-models-optimize" class="slide level2">
+<h2>Write models, optimize</h2>
+<p>Let’s practice <em>writing models</em>, and compare the resuls of <code>stan( )</code> to <code>optimizing( )</code>.</p>
+</section><section class="slide level2">
+
+<ol type="1">
+<li><p>Write down a model on the whiteboard.</p></li>
+<li><p>Explain the model, how to find what you want from it, to another pair of people.</p></li>
+<li><p>Code up the Stan model.</p></li>
+<li><p>Simulate some test data.</p></li>
+<li><p>Run <code>optimizing( )</code> to get point estimates.</p></li>
+</ol>
+</section><section id="pick-a-situation" class="slide level2">
+<h2>Pick a situation</h2>
+<ol type="1">
+<li><p>Number of mosquitos caught in traps at 20 different time points at 4 locations; temperature and rainfall are also measured.</p></li>
+<li><p>Transpiration rates of 5 trees each of 100 strains, along with genotype at five SNPs putatively linked to stomatal efficiency.</p></li>
+<li><p>Presence or absence of <em>Wolbachia</em> parasites in fifty flies are sampled from each of 100 populations, along with the sex and transcription levels of ten immune-related genes of each fly.</p></li>
+</ol>
+<p><em>Modifications:</em> (a) change the numbers - 1,000 SNPs instead of five? (b) make it robust (to outliers)!</p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'none', // none/fade/slide/convex/concave/zoom
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/math/math.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
