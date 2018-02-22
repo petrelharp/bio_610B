@@ -61,9 +61,7 @@ Week 6 (*2/13*)
 
 Week 7 *(2/20)*
 
-: [(slides)](slides/week_7.slides.html) Dimension reduction: overview of the goal and taxonomy of various approaches (PCA, CCA, t-sne, etc).
-    Deconvolution. Regularization as a penalty and as a (Bayesian) prior.
-    **(Reference to Quinn & Keough)**
+: [(slides)](slides/week_7.slides.html) Optimization and variational Bayes in Stan.  Review of model building.
 
     - **Homework:** (due 2/27) [Diabetes](hws/week_7.html)
 
@@ -80,5 +78,6 @@ Week 9 *(3/6)*
 Week 10 *(3/13)*
 
 : Spatial and network covariance: sharing power between related locations.
+    Priors to constrain visualization (e.g., regularized PCA).
 
 
