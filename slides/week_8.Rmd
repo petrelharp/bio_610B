@@ -182,6 +182,23 @@ $$\begin{aligned}
 :::
 :::::::::::::: 
 
+# Nonnegative matrix factorization
+
+## ... aka "NMF"
+
+
+We are *decomposing* $Z$ into the product of two lower-dimensional,
+nonnegative factors:
+
+$$\begin{aligned}
+    Z_{ij} &\approx \sum_k w_{ik} x_{kj} \\
+    w_{ik} &\ge 0 \\
+    x_{kj} &\ge 0 .
+\end{aligned}$$
+
+This is like PCA, but sometimes more *interpretable*.
+
+
 # Stochastic minute
 
 ## the Dirichlet distribution

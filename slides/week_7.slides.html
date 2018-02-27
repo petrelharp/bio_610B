@@ -1989,30 +1989,30 @@ Arguments:
 <ul>
 <li><p><span class="math inline">\(T_i\)</span> : transpiration rate of tree <span class="math inline">\(i\)</span>, for <span class="math inline">\(1 \le i \le 500\)</span></p></li>
 <li><p><span class="math inline">\(S_i\)</span> : strain of tree <span class="math inline">\(i\)</span>, an index between 1 and 100</p></li>
-<li><p><span class="math inline">\(G_{kj}\)</span> : genotype of SNP <span class="math inline">\(j\)</span> in strain <span class="math inline">\(k\)</span>, for <span class="math inline">\(1 \le k \le 100\)</span> and <span class="math inline">\(1 \le j \le 5\)</span>; takes the value 0, 1, or 2.</p></li>
+<li><p><span class="math inline">\(G_{ij}\)</span> : genotype of SNP <span class="math inline">\(j\)</span> in tree <span class="math inline">\(i\)</span>, for <span class="math inline">\(1 \le i \le 500\)</span> and <span class="math inline">\(1 \le j \le 5\)</span>; takes the value 0, 1, or 2.</p></li>
 </ul>
 </section><section class="slide level2">
 
 <p>To make things easier, compute <span class="math display">\[\begin{aligned}
-    H_{kj} &amp;= 1 \qquad \text{ if } G_{kj} = 1 \\
-    D_{kj} &amp;= 1 \qquad \text{ if } G_{kj} = 2
+    H_{ij} &amp;= 1 \qquad \text{ if } G_{ij} = 1 \\
+    D_{ij} &amp;= 1 \qquad \text{ if } G_{ij} = 2
 \end{aligned}\]</span> which are zero otherwise.</p>
 </section><section class="slide level2">
 
 <p><span class="math display">\[\begin{aligned}
     T_i &amp;\sim \log\Normal(\mu_i, \sigma) \\
     \mu_i &amp;= b_{0,S_i} + 
-             b_{1,S_i} H_{S_i,1} +
-             b_{2,S_i} H_{S_i,2} +
-             b_{3,S_i} H_{S_i,3} +
-             b_{4,S_i} H_{S_i,4} +
-             b_{5,S_i} H_{S_i,5} 
+             b_{1,S_i} H_{i,1} +
+             b_{2,S_i} H_{i,2} +
+             b_{3,S_i} H_{i,3} +
+             b_{4,S_i} H_{i,4} +
+             b_{5,S_i} H_{i,5} 
              \\ &amp; \qquad {} + 
-             c_{1,S_i} D_{S_i,1}  +
-             c_{2,S_i} D_{S_i,2}  +
-             c_{3,S_i} D_{S_i,3}  +
-             c_{4,S_i} D_{S_i,4}  +
-             c_{5,S_i} D_{S_i,5} \\
+             c_{1,S_i} D_{i,1}  +
+             c_{2,S_i} D_{i,2}  +
+             c_{3,S_i} D_{i,3}  +
+             c_{4,S_i} D_{i,4}  +
+             c_{5,S_i} D_{i,5} \\
     b_k[s] &amp;= \text{effect of het SNP $k$ in strain $s$} \\
            &amp;\sim \Cauchy(\nu_k, \tau_k) \\
     c_k[s] &amp;= \text{effect of hom SNP $k$ in strain $s$} \\

@@ -1705,6 +1705,16 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 </div>
 </div>
 </section></section>
+<section><section id="nonnegative-matrix-factorization" class="title-slide slide level1"><h1>Nonnegative matrix factorization</h1></section><section id="aka-nmf" class="slide level2">
+<h2>… aka “NMF”</h2>
+<p>We are <em>decomposing</em> <span class="math inline">\(Z\)</span> into the product of two lower-dimensional, nonnegative factors:</p>
+<p><span class="math display">\[\begin{aligned}
+    Z_{ij} &amp;\approx \sum_k w_{ik} x_{kj} \\
+    w_{ik} &amp;\ge 0 \\
+    x_{kj} &amp;\ge 0 .
+\end{aligned}\]</span></p>
+<p>This is like PCA, but sometimes more <em>interpretable</em>.</p>
+</section></section>
 <section><section id="stochastic-minute" class="title-slide slide level1"><h1>Stochastic minute</h1></section><section id="the-dirichlet-distribution" class="slide level2">
 <h2>the Dirichlet distribution</h2>
 <p>A random set of <span class="math inline">\(k\)</span> <em>proportions</em> <span class="math inline">\(0 \le P_i \le 1\)</span> has a <span class="math inline">\(\Dirichlet(\alpha_1, \ldots, \alpha_k)\)</span> if it has probability density <span class="math display">\[\begin{aligned}
