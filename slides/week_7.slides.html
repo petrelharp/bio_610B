@@ -1643,6 +1643,7 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   \DeclareMathOperator{\Exp}{Exponential}
   \DeclareMathOperator{\Cauchy}{Cauchy}
   \DeclareMathOperator{\Unif}{Unif}
+  \DeclareMathOperator{\Dirichlet}{Dirichlet}
   
   
   \newcommand{\given}{\;\vert\;}
@@ -1881,6 +1882,179 @@ Arguments:
 <li><p>Presence or absence of <em>Wolbachia</em> parasites in fifty flies are sampled from each of 100 populations, along with the sex and transcription levels of ten immune-related genes of each fly.</p></li>
 </ol>
 <p><em>Modifications:</em> (a) change the numbers - 1,000 SNPs instead of five? (b) make it robust (to outliers)!</p>
+</section></section>
+<section><section id="case-1-mosquitos" class="title-slide slide level1"><h1>Case 1: Mosquitos</h1></section><section id="the-situation" class="slide level2">
+<h2>The situation</h2>
+<p>Number of mosquitos caught in traps at 20 different time points at 4 locations; temperature and rainfall are also measured.</p>
+</section><section id="data" class="slide level2">
+<h2>Data</h2>
+<ul>
+<li><p><span class="math inline">\(Z_i\)</span> : number of mosquitos caught in trap <span class="math inline">\(i\)</span></p></li>
+<li><p><span class="math inline">\(\text{time}_i\)</span>: which day that trap <span class="math inline">\(i\)</span> was run on (out of 20) - categorical, between 1 and 20, same for each location</p></li>
+<li><p><span class="math inline">\(\text{loc}_i\)</span>: location (out of four) of trap <span class="math inline">\(i\)</span></p></li>
+<li><p><span class="math inline">\(\text{temp}_i\)</span> : temperature at 7am when trap <span class="math inline">\(i\)</span> was run</p></li>
+<li><p><span class="math inline">\(\text{rain}_i\)</span> : rainfall in previous 24hrs to running trap <span class="math inline">\(i\)</span></p></li>
+</ul>
+</section><section class="slide level2">
+
+<ul>
+<li><p>include temp and rain as predictors</p></li>
+<li><p>use an exponential link function so that effects are multiplicative</p></li>
+</ul>
+<p><span class="math display">\[\begin{aligned}
+    Z_i &amp;\sim \Poisson(\exp(\lambda_i)) \\
+    \lambda_i &amp;\sim \Normal(\mu_i, \sigma) \\
+    \mu_i &amp;= \exp\left( 
+                  b_2 \times \text{rain}_i +
+                  b_3 \times \text{temp}_i +
+                  b_0[\text{loc}_i] 
+                  + b_1[\text{time}_i] \\
+    b_0 &amp;\sim \Normal(\nu_0, \sigma_0) \\
+    b_1 &amp;\sim \Normal(\nu_1, \sigma_1) \\
+\end{aligned}\]</span></p>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">moz_block &lt;-<span class="st"> &quot;</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">data {</span></a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">    int N; // number of trap runs</span></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="st">    int Z[N];  // number of mozzies</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="st">    int loc[N]; // location index</span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="st">    int time[N]; // index of sampling day</span></a>
+<a class="sourceLine" id="cb13-7" data-line-number="7"><span class="st">    vector[N] temp; // temperature</span></a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="st">    vector[N] rain; // rainfall</span></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="st">}</span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="st">parameters {</span></a>
+<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="st">    vector[N] lambda;</span></a>
+<a class="sourceLine" id="cb13-12" data-line-number="12"><span class="st">    real&lt;lower=0&gt; sigma;</span></a>
+<a class="sourceLine" id="cb13-13" data-line-number="13"><span class="st">    vector[4] b0;  // four locations</span></a>
+<a class="sourceLine" id="cb13-14" data-line-number="14"><span class="st">    vector[20] b1; // twenty times</span></a>
+<a class="sourceLine" id="cb13-15" data-line-number="15"><span class="st">    real b2;</span></a>
+<a class="sourceLine" id="cb13-16" data-line-number="16"><span class="st">    real b3;</span></a>
+<a class="sourceLine" id="cb13-17" data-line-number="17"><span class="st">    real nu0;</span></a>
+<a class="sourceLine" id="cb13-18" data-line-number="18"><span class="st">    real nu1;</span></a>
+<a class="sourceLine" id="cb13-19" data-line-number="19"><span class="st">    real&lt;lower=0&gt; sigma0;</span></a>
+<a class="sourceLine" id="cb13-20" data-line-number="20"><span class="st">    real&lt;lower=0&gt; sigma1;</span></a>
+<a class="sourceLine" id="cb13-21" data-line-number="21"><span class="st">}</span></a>
+<a class="sourceLine" id="cb13-22" data-line-number="22"><span class="st">model {</span></a>
+<a class="sourceLine" id="cb13-23" data-line-number="23"><span class="st">    vector[N] mu;</span></a>
+<a class="sourceLine" id="cb13-24" data-line-number="24"><span class="st">    Z ~ poisson_log(lambda);</span></a>
+<a class="sourceLine" id="cb13-25" data-line-number="25"><span class="st">    mu = b2 * rain + b3 * temp + b0[loc] + b1[time];</span></a>
+<a class="sourceLine" id="cb13-26" data-line-number="26"><span class="st">    lambda ~ normal(mu, sigma);</span></a>
+<a class="sourceLine" id="cb13-27" data-line-number="27"><span class="st">    b0 ~ normal(nu0, sigma0);</span></a>
+<a class="sourceLine" id="cb13-28" data-line-number="28"><span class="st">    b1 ~ normal(nu1, sigma1);</span></a>
+<a class="sourceLine" id="cb13-29" data-line-number="29"><span class="st">    b2 ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-30" data-line-number="30"><span class="st">    b3 ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-31" data-line-number="31"><span class="st">    nu0 ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-32" data-line-number="32"><span class="st">    nu1 ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-33" data-line-number="33"><span class="st">    sigma ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-34" data-line-number="34"><span class="st">    sigma0 ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-35" data-line-number="35"><span class="st">    sigma1 ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb13-36" data-line-number="36"><span class="st">}&quot;</span></a></code></pre></div>
+</section><section id="simulate-data" class="slide level2">
+<h2>Simulate data</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">tp &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">b2=</span><span class="dv">0</span>, <span class="dt">b3=</span><span class="fl">0.25</span>, <span class="dt">b0=</span><span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">b1=</span><span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">20</span>))</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">x &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">time=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">loc=</span><span class="dv">1</span><span class="op">:</span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">x<span class="op">$</span>temp &lt;-<span class="st"> </span><span class="dv">20</span> <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">80</span>, <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">x<span class="op">$</span>rain &lt;-<span class="st"> </span><span class="kw">round</span>(<span class="kw">rgamma</span>(<span class="dv">80</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">10</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">10</span>), <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">x<span class="op">$</span>mu &lt;-<span class="st"> </span><span class="kw">exp</span>(tp<span class="op">$</span>b0[x<span class="op">$</span>loc] <span class="op">+</span><span class="st"> </span>tp<span class="op">$</span>b1[x<span class="op">$</span>time] </a>
+<a class="sourceLine" id="cb14-6" data-line-number="6">            <span class="op">+</span><span class="st"> </span>tp<span class="op">$</span>b2 <span class="op">*</span><span class="st"> </span>x<span class="op">$</span>rain <span class="op">+</span><span class="st"> </span>tp<span class="op">$</span>b3 <span class="op">*</span><span class="st"> </span>x<span class="op">$</span>temp)</a>
+<a class="sourceLine" id="cb14-7" data-line-number="7">x<span class="op">$</span>Z &lt;-<span class="st"> </span><span class="kw">rpois</span>(<span class="dv">80</span>, x<span class="op">$</span>mu)</a></code></pre></div>
+</section><section id="run-stan" class="slide level2">
+<h2>Run Stan</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">moz_data &lt;-<span class="st"> </span><span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">              <span class="dt">N=</span><span class="dv">80</span>,</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">              <span class="dt">Z=</span>x<span class="op">$</span>Z,</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">              <span class="dt">loc=</span>x<span class="op">$</span>loc,</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">              <span class="dt">time=</span>x<span class="op">$</span>time,</a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">              <span class="dt">temp=</span>(x<span class="op">$</span>temp<span class="op">-</span><span class="kw">mean</span>(x<span class="op">$</span>temp))<span class="op">/</span><span class="kw">sd</span>(x<span class="op">$</span>temp),</a>
+<a class="sourceLine" id="cb15-7" data-line-number="7">              <span class="dt">rain=</span>(x<span class="op">$</span>rain)<span class="op">/</span><span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb15-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb15-9" data-line-number="9">moz_fit &lt;-<span class="st"> </span><span class="kw">stan</span>(<span class="dt">model_code=</span>moz_block,</a>
+<a class="sourceLine" id="cb15-10" data-line-number="10">                <span class="dt">data=</span>moz_data,</a>
+<a class="sourceLine" id="cb15-11" data-line-number="11">                <span class="dt">iter=</span><span class="dv">1000</span>, <span class="dt">chains=</span><span class="dv">4</span>)</a></code></pre></div>
+<pre><code>## Warning: There were 157 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+<pre><code>## Warning: There were 1169 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. See
+## http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded</code></pre>
+<pre><code>## Warning: There were 4 chains where the estimated Bayesian Fraction of Missing Information was low. See
+## http://mc-stan.org/misc/warnings.html#bfmi-low</code></pre>
+<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+<p><em>Conclusion:</em> it runs; but need to adjust things to get good results.</p>
+</section></section>
+<section><section id="case-2-trees" class="title-slide slide level1"><h1>Case #2: trees</h1></section><section id="the-situation-1" class="slide level2">
+<h2>The situation</h2>
+<p>Transpiration rates of 5 trees each of 100 strains, along with genotype at five SNPs putatively linked to stomatal efficiency.</p>
+</section><section id="data-1" class="slide level2">
+<h2>Data</h2>
+<ul>
+<li><p><span class="math inline">\(T_i\)</span> : transpiration rate of tree <span class="math inline">\(i\)</span>, for <span class="math inline">\(1 \le i \le 500\)</span></p></li>
+<li><p><span class="math inline">\(S_i\)</span> : strain of tree <span class="math inline">\(i\)</span>, an index between 1 and 100</p></li>
+<li><p><span class="math inline">\(G_{kj}\)</span> : genotype of SNP <span class="math inline">\(j\)</span> in strain <span class="math inline">\(k\)</span>, for <span class="math inline">\(1 \le k \le 100\)</span> and <span class="math inline">\(1 \le j \le 5\)</span>; takes the value 0, 1, or 2.</p></li>
+</ul>
+</section><section class="slide level2">
+
+<p>To make things easier, compute <span class="math display">\[\begin{aligned}
+    H_{kj} &amp;= 1 \qquad \text{ if } G_{kj} = 1 \\
+    D_{kj} &amp;= 1 \qquad \text{ if } G_{kj} = 2
+\end{aligned}\]</span> which are zero otherwise.</p>
+</section><section class="slide level2">
+
+<p><span class="math display">\[\begin{aligned}
+    T_i &amp;\sim \log\Normal(\mu_i, \sigma) \\
+    \mu_i &amp;= b_{0,S_i} + 
+             b_{1,S_i} H_{S_i,1} +
+             b_{2,S_i} H_{S_i,2} +
+             b_{3,S_i} H_{S_i,3} +
+             b_{4,S_i} H_{S_i,4} +
+             b_{5,S_i} H_{S_i,5} 
+             \\ &amp; \qquad {} + 
+             c_{1,S_i} D_{S_i,1}  +
+             c_{2,S_i} D_{S_i,2}  +
+             c_{3,S_i} D_{S_i,3}  +
+             c_{4,S_i} D_{S_i,4}  +
+             c_{5,S_i} D_{S_i,5} \\
+    b_k[s] &amp;= \text{effect of het SNP $k$ in strain $s$} \\
+           &amp;\sim \Cauchy(\nu_k, \tau_k) \\
+    c_k[s] &amp;= \text{effect of hom SNP $k$ in strain $s$} \\
+           &amp;\sim \Cauchy(\omega_k, u_k)  \\
+    \nu &amp;\sim \Normal^+(0, 2) \\
+    \pi &amp;\sim \Normal^+(0, 2) \\
+    \tau &amp;\sim \Normal^+(0, 20) \\
+    u &amp;\sim \Normal^+(0, 20) 
+\end{aligned}\]</span></p>
+</section><section id="simulate-data-1" class="slide level2">
+<h2>Simulate data</h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">nsnps &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">nstrains &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">nindivs &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">trees &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id=</span><span class="dv">1</span><span class="op">:</span>(nindivs <span class="op">*</span><span class="st"> </span>nstrains),</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">                    <span class="dt">strain=</span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>nstrains, <span class="dt">each=</span>nindivs))</a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co"># strain SNP proportions</span></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7">snp_p &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rbeta</span>(nsnps <span class="op">*</span><span class="st"> </span>nstrains, <span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="dt">ncol=</span>nsnps)</a>
+<a class="sourceLine" id="cb20-8" data-line-number="8">geno &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rbinom</span>(nindivs<span class="op">*</span>nstrains<span class="op">*</span>nsnps, <span class="dt">size=</span><span class="dv">2</span>, </a>
+<a class="sourceLine" id="cb20-9" data-line-number="9">                      <span class="dt">prob=</span>snp_p[trees<span class="op">$</span>strain,]), <span class="dt">ncol=</span>nsnps)</a>
+<a class="sourceLine" id="cb20-10" data-line-number="10"><span class="kw">colnames</span>(geno) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;g&quot;</span>, <span class="dv">1</span><span class="op">:</span>nsnps)</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11">H &lt;-<span class="st"> </span>(geno <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb20-12" data-line-number="12">D &lt;-<span class="st"> </span>(geno <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb20-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb20-14" data-line-number="14"><span class="co"># transpiration</span></a>
+<a class="sourceLine" id="cb20-15" data-line-number="15">true_b0 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(nstrains, <span class="dt">mean=</span><span class="dv">5</span>, <span class="dt">sd=</span><span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb20-16" data-line-number="16"><span class="co"># snp effects</span></a>
+<a class="sourceLine" id="cb20-17" data-line-number="17">true_b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">2.0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)<span class="op">/</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb20-18" data-line-number="18">true_c &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">4.0</span>, <span class="fl">3.0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)<span class="op">/</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb20-19" data-line-number="19"><span class="co"># strain * snp effects</span></a>
+<a class="sourceLine" id="cb20-20" data-line-number="20">true_bmat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(true_b, <span class="dt">each=</span>nstrains), <span class="dt">ncol=</span>nsnps)</a>
+<a class="sourceLine" id="cb20-21" data-line-number="21">true_bmat[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="fl">-2.0</span><span class="op">/</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb20-22" data-line-number="22">true_cmat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(true_b, <span class="dt">each=</span>nstrains), <span class="dt">ncol=</span>nsnps)</a>
+<a class="sourceLine" id="cb20-23" data-line-number="23">true_bmat[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="fl">-4.0</span><span class="op">/</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb20-24" data-line-number="24"><span class="co"># combined</span></a>
+<a class="sourceLine" id="cb20-25" data-line-number="25">trees<span class="op">$</span>true_mu &lt;-<span class="st"> </span>(true_b0[trees<span class="op">$</span>strain] <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-26" data-line-number="26"><span class="st">                  </span><span class="kw">rowSums</span>(H <span class="op">*</span><span class="st"> </span>true_bmat[trees<span class="op">$</span>strain,]) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-27" data-line-number="27"><span class="st">                  </span><span class="kw">rowSums</span>(D <span class="op">*</span><span class="st"> </span>true_cmat[trees<span class="op">$</span>strain,]))</a>
+<a class="sourceLine" id="cb20-28" data-line-number="28"><span class="co"># noise</span></a>
+<a class="sourceLine" id="cb20-29" data-line-number="29">true_sigma &lt;-<span class="st"> </span><span class="fl">0.05</span></a>
+<a class="sourceLine" id="cb20-30" data-line-number="30">trees<span class="op">$</span>transpiration &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">rnorm</span>(nstrains<span class="op">*</span>nindivs, </a>
+<a class="sourceLine" id="cb20-31" data-line-number="31">                                 <span class="dt">mean=</span>trees<span class="op">$</span>true_mu, <span class="dt">sd=</span>true_sigma))</a></code></pre></div>
 </section></section>
     </div>
   </div>

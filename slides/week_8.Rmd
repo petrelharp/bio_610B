@@ -1,0 +1,313 @@
+---
+title: "Clustering and categorization"
+author: "Peter Ralph"
+date: "26 February 2018 -- Advanced Biological Statistics"
+---
+
+```{r setup, include=FALSE}
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+library(lars)
+library(tidyverse)
+library(rstan)
+library(matrixStats)
+options(mc.cores = parallel::detectCores())
+```
+
+# Clusters in expression space
+
+## A conceptual model
+
+Let's build a *conceptual* model for
+descriptive analysis of "mixture" expression data.
+
+. . .
+
+**Data:** expression data from tissue samples
+that consist of various *mixtures* of different cell types.
+
+. . .
+
+**Goal:** identify shared coexpression patterns
+corresponding to *cell type*.
+
+. . .
+
+*Similar situations:* 
+identify different developmental stages from whole-organism expression;
+common community structures from metagenomic data.
+
+----------------
+
+
+1. Each cell type has a typical set of *mean* expression levels.
+
+2. Each sample is composed of a mixture of cell types,
+   defined by the proportions that come from each type.
+
+3. Mean expression levels differ between cell types
+   for only some of the genes.
+
+4. Some samples are *noisier* than others.
+
+. . .
+
+**Assume** the same amount of sequencing of each sample.
+   
+
+------------------
+
+::: {.columns}
+:::::::::::::: {.column width=50%}
+
+
+1. Mean expression by cell type.
+
+2. Cell type proportions by sample.
+
+
+:::
+:::::::::::::: {.column width=50%}
+
+
+1. $x_{kj}$ : Mean expression of gene $j$ in cell type $k$.
+
+2. $w_{ik}$ : Proportion of sample $i$ of cell type $k$.
+
+$Z_{ij}$ : expression level in sample $i$ of gene $j$.
+
+   $$\begin{aligned}
+        Z_{ij} \approx \sum_{k=1}^K w_{ik} x_{kj} .
+   \end{aligned}$$
+
+
+:::
+:::::::::::::: 
+
+------------------
+
+::: {.columns}
+:::::::::::::: {.column width=50%}
+
+
+1. Mean expression by cell type.
+
+2. Cell type proportions by sample.
+
+3. Mean expression levels differ between cell types
+   for only some of the genes.
+
+4. Some samples are *noisier* than others.
+
+:::
+:::::::::::::: {.column width=50%}
+
+
+$Z_{ij}$ : expression level in sample $i$ of gene $j$.
+
+   $$\begin{aligned}
+        Z_{ij} \approx \sum_{k=1}^K w_{ik} x_{kj} .
+   \end{aligned}$$
+
+3. $y_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
+   shrink $x_{kj}$ towards $x_j$.
+
+4. $\sigma_i$ : expression SD multiplier for sample $i$.
+
+:::
+:::::::::::::: 
+
+----------------------
+
+::: {.columns}
+:::::::::::::: {.column width=50%}
+
+```
+data {
+  int N; // # samples
+  int L; // # genes
+  int K; // # cell types
+  int Z[N,L];
+}
+```
+```
+parameters {
+  matrix[L,K] x;
+  vector[L] y;
+  simplex[K] w[N];
+  vector<lower=0>[L] gamma;
+  row_vector<lower=0>[L] eta;
+  vector<lower=0>[N] sigma;
+  vector<lower=0>[K] alpha;
+  real<lower=0> d_alpha;
+}
+```
+```
+model {
+  for (i in 1:N) {
+      Z[i] ~ poisson(x * w[i], 
+                     sigma[i] * gamma);
+      x[,i] ~ lognormal(y, eta);
+  }
+  y ~ normal(0, 20);
+  w ~ dirichlet(d_alpha * alpha);
+  alpha ~ normal(0, 1);
+  d_alpha ~ normal(0, 20);
+}
+```
+
+
+:::
+:::::::::::::: {.column width=50%}
+
+
+1. $x_{kj}$ : Mean expression of gene $j$ in cell type $k$.
+
+2. $w_{ik}$ : Proportion of sample $i$ of cell type $k$.
+
+$$\begin{aligned}
+    Z_{ij} \approx \sum_k w_{ik} x_{kj} .
+\end{aligned}$$
+
+3. $x_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
+   shrink $x_{kj}$ towards $x_j$.
+
+4. $\gamma_j$ : expression SD for gene $j$;
+
+   $\sigma_i$ : expression SD multiplier for sample $i$; 
+
+:::
+:::::::::::::: 
+
+# Stochastic minute
+
+## the Dirichlet distribution
+
+A random set of $k$ *proportions* $0 \le P_i \le 1$
+has a $\Dirichlet(\alpha_1, \ldots, \alpha_k)$ if it has probability density
+$$\begin{aligned}
+    \frac{1}{B(\alpha)} \prod_{i=1}^k p_i^{\alpha_i} 
+\end{aligned}$$
+over the set of possible values
+$$\begin{aligned}
+    P_1 + \cdots + P_k = 1 .
+\end{aligned}$$
+
+. . .
+
+1. This is useful as a prior on *proportions*.
+
+2. This generalized the Beta: if $X \sim \Beta(a, b)$ then $(X, 1-X) \sim \Dirichlet(a, b)$.
+
+3. Marginal distributions are Beta distributed: $P_i \sim \Beta(\alpha_i, \sum_{j=1}^k \alpha_j - \alpha_i)$.
+
+-----------------
+
+4. If $X_i \sim \Exp(\alpha_i)$, and
+   $$\begin{aligned}
+    P_i = X_i / \sum_{j=1}^k X_j
+   \end{aligned}$$
+   then $P \sim \Dirichlet(\alpha)$.
+
+## "Simplex" parameters
+
+"The $k$-simplex" is the set of *proportions*,
+i.e., nonnegative numbers $p$ satisfying
+$$\begin{aligned}
+    p_1 + \cdots p_k = 1 .
+\end{aligned}$$
+
+```
+parameters {
+    simplex[K] w[N];
+}
+model {
+    w ~ dirichlet(d_alpha * alpha);
+}
+```
+
+# Finish up the model
+
+
+-------------
+
+::: {.columns}
+:::::::::::::: {.column width=50%}
+
+```
+data {
+  int N; // # samples
+  int L; // # genes
+  int K; // # cell types
+  int Z[N,L];
+}
+```
+```
+parameters {
+  matrix[L,K] x;
+  vector[L] y;
+  simplex[K] w[N];
+  vector<lower=0>[L] gamma;
+  row_vector<lower=0>[L] eta;
+  vector<lower=0>[N] sigma;
+  vector<lower=0>[K] alpha;
+  real<lower=0> d_alpha;
+}
+```
+```
+model {
+  for (i in 1:N) {
+      Z[i] ~ poisson(x * w[i], 
+                     sigma[i] * gamma);
+      x[,i] ~ lognormal(y, eta);
+  }
+  y ~ normal(0, 20);
+  w ~ dirichlet(d_alpha * alpha);
+  alpha ~ normal(0, 1);
+  d_alpha ~ normal(0, 20);
+}
+```
+
+
+:::
+:::::::::::::: {.column width=50%}
+
+
+1. $x_{kj}$ : Mean expression of gene $j$ in cell type $k$.
+
+2. $w_{ik}$ : Proportion of sample $i$ of cell type $k$.
+
+$$\begin{aligned}
+    Z_{ij} \approx \sum_k w_{ik} x_{kj} .
+\end{aligned}$$
+
+3. $x_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
+   shrink $x_{kj}$ towards $x_j$.
+
+4. $\gamma_j$ : expression SD for gene $j$;
+
+   $\sigma_i$ : expression SD multiplier for sample $i$; 
+
+:::
+:::::::::::::: 
+
+
+# Simulate data
+
+## Outline
+
+1. How many cell types?
+
+2. How many genes?
+
+3. How many samples?
+
+4. How much noise in expression?
+
+5. How many genes distinguish cell types,
+   and by how much relative to expression?
+
+6. How many "noisy" genes?  How many "noisy" samples?

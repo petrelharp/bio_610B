@@ -1643,6 +1643,7 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   \DeclareMathOperator{\Exp}{Exponential}
   \DeclareMathOperator{\Cauchy}{Cauchy}
   \DeclareMathOperator{\Unif}{Unif}
+  \DeclareMathOperator{\Dirichlet}{Dirichlet}
   
   
   \newcommand{\given}{\;\vert\;}
@@ -1694,7 +1695,7 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 <p>Standard linear regression</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">system.time</span>( slr2 &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x) )</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   0.004   0.000   0.004</code></pre>
+##   0.005   0.000   0.004</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">summary</span>(slr2)</a></code></pre></div>
 <pre><code>## 
 ## Call:

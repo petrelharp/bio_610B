@@ -264,3 +264,208 @@ and compare the resuls of `stan( )` to `optimizing( )`.
 *Modifications:* 
 (a) change the numbers - 1,000 SNPs instead of five?
 (b) make it robust (to outliers)!
+
+
+# Case 1: Mosquitos
+
+## The situation
+
+Number of mosquitos caught in traps
+at 20 different time points at 4 locations;
+temperature and rainfall are also measured.
+
+## Data
+
+
+- $Z_i$ : number of mosquitos caught in trap $i$
+
+- $\text{time}_i$: which day that trap $i$ was run on (out of 20) - categorical, between 1 and 20, same for each location
+
+- $\text{loc}_i$: location (out of four) of trap $i$
+
+- $\text{temp}_i$ : temperature at 7am when trap $i$ was run
+
+- $\text{rain}_i$ : rainfall in previous 24hrs to running trap $i$
+
+----------------
+
+- include temp and rain as predictors
+
+- use an exponential link function so that effects are multiplicative
+
+
+$$\begin{aligned}
+    Z_i &\sim \Poisson(\exp(\lambda_i)) \\
+    \lambda_i &\sim \Normal(\mu_i, \sigma) \\
+    \mu_i &= \exp\left( 
+                  b_2 \times \text{rain}_i +
+                  b_3 \times \text{temp}_i +
+                  b_0[\text{loc}_i] 
+                  + b_1[\text{time}_i] \\
+    b_0 &\sim \Normal(\nu_0, \sigma_0) \\
+    b_1 &\sim \Normal(\nu_1, \sigma_1) \\
+\end{aligned}$$
+
+----------------
+
+```{r mosquito_stan}
+moz_block <- "
+data {
+    int N; // number of trap runs
+    int Z[N];  // number of mozzies
+    int loc[N]; // location index
+    int time[N]; // index of sampling day
+    vector[N] temp; // temperature
+    vector[N] rain; // rainfall
+}
+parameters {
+    vector[N] lambda;
+    real<lower=0> sigma;
+    vector[4] b0;  // four locations
+    vector[20] b1; // twenty times
+    real b2;
+    real b3;
+    real nu0;
+    real nu1;
+    real<lower=0> sigma0;
+    real<lower=0> sigma1;
+}
+model {
+    vector[N] mu;
+    Z ~ poisson_log(lambda);
+    mu = b2 * rain + b3 * temp + b0[loc] + b1[time];
+    lambda ~ normal(mu, sigma);
+    b0 ~ normal(nu0, sigma0);
+    b1 ~ normal(nu1, sigma1);
+    b2 ~ normal(0, 10);
+    b3 ~ normal(0, 10);
+    nu0 ~ normal(0, 10);
+    nu1 ~ normal(0, 10);
+    sigma ~ normal(0, 10);
+    sigma0 ~ normal(0, 10);
+    sigma1 ~ normal(0, 10);
+}"
+```
+
+## Simulate data
+
+```{r sim_mozzies}
+tp <- list(b2=0, b3=0.25, b0=1:4, b1=rep(0,20))
+x <- expand.grid(time=1:20, loc=1:4)
+x$temp <- 20 + rnorm(80, 5)
+x$rain <- round(rgamma(80, 1/10, 1/10), 2)
+x$mu <- exp(tp$b0[x$loc] + tp$b1[x$time] 
+            + tp$b2 * x$rain + tp$b3 * x$temp)
+x$Z <- rpois(80, x$mu)
+```
+
+## Run Stan
+
+```{r stan_moz, cache=TRUE}
+moz_data <- list(
+              N=80,
+              Z=x$Z,
+              loc=x$loc,
+              time=x$time,
+              temp=(x$temp-mean(x$temp))/sd(x$temp),
+              rain=(x$rain)/10)
+
+moz_fit <- stan(model_code=moz_block,
+                data=moz_data,
+                iter=1000, chains=4)
+
+```
+
+*Conclusion:* it runs; but need to adjust things
+to get good results.
+
+# Case #2: trees
+
+## The situation
+
+Transpiration rates of 5 trees each of 100 strains,
+along with genotype at five SNPs putatively linked to stomatal efficiency.
+
+## Data
+
+- $T_i$ : transpiration rate of tree $i$, for $1 \le i \le 500$
+
+- $S_i$ : strain of tree $i$, an index between 1 and 100
+
+- $G_{kj}$ : genotype of SNP $j$ in strain $k$, for $1 \le k \le 100$ and $1 \le j \le 5$;
+  takes the value 0, 1, or 2.
+
+---------------
+
+To make things easier, compute
+$$\begin{aligned}
+    H_{kj} &= 1 \qquad \text{ if } G_{kj} = 1 \\
+    D_{kj} &= 1 \qquad \text{ if } G_{kj} = 2
+\end{aligned}$$
+which are zero otherwise.
+
+---------------
+
+
+$$\begin{aligned}
+    T_i &\sim \log\Normal(\mu_i, \sigma) \\
+    \mu_i &= b_{0,S_i} + 
+             b_{1,S_i} H_{S_i,1} +
+             b_{2,S_i} H_{S_i,2} +
+             b_{3,S_i} H_{S_i,3} +
+             b_{4,S_i} H_{S_i,4} +
+             b_{5,S_i} H_{S_i,5} 
+             \\ & \qquad {} + 
+             c_{1,S_i} D_{S_i,1}  +
+             c_{2,S_i} D_{S_i,2}  +
+             c_{3,S_i} D_{S_i,3}  +
+             c_{4,S_i} D_{S_i,4}  +
+             c_{5,S_i} D_{S_i,5} \\
+    b_k[s] &= \text{effect of het SNP $k$ in strain $s$} \\
+           &\sim \Cauchy(\nu_k, \tau_k) \\
+    c_k[s] &= \text{effect of hom SNP $k$ in strain $s$} \\
+           &\sim \Cauchy(\omega_k, u_k)  \\
+    \nu &\sim \Normal^+(0, 2) \\
+    \pi &\sim \Normal^+(0, 2) \\
+    \tau &\sim \Normal^+(0, 20) \\
+    u &\sim \Normal^+(0, 20) 
+\end{aligned}$$
+
+## Simulate data
+
+```{r sim_trees}
+nsnps <- 5
+nstrains <- 100
+nindivs <- 5
+trees <- data.frame(id=1:(nindivs * nstrains),
+                    strain=rep(1:nstrains, each=nindivs))
+# strain SNP proportions
+snp_p <- matrix(rbeta(nsnps * nstrains, 0.5, 0.5), ncol=nsnps)
+geno <- matrix(rbinom(nindivs*nstrains*nsnps, size=2, 
+                      prob=snp_p[trees$strain,]), ncol=nsnps)
+colnames(geno) <- paste0("g", 1:nsnps)
+H <- (geno == 1)
+D <- (geno == 2)
+
+# transpiration
+true_b0 <- rnorm(nstrains, mean=5, sd=0.1)
+# snp effects
+true_b <- c(2.0, 0, 0, 0, 0)/100
+true_c <- c(4.0, 3.0, 0, 0, 0)/100
+# strain * snp effects
+true_bmat <- matrix(rep(true_b, each=nstrains), ncol=nsnps)
+true_bmat[1:20, 3] <- -2.0/100
+true_cmat <- matrix(rep(true_b, each=nstrains), ncol=nsnps)
+true_bmat[1:20, 3] <- -4.0/100
+# combined
+trees$true_mu <- (true_b0[trees$strain] + 
+                  rowSums(H * true_bmat[trees$strain,]) + 
+                  rowSums(D * true_cmat[trees$strain,]))
+# noise
+true_sigma <- 0.05
+trees$transpiration <- exp(rnorm(nstrains*nindivs, 
+                                 mean=trees$true_mu, sd=true_sigma))
+```
+
+
+
