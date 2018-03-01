@@ -1780,8 +1780,8 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 <pre><code>## 
 ## SAMPLING FOR MODEL '6bf185852a21356090a30a8ae2eb7e2d' NOW (CHAIN 1).
 ## 
-## Gradient evaluation took 6.2e-05 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 0.62 seconds.
+## Gradient evaluation took 5.9e-05 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0.59 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
@@ -1806,9 +1806,9 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 ## Iteration: 90 / 100 [ 90%]  (Sampling)
 ## Iteration: 100 / 100 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 0.320395 seconds (Warm-up)
-##                0.195322 seconds (Sampling)
-##                0.515717 seconds (Total)</code></pre>
+##  Elapsed Time: 0.321605 seconds (Warm-up)
+##                0.196738 seconds (Sampling)
+##                0.518343 seconds (Total)</code></pre>
 <pre><code>## Warning: There were 3 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
 ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
 <pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
@@ -1907,7 +1907,7 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 ## d_alpha     44.01    50 0.99
 ## lp__     18272.70     5 1.57
 ## 
-## Samples were drawn using NUTS(diag_e) at Thu Mar  1 07:25:48 2018.
+## Samples were drawn using NUTS(diag_e) at Thu Mar  1 11:00:12 2018.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -1958,12 +1958,12 @@ model {
 <section><section id="simulate-data" class="title-slide slide level1"><h1>Simulate data</h1></section><section id="outline" class="slide level2">
 <h2>Outline</h2>
 <ol type="1">
-<li><p>How many cell types?</p></li>
-<li><p>How many genes?</p></li>
-<li><p>How many samples?</p></li>
-<li><p>How much noise in expression?</p></li>
-<li><p>How many genes distinguish cell types, and by how much relative to expression?</p></li>
-<li><p>How many “noisy” genes? How many “noisy” samples?</p></li>
+<li><p>How many cell types? <em>five</em></p></li>
+<li><p>How many genes? <em>one thousand</em></p></li>
+<li><p>How many samples? <em>one hundred</em></p></li>
+<li><p>How much noise in expression? <em>Mean expression per gene are <span class="math inline">\(\mu \sim \Exp(1/100)\)</span>; expression per sample is <span class="math inline">\(\Poisson(m)\)</span>, where <span class="math inline">\(m\)</span> is truncated <span class="math inline">\(\Normal(m, \sigma m)\)</span>, and <span class="math inline">\(\sigma\)</span> is around 1.</em></p></li>
+<li><p>How many genes distinguish cell types, and by how much relative to expression? <em>Ten percent of genes, and a gene with mean expression <span class="math inline">\(\mu\)</span> differs between cell types by about <span class="math inline">\(\mu/2\)</span>: means by cell type are <span class="math inline">\(\mu \times \log\Normal(\log(1/2), 1)\)</span>.</em></p></li>
+<li><p>How many “noisy” genes? How many “noisy” samples? <em>Two percent of each.</em></p></li>
 </ol>
 </section></section>
     </div>

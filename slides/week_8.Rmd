@@ -271,16 +271,25 @@ model {
 
 ## Outline
 
-1. How many cell types?
+1. How many cell types? *five*
 
-2. How many genes?
+2. How many genes? *one thousand*
 
-3. How many samples?
+3. How many samples? *one hundred*
 
 4. How much noise in expression?
+   *Mean expression per gene are $\mu \sim \Exp(1/100)$;
+    expression per sample is $\Poisson(m)$,
+    where $m$ is truncated $\Normal(m, \sigma m)$,
+    and $\sigma$ is around 1.*
 
 5. How many genes distinguish cell types,
    and by how much relative to expression?
+   *Ten percent of genes, and a gene with mean expression $\mu$
+   differs between cell types by about $\mu/2$:
+   means by cell type are $\mu \times \log\Normal(\log(1/2), 1)$.*
 
 6. How many "noisy" genes?  How many "noisy" samples?
+   *Two percent of each.*
+
 

@@ -67,7 +67,7 @@ Week 7 *(2/20)*
 
 Week 8 *(2/27)*
 
-: [(slides)](slides/week_8.slides.html) Clustering and categorization: softmax regression; applied example.
+: [(slides)](slides/week_8.slides.html) Clustering and categorization: softmax regression; applied example.  Also: [t-SNE in Stan](slides/t-sne.html).
 
 Week 9 *(3/6)*
 
