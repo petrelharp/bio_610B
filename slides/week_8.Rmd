@@ -280,16 +280,53 @@ model {
 4. How much noise in expression?
    *Mean expression per gene are $\mu \sim \Exp(1/100)$;
     expression per sample is $\Poisson(m)$,
-    where $m$ is truncated $\Normal(m, \sigma m)$,
+    where $m$ is truncated $\Normal(\mu, \sigma \mu)$,
     and $\sigma$ is around 1.*
 
 5. How many genes distinguish cell types,
    and by how much relative to expression?
    *Ten percent of genes, and a gene with mean expression $\mu$
    differs between cell types by about $\mu/2$:
-   means by cell type are $\mu \times \log\Normal(\log(1/2), 1)$.*
+   means by cell type are $\mu \times \log\Normal(0, 1)$.*
 
 6. How many "noisy" genes?  How many "noisy" samples?
    *Two percent of each.*
 
+-----------
 
+```{r sim_data}
+ntypes <- 5
+ngenes <- 1000
+nsamples <- 100
+ninf <- 0.1 * ngenes # number of informative genes
+
+mu <- rexp(ngenes, .01)
+# copy mu into five columns
+type_mu <- do.call(cbind, list(mu)[rep(1,ntypes)])
+
+# simulate how differnt mu is across cell types
+diff_sigma <- matrix(rlnorm(ntypes * ninf, log(0.5), 1), ncol=ntypes)
+type_mu[1:ninf,] <- type_mu[1:ninf,] * diff_sigma
+
+m_list <- lapply(1:ntypes, function (ct) {
+                    matrix(pmax(0, rnorm(ngenes*nsamples, 
+                                         type_mu[,ct], type_mu[,ct])),
+                           ncol=ngenes, byrow=TRUE) })
+
+# simulate proportions per sample
+w <- matrix( rexp(nsamples*ntypes), ncol=ntypes)
+w <- sweep(w, 1, rowSums(w), "/")
+stopifnot(all(abs(rowSums(w) - 1) < 1e-15))
+
+# construct expected expression levels:
+m <- matrix(0, nrow=nsamples, ncol=ngenes)
+for (ct in 1:ntypes) {
+    m <- m + (w[,ct] * m_list[[ct]])
+}
+
+# simulate expression
+Z <- matrix(rpois(length(m), m), ncol=ncol(m))
+
+# add noisy indivs, genes??
+
+```
