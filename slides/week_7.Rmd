@@ -425,10 +425,11 @@ $$\begin{aligned}
            &\sim \Cauchy(\nu_k, \tau_k) \\
     c_k[s] &= \text{effect of hom SNP $k$ in strain $s$} \\
            &\sim \Cauchy(\omega_k, u_k)  \\
-    \nu &\sim \Normal^+(0, 2) \\
-    \pi &\sim \Normal^+(0, 2) \\
-    \tau &\sim \Normal^+(0, 20) \\
-    u &\sim \Normal^+(0, 20) 
+    \nu &\sim \Normal(0, 10) \\
+    \omega &\sim \Normal^+(0, 10) \\
+    \tau &\sim \Normal(0, 10) \\
+    u &\sim \Normal^+(0, 10)  \\
+    \sigma &\sim \Normal^+(0, 20) 
 \end{aligned}$$
 
 ## Simulate data
@@ -456,7 +457,7 @@ true_c <- c(4.0, 3.0, 0, 0, 0)/100
 true_bmat <- matrix(rep(true_b, each=nstrains), ncol=nsnps)
 true_bmat[1:20, 3] <- -2.0/100
 true_cmat <- matrix(rep(true_b, each=nstrains), ncol=nsnps)
-true_bmat[1:20, 3] <- -4.0/100
+true_cmat[1:20, 3] <- -4.0/100
 # combined
 trees$true_mu <- (true_b0[trees$strain] + 
                   rowSums(H * true_bmat[trees$strain,]) + 
@@ -468,4 +469,54 @@ trees$transpiration <- exp(rnorm(nstrains*nindivs,
 ```
 
 
+## Stan block
 
+```{r tree_block}
+tree_block <- "
+data {
+    int N; // number of trees
+    int nsnps; // number of SNPs
+    vector[N] T; // transp rates
+    int S[N]; // strain index
+    matrix[N, nsnps] H; // 0 or 1 if het
+    matrix[N, nsnps] D; // 0 or 1 if hom
+}
+parameters {
+    vector[100] b0;
+    matrix[100,nsnps] b;
+    matrix[100,nsnps] c;
+    real<lower=0> sigma;
+    vector[nsnps] nu;
+    vector<lower=0>[nsnps] tau;
+    vector[nsnps] omega;
+    vector<lower=0>[nsnps] u;
+}
+model {
+    vector[N] mu;
+    mu = b0[S];
+    for (j in 1:nsnps) {
+        mu += (b[S,j] .* H[,j]) + (c[S,j] .* D[,j]);
+        b[,j] ~ cauchy(nu[j], tau[j]);
+        c[,j] ~ cauchy(omega[j], u[j]);
+    }
+    T ~ lognormal(mu, sigma);
+    nu ~ normal(0, 10);
+    omega ~ normal(0, 10);
+    tau ~ normal(0, 10);
+    u ~ normal(0, 10);
+    sigma ~ normal(0, 20);
+}"
+```
+
+---------
+
+```{r run_trees, cache=TRUE}
+tree_fit <- stan(model_code=tree_block,
+                 data=list(N=nstrains*nindivs,
+                           nsnps=nsnps,
+                           T=trees$transpiration,
+                           S=trees$strain,
+                           H=matrix(as.numeric(H), ncol=nsnps),
+                           D=matrix(as.numeric(D), ncol=nsnps)),
+                 iter=1000)
+```

@@ -2017,10 +2017,11 @@ Arguments:
            &amp;\sim \Cauchy(\nu_k, \tau_k) \\
     c_k[s] &amp;= \text{effect of hom SNP $k$ in strain $s$} \\
            &amp;\sim \Cauchy(\omega_k, u_k)  \\
-    \nu &amp;\sim \Normal^+(0, 2) \\
-    \pi &amp;\sim \Normal^+(0, 2) \\
-    \tau &amp;\sim \Normal^+(0, 20) \\
-    u &amp;\sim \Normal^+(0, 20) 
+    \nu &amp;\sim \Normal(0, 10) \\
+    \omega &amp;\sim \Normal^+(0, 10) \\
+    \tau &amp;\sim \Normal(0, 10) \\
+    u &amp;\sim \Normal^+(0, 10)  \\
+    \sigma &amp;\sim \Normal^+(0, 20) 
 \end{aligned}\]</span></p>
 </section><section id="simulate-data-1" class="slide level2">
 <h2>Simulate data</h2>
@@ -2046,7 +2047,7 @@ Arguments:
 <a class="sourceLine" id="cb20-20" data-line-number="20">true_bmat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(true_b, <span class="dt">each=</span>nstrains), <span class="dt">ncol=</span>nsnps)</a>
 <a class="sourceLine" id="cb20-21" data-line-number="21">true_bmat[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="fl">-2.0</span><span class="op">/</span><span class="dv">100</span></a>
 <a class="sourceLine" id="cb20-22" data-line-number="22">true_cmat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(true_b, <span class="dt">each=</span>nstrains), <span class="dt">ncol=</span>nsnps)</a>
-<a class="sourceLine" id="cb20-23" data-line-number="23">true_bmat[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="fl">-4.0</span><span class="op">/</span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb20-23" data-line-number="23">true_cmat[<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="fl">-4.0</span><span class="op">/</span><span class="dv">100</span></a>
 <a class="sourceLine" id="cb20-24" data-line-number="24"><span class="co"># combined</span></a>
 <a class="sourceLine" id="cb20-25" data-line-number="25">trees<span class="op">$</span>true_mu &lt;-<span class="st"> </span>(true_b0[trees<span class="op">$</span>strain] <span class="op">+</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb20-26" data-line-number="26"><span class="st">                  </span><span class="kw">rowSums</span>(H <span class="op">*</span><span class="st"> </span>true_bmat[trees<span class="op">$</span>strain,]) <span class="op">+</span><span class="st"> </span></a>
@@ -2055,6 +2056,57 @@ Arguments:
 <a class="sourceLine" id="cb20-29" data-line-number="29">true_sigma &lt;-<span class="st"> </span><span class="fl">0.05</span></a>
 <a class="sourceLine" id="cb20-30" data-line-number="30">trees<span class="op">$</span>transpiration &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">rnorm</span>(nstrains<span class="op">*</span>nindivs, </a>
 <a class="sourceLine" id="cb20-31" data-line-number="31">                                 <span class="dt">mean=</span>trees<span class="op">$</span>true_mu, <span class="dt">sd=</span>true_sigma))</a></code></pre></div>
+</section><section id="stan-block" class="slide level2">
+<h2>Stan block</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">tree_block &lt;-<span class="st"> &quot;</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="st">data {</span></a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">    int N; // number of trees</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="st">    int nsnps; // number of SNPs</span></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="st">    vector[N] T; // transp rates</span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="st">    int S[N]; // strain index</span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="st">    matrix[N, nsnps] H; // 0 or 1 if het</span></a>
+<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="st">    matrix[N, nsnps] D; // 0 or 1 if hom</span></a>
+<a class="sourceLine" id="cb21-9" data-line-number="9"><span class="st">}</span></a>
+<a class="sourceLine" id="cb21-10" data-line-number="10"><span class="st">parameters {</span></a>
+<a class="sourceLine" id="cb21-11" data-line-number="11"><span class="st">    vector[100] b0;</span></a>
+<a class="sourceLine" id="cb21-12" data-line-number="12"><span class="st">    matrix[100,nsnps] b;</span></a>
+<a class="sourceLine" id="cb21-13" data-line-number="13"><span class="st">    matrix[100,nsnps] c;</span></a>
+<a class="sourceLine" id="cb21-14" data-line-number="14"><span class="st">    real&lt;lower=0&gt; sigma;</span></a>
+<a class="sourceLine" id="cb21-15" data-line-number="15"><span class="st">    vector[nsnps] nu;</span></a>
+<a class="sourceLine" id="cb21-16" data-line-number="16"><span class="st">    vector&lt;lower=0&gt;[nsnps] tau;</span></a>
+<a class="sourceLine" id="cb21-17" data-line-number="17"><span class="st">    vector[nsnps] omega;</span></a>
+<a class="sourceLine" id="cb21-18" data-line-number="18"><span class="st">    vector&lt;lower=0&gt;[nsnps] u;</span></a>
+<a class="sourceLine" id="cb21-19" data-line-number="19"><span class="st">}</span></a>
+<a class="sourceLine" id="cb21-20" data-line-number="20"><span class="st">model {</span></a>
+<a class="sourceLine" id="cb21-21" data-line-number="21"><span class="st">    vector[N] mu;</span></a>
+<a class="sourceLine" id="cb21-22" data-line-number="22"><span class="st">    mu = b0[S];</span></a>
+<a class="sourceLine" id="cb21-23" data-line-number="23"><span class="st">    for (j in 1:nsnps) {</span></a>
+<a class="sourceLine" id="cb21-24" data-line-number="24"><span class="st">        mu += (b[S,j] .* H[,j]) + (c[S,j] .* D[,j]);</span></a>
+<a class="sourceLine" id="cb21-25" data-line-number="25"><span class="st">        b[,j] ~ cauchy(nu[j], tau[j]);</span></a>
+<a class="sourceLine" id="cb21-26" data-line-number="26"><span class="st">        c[,j] ~ cauchy(omega[j], u[j]);</span></a>
+<a class="sourceLine" id="cb21-27" data-line-number="27"><span class="st">    }</span></a>
+<a class="sourceLine" id="cb21-28" data-line-number="28"><span class="st">    T ~ lognormal(mu, sigma);</span></a>
+<a class="sourceLine" id="cb21-29" data-line-number="29"><span class="st">    nu ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb21-30" data-line-number="30"><span class="st">    omega ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb21-31" data-line-number="31"><span class="st">    tau ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb21-32" data-line-number="32"><span class="st">    u ~ normal(0, 10);</span></a>
+<a class="sourceLine" id="cb21-33" data-line-number="33"><span class="st">    sigma ~ normal(0, 20);</span></a>
+<a class="sourceLine" id="cb21-34" data-line-number="34"><span class="st">}&quot;</span></a></code></pre></div>
+</section><section class="slide level2">
+
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">tree_fit &lt;-<span class="st"> </span><span class="kw">stan</span>(<span class="dt">model_code=</span>tree_block,</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2">                 <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span>nstrains<span class="op">*</span>nindivs,</a>
+<a class="sourceLine" id="cb22-3" data-line-number="3">                           <span class="dt">nsnps=</span>nsnps,</a>
+<a class="sourceLine" id="cb22-4" data-line-number="4">                           <span class="dt">T=</span>trees<span class="op">$</span>transpiration,</a>
+<a class="sourceLine" id="cb22-5" data-line-number="5">                           <span class="dt">S=</span>trees<span class="op">$</span>strain,</a>
+<a class="sourceLine" id="cb22-6" data-line-number="6">                           <span class="dt">H=</span><span class="kw">matrix</span>(<span class="kw">as.numeric</span>(H), <span class="dt">ncol=</span>nsnps),</a>
+<a class="sourceLine" id="cb22-7" data-line-number="7">                           <span class="dt">D=</span><span class="kw">matrix</span>(<span class="kw">as.numeric</span>(D), <span class="dt">ncol=</span>nsnps)),</a>
+<a class="sourceLine" id="cb22-8" data-line-number="8">                 <span class="dt">iter=</span><span class="dv">1000</span>)</a></code></pre></div>
+<pre><code>## Warning: There were 2000 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. See
+## http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded</code></pre>
+<pre><code>## Warning: There were 2 chains where the estimated Bayesian Fraction of Missing Information was low. See
+## http://mc-stan.org/misc/warnings.html#bfmi-low</code></pre>
+<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
 </section></section>
     </div>
   </div>

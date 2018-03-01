@@ -113,9 +113,9 @@ $Z_{ij}$ : expression level in sample $i$ of gene $j$.
    \end{aligned}$$
 
 3. $y_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
-   shrink $x_{kj}$ towards $x_j$.
+   shrink $x_{kj}$ towards $y_j$.
 
-4. $\sigma_i$ : expression SD multiplier for sample $i$.
+4. *(omit this)*
 
 :::
 :::::::::::::: 
@@ -126,37 +126,42 @@ $Z_{ij}$ : expression level in sample $i$ of gene $j$.
 :::::::::::::: {.column width=50%}
 
 ```
-data {
+```{r nmf1, echo=FALSE, results="asis"}
+cat(nmf1 <- "data {
   int N; // # samples
   int L; // # genes
   int K; // # cell types
   int Z[N,L];
-}
+}")
 ```
 ```
-parameters {
-  matrix[L,K] x;
+```
+```{r nmf2, echo=FALSE, results="asis"}
+cat(nmf2 <- "parameters {
+  matrix<lower=0>[L,K] x;
   vector[L] y;
   simplex[K] w[N];
-  vector<lower=0>[L] gamma;
-  row_vector<lower=0>[L] eta;
-  vector<lower=0>[N] sigma;
+  vector<lower=0>[L] eta;
   vector<lower=0>[K] alpha;
   real<lower=0> d_alpha;
-}
+}")
 ```
 ```
-model {
+```
+```{r nmf3, echo=FALSE, results="asis"}
+cat(nmf3 <- "model {
   for (i in 1:N) {
-      Z[i] ~ poisson(x * w[i], 
-                     sigma[i] * gamma);
-      x[,i] ~ lognormal(y, eta);
+      Z[i] ~ poisson(x * w[i]);
+      w[i] ~ dirichlet(d_alpha * alpha);
   }
+  for (j in 1:K) 
+      { x[,j] ~ lognormal(y, eta); }
   y ~ normal(0, 20);
-  w ~ dirichlet(d_alpha * alpha);
   alpha ~ normal(0, 1);
   d_alpha ~ normal(0, 20);
-}
+  eta ~ cauchy(0, 1);
+}")
+```
 ```
 
 
@@ -172,15 +177,31 @@ $$\begin{aligned}
     Z_{ij} \approx \sum_k w_{ik} x_{kj} .
 \end{aligned}$$
 
-3. $x_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
-   shrink $x_{kj}$ towards $x_j$.
+3. $y_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
+   shrink $x_{kj}$ towards $y_j$.
 
-4. $\gamma_j$ : expression SD for gene $j$;
-
-   $\sigma_i$ : expression SD multiplier for sample $i$; 
 
 :::
 :::::::::::::: 
+
+## Testing: compiles?
+
+```{r model_compiles, echo=-1, cache=TRUE}
+nmf_block <- paste(nmf1, nmf2, nmf3, sep='\n')
+nmf_model <- stan_model(model_code=nmf_block)
+```
+
+## Testing: runs?
+
+```{r test_runs}
+sampling(nmf_model,
+         data=list(N=10,
+                   L=5,
+                   K=2,
+                   Z=matrix(rpois(50, 100), ncol=5)),
+         chains=1, iter=100)
+```
+
 
 # Nonnegative matrix factorization
 
@@ -246,72 +267,6 @@ model {
 }
 ```
 
-# Finish up the model
-
-
--------------
-
-::: {.columns}
-:::::::::::::: {.column width=50%}
-
-```
-data {
-  int N; // # samples
-  int L; // # genes
-  int K; // # cell types
-  int Z[N,L];
-}
-```
-```
-parameters {
-  matrix[L,K] x;
-  vector[L] y;
-  simplex[K] w[N];
-  vector<lower=0>[L] gamma;
-  row_vector<lower=0>[L] eta;
-  vector<lower=0>[N] sigma;
-  vector<lower=0>[K] alpha;
-  real<lower=0> d_alpha;
-}
-```
-```
-model {
-  for (i in 1:N) {
-      Z[i] ~ poisson(x * w[i], 
-                     sigma[i] * gamma);
-      x[,i] ~ lognormal(y, eta);
-  }
-  y ~ normal(0, 20);
-  w ~ dirichlet(d_alpha * alpha);
-  alpha ~ normal(0, 1);
-  d_alpha ~ normal(0, 20);
-}
-```
-
-
-:::
-:::::::::::::: {.column width=50%}
-
-
-1. $x_{kj}$ : Mean expression of gene $j$ in cell type $k$.
-
-2. $w_{ik}$ : Proportion of sample $i$ of cell type $k$.
-
-$$\begin{aligned}
-    Z_{ij} \approx \sum_k w_{ik} x_{kj} .
-\end{aligned}$$
-
-3. $x_j$, $\eta_j$ : mean and SD of expression of gene $j$ across *all* cell types;
-   shrink $x_{kj}$ towards $x_j$.
-
-4. $\gamma_j$ : expression SD for gene $j$;
-
-   $\sigma_i$ : expression SD multiplier for sample $i$; 
-
-:::
-:::::::::::::: 
-
-
 # Simulate data
 
 ## Outline
@@ -328,3 +283,4 @@ $$\begin{aligned}
    and by how much relative to expression?
 
 6. How many "noisy" genes?  How many "noisy" samples?
+

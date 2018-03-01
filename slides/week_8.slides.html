@@ -1299,6 +1299,71 @@ visibility: hidden; }
       div.column{display: inline-block; vertical-align: top; width: 50%;}
   </style>
   <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style type="text/css">
 @font-face {
 font-family: 'News Cycle';
 font-style: normal;
@@ -1653,8 +1718,8 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
         Z_{ij} \approx \sum_{k=1}^K w_{ik} x_{kj} .
    \end{aligned}\]</span></p>
 <ol start="3" type="1">
-<li><p><span class="math inline">\(y_j\)</span>, <span class="math inline">\(\eta_j\)</span> : mean and SD of expression of gene <span class="math inline">\(j\)</span> across <em>all</em> cell types; shrink <span class="math inline">\(x_{kj}\)</span> towards <span class="math inline">\(x_j\)</span>.</p></li>
-<li><p><span class="math inline">\(\sigma_i\)</span> : expression SD multiplier for sample <span class="math inline">\(i\)</span>.</p></li>
+<li><p><span class="math inline">\(y_j\)</span>, <span class="math inline">\(\eta_j\)</span> : mean and SD of expression of gene <span class="math inline">\(j\)</span> across <em>all</em> cell types; shrink <span class="math inline">\(x_{kj}\)</span> towards <span class="math inline">\(y_j\)</span>.</p></li>
+<li><p><em>(omit this)</em></p></li>
 </ol>
 </div>
 </div>
@@ -1669,25 +1734,24 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   int Z[N,L];
 }</code></pre>
 <pre><code>parameters {
-  matrix[L,K] x;
+  matrix&lt;lower=0&gt;[L,K] x;
   vector[L] y;
   simplex[K] w[N];
-  vector&lt;lower=0&gt;[L] gamma;
-  row_vector&lt;lower=0&gt;[L] eta;
-  vector&lt;lower=0&gt;[N] sigma;
+  vector&lt;lower=0&gt;[L] eta;
   vector&lt;lower=0&gt;[K] alpha;
   real&lt;lower=0&gt; d_alpha;
 }</code></pre>
 <pre><code>model {
   for (i in 1:N) {
-      Z[i] ~ poisson(x * w[i], 
-                     sigma[i] * gamma);
-      x[,i] ~ lognormal(y, eta);
+      Z[i] ~ poisson(x * w[i]);
+      w[i] ~ dirichlet(d_alpha * alpha);
   }
+  for (j in 1:K) 
+      { x[,j] ~ lognormal(y, eta); }
   y ~ normal(0, 20);
-  w ~ dirichlet(d_alpha * alpha);
   alpha ~ normal(0, 1);
   d_alpha ~ normal(0, 20);
+  eta ~ cauchy(0, 1);
 }</code></pre>
 </div><div class="column" style="width:50%;">
 <ol type="1">
@@ -1698,12 +1762,155 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
     Z_{ij} \approx \sum_k w_{ik} x_{kj} .
 \end{aligned}\]</span></p>
 <ol start="3" type="1">
-<li><p><span class="math inline">\(x_j\)</span>, <span class="math inline">\(\eta_j\)</span> : mean and SD of expression of gene <span class="math inline">\(j\)</span> across <em>all</em> cell types; shrink <span class="math inline">\(x_{kj}\)</span> towards <span class="math inline">\(x_j\)</span>.</p></li>
-<li><p><span class="math inline">\(\gamma_j\)</span> : expression SD for gene <span class="math inline">\(j\)</span>;</p>
-<p><span class="math inline">\(\sigma_i\)</span> : expression SD multiplier for sample <span class="math inline">\(i\)</span>;</p></li>
+<li><span class="math inline">\(y_j\)</span>, <span class="math inline">\(\eta_j\)</span> : mean and SD of expression of gene <span class="math inline">\(j\)</span> across <em>all</em> cell types; shrink <span class="math inline">\(x_{kj}\)</span> towards <span class="math inline">\(y_j\)</span>.</li>
 </ol>
 </div>
 </div>
+</section><section id="testing-compiles" class="slide level2">
+<h2>Testing: compiles?</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">nmf_model &lt;-<span class="st"> </span><span class="kw">stan_model</span>(<span class="dt">model_code=</span>nmf_block)</a></code></pre></div>
+</section><section id="testing-runs" class="slide level2">
+<h2>Testing: runs?</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">sampling</span>(nmf_model,</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">         <span class="dt">data=</span><span class="kw">list</span>(<span class="dt">N=</span><span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">                   <span class="dt">L=</span><span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">                   <span class="dt">K=</span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">                   <span class="dt">Z=</span><span class="kw">matrix</span>(<span class="kw">rpois</span>(<span class="dv">50</span>, <span class="dv">100</span>), <span class="dt">ncol=</span><span class="dv">5</span>)),</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">         <span class="dt">chains=</span><span class="dv">1</span>, <span class="dt">iter=</span><span class="dv">100</span>)</a></code></pre></div>
+<pre><code>## 
+## SAMPLING FOR MODEL '6bf185852a21356090a30a8ae2eb7e2d' NOW (CHAIN 1).
+## 
+## Gradient evaluation took 6.2e-05 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0.62 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## WARNING: There aren't enough warmup iterations to fit the
+##          three stages of adaptation as currently configured.
+##          Reducing each adaptation stage to 15%/75%/10% of
+##          the given number of warmup iterations:
+##            init_buffer = 7
+##            adapt_window = 38
+##            term_buffer = 5
+## 
+## Iteration:  1 / 100 [  1%]  (Warmup)
+## Iteration: 10 / 100 [ 10%]  (Warmup)
+## Iteration: 20 / 100 [ 20%]  (Warmup)
+## Iteration: 30 / 100 [ 30%]  (Warmup)
+## Iteration: 40 / 100 [ 40%]  (Warmup)
+## Iteration: 50 / 100 [ 50%]  (Warmup)
+## Iteration: 51 / 100 [ 51%]  (Sampling)
+## Iteration: 60 / 100 [ 60%]  (Sampling)
+## Iteration: 70 / 100 [ 70%]  (Sampling)
+## Iteration: 80 / 100 [ 80%]  (Sampling)
+## Iteration: 90 / 100 [ 90%]  (Sampling)
+## Iteration: 100 / 100 [100%]  (Sampling)
+## 
+##  Elapsed Time: 0.320395 seconds (Warm-up)
+##                0.195322 seconds (Sampling)
+##                0.515717 seconds (Total)</code></pre>
+<pre><code>## Warning: There were 3 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+<pre><code>## Inference for Stan model: 6bf185852a21356090a30a8ae2eb7e2d.
+## 1 chains, each with iter=100; warmup=50; thin=1; 
+## post-warmup draws per chain=50, total post-warmup draws=50.
+## 
+##              mean se_mean     sd     2.5%      25%      50%      75%
+## x[1,1]     106.41    3.83  20.37    54.51    99.03   106.35   119.74
+## x[1,2]     126.87   18.46 130.52     4.04    68.18   108.87   124.94
+## x[2,1]     100.05    6.56  24.38    48.44    92.99   100.92   109.93
+## x[2,2]     100.13   10.02  54.04     4.11    66.86   103.58   125.15
+## x[3,1]      95.20    3.25  18.46    53.38    89.84    96.64   101.83
+## x[3,2]     110.05    9.11  44.52    54.93    87.46   100.92   120.58
+## x[4,1]     111.17    4.72  20.28    75.97   100.30   108.74   122.63
+## x[4,2]      81.16   17.51  65.37     1.69    32.58    66.96   100.86
+## x[5,1]     102.28    1.50   9.58    88.67    97.85   100.68   102.48
+## x[5,2]      94.97    6.23  35.63     4.09    88.82    98.12   104.19
+## y[1]         4.62    0.10   0.73     3.44     4.28     4.53     4.97
+## y[2]         4.29    0.20   0.98     1.65     4.19     4.56     4.75
+## y[3]         4.47    0.06   0.37     3.81     4.24     4.54     4.65
+## y[4]         4.57    0.25   1.16     2.34     4.05     4.30     4.88
+## y[5]         4.84    0.19   0.79     4.14     4.57     4.61     4.85
+## w[1,1]       0.76    0.05   0.15     0.37     0.69     0.78     0.86
+## w[1,2]       0.24    0.05   0.15     0.04     0.14     0.22     0.31
+## w[2,1]       0.76    0.05   0.15     0.39     0.71     0.76     0.86
+## w[2,2]       0.24    0.05   0.15     0.01     0.14     0.24     0.29
+## w[3,1]       0.75    0.06   0.16     0.36     0.67     0.73     0.90
+## w[3,2]       0.25    0.06   0.16     0.03     0.10     0.27     0.33
+## w[4,1]       0.77    0.05   0.15     0.35     0.71     0.79     0.86
+## w[4,2]       0.23    0.05   0.15     0.05     0.14     0.21     0.29
+## w[5,1]       0.77    0.04   0.13     0.43     0.72     0.80     0.84
+## w[5,2]       0.23    0.04   0.13     0.04     0.16     0.20     0.28
+## w[6,1]       0.77    0.05   0.14     0.43     0.76     0.80     0.85
+## w[6,2]       0.23    0.05   0.14     0.02     0.15     0.20     0.24
+## w[7,1]       0.74    0.06   0.17     0.30     0.65     0.74     0.89
+## w[7,2]       0.26    0.06   0.17     0.03     0.11     0.26     0.35
+## w[8,1]       0.75    0.05   0.16     0.37     0.69     0.78     0.86
+## w[8,2]       0.25    0.05   0.16     0.04     0.14     0.22     0.31
+## w[9,1]       0.75    0.06   0.14     0.43     0.66     0.77     0.84
+## w[9,2]       0.25    0.06   0.14     0.05     0.16     0.23     0.34
+## w[10,1]      0.74    0.05   0.14     0.40     0.68     0.73     0.86
+## w[10,2]      0.26    0.05   0.14     0.04     0.14     0.27     0.32
+## eta[1]       0.95    0.16   0.79     0.14     0.40     0.68     1.38
+## eta[2]       1.45    0.53   2.49     0.09     0.29     0.82     1.73
+## eta[3]       0.65    0.14   0.52     0.05     0.24     0.50     1.05
+## eta[4]       1.26    0.37   1.04     0.18     0.60     0.86     1.47
+## eta[5]       0.60    0.33   1.00     0.03     0.06     0.22     0.71
+## alpha[1]     1.60    0.10   0.55     0.47     1.26     1.52     2.04
+## alpha[2]     0.55    0.12   0.37     0.09     0.22     0.52     0.73
+## d_alpha     22.16    1.32   9.35     8.98    16.54    20.15    26.67
+## lp__     18262.11    3.68   8.08 18247.42 18255.58 18264.32 18269.54
+##             97.5% n_eff Rhat
+## x[1,1]     145.52    28 1.05
+## x[1,2]     367.79    50 1.02
+## x[2,1]     150.49    14 1.07
+## x[2,2]     211.05    29 1.05
+## x[3,1]     133.33    32 1.02
+## x[3,2]     228.06    24 1.08
+## x[4,1]     154.69    18 0.99
+## x[4,2]     225.12    14 0.98
+## x[5,1]     128.73    41 0.99
+## x[5,2]     169.28    33 1.01
+## y[1]         5.64    50 1.02
+## y[2]         5.39    25 1.01
+## y[3]         5.20    38 0.98
+## y[4]         7.09    21 0.99
+## y[5]         6.13    17 1.08
+## w[1,1]       0.96     8 1.18
+## w[1,2]       0.63     8 1.18
+## w[2,1]       0.99     9 1.19
+## w[2,2]       0.61     9 1.19
+## w[3,1]       0.97     8 1.24
+## w[3,2]       0.64     8 1.24
+## w[4,1]       0.95     9 1.21
+## w[4,2]       0.65     9 1.21
+## w[5,1]       0.96     9 1.19
+## w[5,2]       0.57     9 1.19
+## w[6,1]       0.98     8 1.15
+## w[6,2]       0.57     8 1.15
+## w[7,1]       0.97     8 1.33
+## w[7,2]       0.70     8 1.33
+## w[8,1]       0.96     9 1.09
+## w[8,2]       0.63     9 1.09
+## w[9,1]       0.95     7 1.33
+## w[9,2]       0.57     7 1.33
+## w[10,1]      0.96     7 1.30
+## w[10,2]      0.60     7 1.30
+## eta[1]       2.75    26 1.00
+## eta[2]      10.27    22 1.01
+## eta[3]       1.72    13 1.10
+## eta[4]       3.55     8 1.28
+## eta[5]       3.22     9 1.21
+## alpha[1]     2.51    30 0.98
+## alpha[2]     1.12     9 1.16
+## d_alpha     44.01    50 0.99
+## lp__     18272.70     5 1.57
+## 
+## Samples were drawn using NUTS(diag_e) at Thu Mar  1 07:25:48 2018.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
 </section></section>
 <section><section id="nonnegative-matrix-factorization" class="title-slide slide level1"><h1>Nonnegative matrix factorization</h1></section><section id="aka-nmf" class="slide level2">
 <h2>… aka “NMF”</h2>
@@ -1747,53 +1954,6 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 model {
     w ~ dirichlet(d_alpha * alpha);
 }</code></pre>
-</section></section>
-<section><section id="finish-up-the-model" class="title-slide slide level1"><h1>Finish up the model</h1></section><section class="slide level2">
-
-<div class="columns">
-<div class="column" style="width:50%;">
-<pre><code>data {
-  int N; // # samples
-  int L; // # genes
-  int K; // # cell types
-  int Z[N,L];
-}</code></pre>
-<pre><code>parameters {
-  matrix[L,K] x;
-  vector[L] y;
-  simplex[K] w[N];
-  vector&lt;lower=0&gt;[L] gamma;
-  row_vector&lt;lower=0&gt;[L] eta;
-  vector&lt;lower=0&gt;[N] sigma;
-  vector&lt;lower=0&gt;[K] alpha;
-  real&lt;lower=0&gt; d_alpha;
-}</code></pre>
-<pre><code>model {
-  for (i in 1:N) {
-      Z[i] ~ poisson(x * w[i], 
-                     sigma[i] * gamma);
-      x[,i] ~ lognormal(y, eta);
-  }
-  y ~ normal(0, 20);
-  w ~ dirichlet(d_alpha * alpha);
-  alpha ~ normal(0, 1);
-  d_alpha ~ normal(0, 20);
-}</code></pre>
-</div><div class="column" style="width:50%;">
-<ol type="1">
-<li><p><span class="math inline">\(x_{kj}\)</span> : Mean expression of gene <span class="math inline">\(j\)</span> in cell type <span class="math inline">\(k\)</span>.</p></li>
-<li><p><span class="math inline">\(w_{ik}\)</span> : Proportion of sample <span class="math inline">\(i\)</span> of cell type <span class="math inline">\(k\)</span>.</p></li>
-</ol>
-<p><span class="math display">\[\begin{aligned}
-    Z_{ij} \approx \sum_k w_{ik} x_{kj} .
-\end{aligned}\]</span></p>
-<ol start="3" type="1">
-<li><p><span class="math inline">\(x_j\)</span>, <span class="math inline">\(\eta_j\)</span> : mean and SD of expression of gene <span class="math inline">\(j\)</span> across <em>all</em> cell types; shrink <span class="math inline">\(x_{kj}\)</span> towards <span class="math inline">\(x_j\)</span>.</p></li>
-<li><p><span class="math inline">\(\gamma_j\)</span> : expression SD for gene <span class="math inline">\(j\)</span>;</p>
-<p><span class="math inline">\(\sigma_i\)</span> : expression SD multiplier for sample <span class="math inline">\(i\)</span>;</p></li>
-</ol>
-</div>
-</div>
 </section></section>
 <section><section id="simulate-data" class="title-slide slide level1"><h1>Simulate data</h1></section><section id="outline" class="slide level2">
 <h2>Outline</h2>
