@@ -126,7 +126,7 @@ $Z_{ij}$ : expression level in sample $i$ of gene $j$.
 :::::::::::::: {.column width=50%}
 
 ```
-```{r nmf1, echo=FALSE, results="asis"}
+```{r nmf1, echo=FALSE, results="asis", cache=TRUE}
 cat(nmf1 <- "data {
   int N; // # samples
   int L; // # genes
@@ -136,7 +136,7 @@ cat(nmf1 <- "data {
 ```
 ```
 ```
-```{r nmf2, echo=FALSE, results="asis"}
+```{r nmf2, echo=FALSE, results="asis", cache=TRUE}
 cat(nmf2 <- "parameters {
   matrix<lower=0>[L,K] x;
   vector[L] y;
@@ -148,18 +148,18 @@ cat(nmf2 <- "parameters {
 ```
 ```
 ```
-```{r nmf3, echo=FALSE, results="asis"}
+```{r nmf3, echo=FALSE, results="asis", cache=TRUE}
 cat(nmf3 <- "model {
   for (i in 1:N) {
-      Z[i] ~ poisson(x * w[i]);
+      Z[i] ~ poisson(eta .* (x * w[i]));
       w[i] ~ dirichlet(d_alpha * alpha);
   }
   for (j in 1:K) 
-      { x[,j] ~ lognormal(y, eta); }
+      { x[,j] ~ normal(y ./ eta, 1); }
   y ~ normal(0, 20);
   alpha ~ normal(0, 1);
-  d_alpha ~ normal(0, 20);
-  eta ~ cauchy(0, 1);
+  d_alpha ~ exponential(0.2);
+  eta ~ cauchy(0, 10);
 }")
 ```
 ```
@@ -186,7 +186,7 @@ $$\begin{aligned}
 
 ## Testing: compiles?
 
-```{r model_compiles, echo=-1, cache=TRUE}
+```{r model_compiles, echo=-1, cache=TRUE, dependson=c("nmf1", "nmf2", "nmf3")}
 nmf_block <- paste(nmf1, nmf2, nmf3, sep='\n')
 nmf_model <- stan_model(model_code=nmf_block)
 ```
@@ -292,14 +292,19 @@ model {
 6. How many "noisy" genes?  How many "noisy" samples?
    *Two percent of each.*
 
------------
 
-```{r sim_data}
-ntypes <- 5
+# An easy case
+
+Parameters:
+```{r sim_data, cache=TRUE}
+ntypes <- 3
 ngenes <- 1000
-nsamples <- 100
-ninf <- 0.1 * ngenes # number of informative genes
+nsamples <- 1000
+ninf <- 0.6 * ngenes # number of informative genes
+```
 
+Determine expression profiles per cell type
+```{r sim_data_2, cache=TRUE, dependson="sim_data"}
 mu <- rexp(ngenes, .01)
 # copy mu into five columns
 type_mu <- do.call(cbind, list(mu)[rep(1,ntypes)])
@@ -312,7 +317,12 @@ m_list <- lapply(1:ntypes, function (ct) {
                     matrix(pmax(0, rnorm(ngenes*nsamples, 
                                          type_mu[,ct], type_mu[,ct])),
                            ncol=ngenes, byrow=TRUE) })
+```
 
+---------
+
+Simulate proportions per sample, and construct expected expression levels
+```{r sim_data_3, cache=TRUE, dependson="sim_data_2"}
 # simulate proportions per sample
 w <- matrix( rexp(nsamples*ntypes), ncol=ntypes)
 w <- sweep(w, 1, rowSums(w), "/")
@@ -323,10 +333,224 @@ m <- matrix(0, nrow=nsamples, ncol=ngenes)
 for (ct in 1:ntypes) {
     m <- m + (w[,ct] * m_list[[ct]])
 }
+```
 
+-------------
+
+```{r sim_data_4, cache=TRUE, dependson="sim_data_3"}
 # simulate expression
 Z <- matrix(rpois(length(m), m), ncol=ncol(m))
 
 # add noisy indivs, genes??
 
 ```
+
+## Point estimates with `optimizing`
+
+```{r optim_nmf, cache=TRUE, dependson=c("model_compiles", "sim_data_4")}
+system.time(nmf_optim <- optimizing(nmf_model,
+                                    data=list(N=nsamples,
+                                              L=ngenes,
+                                              K=ntypes,
+                                              Z=Z)))
+```
+
+## Can we infer mixture proportions?
+
+```{r optim_results}
+results <- list(x=nmf_optim$par[grepl("^x", names(nmf_optim$par))],
+                y=nmf_optim$par[grepl("^y", names(nmf_optim$par))],
+                w=nmf_optim$par[grepl("^w", names(nmf_optim$par))],
+                eta=nmf_optim$par[grepl("^eta", names(nmf_optim$par))],
+                alpha=nmf_optim$par[grepl("^alpha", names(nmf_optim$par))],
+                d_alpha=nmf_optim$par[grepl("^d_alpha", names(nmf_optim$par))])
+dim(results$x) <- c(ngenes, ntypes)
+dim(results$w) <- c(nsamples, ntypes)
+
+cor(results$w, w)
+```
+
+------------------
+
+```{r show_optim, echo=FALSE, fig.width=3*fig.dim, fig.height=2*fig.dim}
+w_pos <- svd(w)$u[,1]
+w_cols <- rainbow(64)[ceiling(64*(w_pos - min(w_pos))/diff(range(w_pos)))]
+layout(matrix(1:ntypes^2, nrow=ntypes))
+for (i in 1:ntypes) {
+    for (j in 1:ntypes) {
+        plot(w[,i], results$w[,j], col=w_cols, pch=20,
+             xlab="true w", ylab="inferred w", main=paste(i, j))
+        abline(0,1)
+    }
+}
+```
+
+------------------
+
+```{r match_w, echo=FALSE}
+wij <- apply(cor(results$w, w), 2, which.max)
+mean_abs_err <- mean(abs(w - results$w[,wij]))
+```
+
+The mean absolute error in inference of mixture proportions ($w$)
+is `r mean_abs_err`.
+
+
+## Can we infer expression profiles?
+
+```{r x_results}
+cor(results$x, type_mu)
+```
+
+----------------
+
+
+```{r x_plot_res, fig.width=4*fig.dim}
+xij <- apply(cor(results$x, type_mu), 2, which.max)
+x_ord <- apply(type_mu, 2, order)
+layout(t(1:ntypes))
+for (i in 1:ntypes) {
+    plot(type_mu[x_ord[,i],i], pch=20,
+         main=paste("expression profile", i))
+    points((results$eta * results$x[,xij[i]])[x_ord[,i]], pch=20, col='red')
+}
+legend("topleft", pch=20, col=c("black", "red"),
+       legend=c("truth", "inferred"))
+```
+
+# A harder case
+
+Parameters:
+```{r hsim_data, cache=TRUE}
+ntypes <- 5
+ngenes <- 1000
+nsamples <- 100
+ninf <- 0.1 * ngenes # number of informative genes
+```
+
+Determine expression profiles per cell type
+```{r hsim_data_2, cache=TRUE, dependson="hsim_data"}
+mu <- rexp(ngenes, .01)
+# copy mu into five columns
+type_mu <- do.call(cbind, list(mu)[rep(1,ntypes)])
+
+# simulate how differnt mu is across cell types
+diff_sigma <- matrix(rlnorm(ntypes * ninf, log(0.5), 1), ncol=ntypes)
+type_mu[1:ninf,] <- type_mu[1:ninf,] * diff_sigma
+
+m_list <- lapply(1:ntypes, function (ct) {
+                    matrix(pmax(0, rnorm(ngenes*nsamples, 
+                                         type_mu[,ct], type_mu[,ct])),
+                           ncol=ngenes, byrow=TRUE) })
+```
+
+---------
+
+Simulate proportions per sample, and construct expected expression levels
+```{r hsim_data_3, cache=TRUE, dependson="hsim_data_2"}
+# simulate proportions per sample
+w <- matrix( rexp(nsamples*ntypes), ncol=ntypes)
+w <- sweep(w, 1, rowSums(w), "/")
+stopifnot(all(abs(rowSums(w) - 1) < 1e-15))
+
+# construct expected expression levels:
+m <- matrix(0, nrow=nsamples, ncol=ngenes)
+for (ct in 1:ntypes) {
+    m <- m + (w[,ct] * m_list[[ct]])
+}
+```
+
+-------------
+
+```{r hsim_data_4, cache=TRUE, dependson="hsim_data_3"}
+# simulate expression
+Z <- matrix(rpois(length(m), m), ncol=ncol(m))
+
+# add noisy indivs, genes??
+
+```
+
+## Point estimates with `optimizing`
+
+```{r hoptim_nmf, cache=TRUE, dependson=c("model_compiles", "hsim_data_4")}
+system.time(nmf_optim <- optimizing(nmf_model,
+                                    data=list(N=nsamples,
+                                              L=ngenes,
+                                              K=ntypes,
+                                              Z=Z)))
+```
+
+## Can we infer mixture proportions?
+
+```{r hoptim_results}
+results <- list(x=nmf_optim$par[grepl("^x", names(nmf_optim$par))],
+                y=nmf_optim$par[grepl("^y", names(nmf_optim$par))],
+                w=nmf_optim$par[grepl("^w", names(nmf_optim$par))],
+                eta=nmf_optim$par[grepl("^eta", names(nmf_optim$par))],
+                alpha=nmf_optim$par[grepl("^alpha", names(nmf_optim$par))],
+                d_alpha=nmf_optim$par[grepl("^d_alpha", names(nmf_optim$par))])
+dim(results$x) <- c(ngenes, ntypes)
+dim(results$w) <- c(nsamples, ntypes)
+
+cor(results$w, w)
+```
+
+------------------
+
+```{r hshow_optim, echo=FALSE, fig.width=3*fig.dim, fig.height=2*fig.dim}
+w_pos <- svd(w)$u[,1]
+w_cols <- rainbow(64)[ceiling(64*(w_pos - min(w_pos))/diff(range(w_pos)))]
+layout(matrix(1:ntypes^2, nrow=ntypes), widths=c(1.2,rep(1,ntypes-2),1.1), 
+       heights=c(1.5,rep(1,ntypes-2),1.2))
+opar <- par("mar")
+for (i in 1:ntypes) {
+    for (j in 1:ntypes) {
+        par(mar=c(opar,0)[c(if (j==ntypes) 1 else 5, 
+                            if (i==1) 2 else 5, 
+                            if (j==1) 3 else 5, 
+                            if (i==ntypes) 4 else 5)])
+        plot(w[,i], results$w[,j], col=w_cols, pch=20,
+             xaxt=if (j==ntypes) "s" else "n",  
+             xlab=if (j==ntypes) "true w" else "",  
+             yaxt=if (i==1) "s" else "n",  
+             ylab=if (i==1) "inferred w" else "",
+             xlim=c(0,1), ylim=c(0,1))
+        abline(0,1)
+    }
+}
+```
+
+------------------
+
+```{r hmatch_w, echo=FALSE}
+wij <- apply(cor(results$w, w), 2, which.max)
+mean_abs_err <- mean(abs(w - results$w[,wij]))
+```
+
+The mean absolute error in inference of mixture proportions ($w$)
+is `r mean_abs_err`.
+
+
+## Can we infer expression profiles?
+
+```{r hx_results}
+cor(results$x, type_mu)
+```
+
+----------------
+
+
+```{r hx_plot_res, fig.width=4*fig.dim}
+xij <- apply(cor(results$x, type_mu), 2, which.max)
+x_ord <- apply(type_mu, 2, order)
+layout(t(1:ntypes))
+for (i in 1:ntypes) {
+    plot(type_mu[x_ord[,i],i], pch=20,
+         main=paste("expression profile", i))
+    points((results$eta * results$x[,xij[i]])[x_ord[,i]], pch=20, col='red')
+}
+legend("topleft", pch=20, col=c("black", "red"),
+       legend=c("truth", "inferred"))
+```
+
+

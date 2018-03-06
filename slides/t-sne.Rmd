@@ -17,16 +17,145 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 ```
 
+
 # t-SNE
+
+## t-SNE
 
 ![http://www.jmlr.org/papers/volume9/vandermaaten08a/vandermaaten08a.pdf](t-sne_abstract.png)
 
-[t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) is a recently population dimension reduction method.
+----------------
+
+[t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) 
+is a recently published method for dimension reduction
+(visualization of struture in high-dimensional data).
+
+-----------------
 
 It [makes very nice visualizations](https://distill.pub/2016/misread-tsne/).
 
+------------
+
+The *generic idea* is to find a low dimensional representation
+(i.e., a *picture*)
+in which *proximity* of points
+reflects *similarity* of the corresponding (high dimensional) observations.
+
+-------------
+
+Suppose we have $n$ data points, $x_1, \ldots, x_n$
+and each one has $p$ variables: $x_1 = (x_{11}, \ldots, x_{1p})$.
+
+. . .
+
+For each, we want to find a low-dimensional point $y$:
+$$\begin{aligned}
+    x_i \mapsto y_i
+\end{aligned}$$
+similarity of $x_i$ and $x_j$
+is (somehow) reflected by proximity of $y_i$ and $y_j$
+
+. . .
+
+We need to define:
+
+0. "low dimension" (usually, $k=2$ or $3$)
+1. "similarity" of $x_i$ and $x_j$
+2. "reflected by proximity" of $y_i$ and $y_j$
+
+## Similarity
+
+To measure similarity, we just use (Euclidean) distance:
+$$\begin{aligned}
+    d(x_i, x_j) = \sqrt{\sum_{\ell=1}^n (x_{i\ell} - x_{j\ell})^2} ,
+\end{aligned}$$
+after first normalizing variables to vary on comparable scales.
+
+
+## Proximity
+
+A natural choice is to require distances in the new space ($d(y_i, y_j)$) 
+to be as close as possible to distances in the original space ($d(x_i, x_j)$).
+
+. . .
+
+That's a *pairwise* condition.
+t-SNE instead tries to measure how faithfully
+*relative distances* are represented in each point's *neighborhood*.
+
+
+## Neighborhoods 
+
+For each data point $x_i$, define 
+$$\begin{aligned}
+    p_{ij} = \frac{ e^{-d(x_i, x_j)^2 / \sigma^2} 
+                  }{ \sum_{\ell \neq i} e^{-d(x_i, x_\ell)^2 / \sigma^2} } ,
+\end{aligned}$$
+and $p_{ii} =  0$.
+
+This is the probability that point $i$ would pick point $j$ as a neighbor
+if these are chosen according to the Gaussian density centered at $x_i$.
+
+
+--------------
+
+Similarly, in the output space, define
+$$\begin{aligned}
+    q_{ij} = \frac{ (1 + d(y_i, y_j)^2)^{-1} 
+                  }{ \sum_{\ell \neq i} (1 + d(y_i, y_\ell)^2)^{-1} }
+\end{aligned}$$
+and $q_{ii} =  0$.
+
+
+This is the probability that point $i$ would pick point $j$ as a neighbor
+if these are chosen according to the Cauchy centered at $x_i$.
+
+
+## Similiarity of neighborhoods
+
+We want neighborhoods to look similar, i.e.,
+choose $y$ so that 
+$q$ looks like $p$.
+
+To do this, we minimize
+$$\begin{aligned}
+    \text{KL}(p \given q)
+    &=
+    \sum_{i} \sum_{j} p_{ij} \log\left(\frac{p_{ij}}{q_{ij}}\right) .
+\end{aligned}$$
+
+. . .
+
+*What's KL()?*
+
+## Kullback-Leibler divergence
+
+$$\begin{aligned}
+    \text{KL}(p \given q)
+    &=
+    \sum_{i} \sum_{j} p_{ij} \log\left(\frac{p_{ij}}{q_{ij}}\right) .
+\end{aligned}$$
+
+This is the average log-likelihood ratio between $p$ and $q$
+for a single observation drawn from $p$.
+
+It is a measure of how "surprised" you would be by a sequence of samples from $p$
+that you think should be coming from $q$.
+
+
+. . .
+
+**Facts:**
+
+1. $\text{KL}(p \given q) \ge 0$
+
+2. $\text{KL}(p \given q) = 0$ only if $p_i = q_i$ for all $i$.
+
+
 
 # Simulate data
+
+## A high-dimensional donut
 
 Let's first make some data.
 This will be some points distributed around a ellipse in $n$ dimensions.
@@ -45,16 +174,22 @@ for (k in 1:npts) {
 }
 ```
 
+---------------------
+
 Here's what the data look like:
-```{r plot_data, fig.width=6*fig.dim, fig.height=6*fig.dim}
+```{r plot_data, fig.width=6*fig.dim, fig.height=4*fig.dim, echo=FALSE}
 pairs(xy, pch=20)
 ```
 
+---------------------
+
 But there is hidden, two-dimensional structure:
-```{r plot_ring, fig.height=2*fig.dim}
+```{r plot_ring, fig.height=2*fig.dim, echo=FALSE}
 plot(xy %*% t(ab), xlab='dimension 1', ylab='dimension 2', 
      pch=20, col=rainbow(nrow(xy))[rank(theta)])
 ```
+
+---------------------
 
 Now let's build the distance matrix.
 
@@ -71,7 +206,10 @@ $$\begin{aligned}
         &= \sum_x p_x \log(p_x/q_x) .
 \end{aligned}$$
 
-Here is a Stan block.
+---------------------
+
+## A Stan block
+
 ```{r stan_tsne, cache=TRUE}
 tsne_block <- '
 data {
@@ -82,32 +220,43 @@ data {
 }
 parameters {
     real<lower=0> sigma_sq; // in kernel for p 
+    matrix[N-2,k] y1;
+    real<lower=0> y21;
+}
+transformed parameters {
     matrix[N,k] y;
+    y[1,] = rep_row_vector(0.0, k);
+    y[3:N,] = y1;
+    y[2,] = rep_row_vector(0.0, k);
+    y[2,1] = y21;
 }
 model {
     matrix[N,N] q;
     real dt;
     matrix[N,N] p;
-    q[N,N] = 1.0;
+    q[N,N] = 0.0;
     for (i in 1:(N-1)) {
-        q[i,i] = 1.0;
+        q[i,i] = 0.0;
         for (j in (i+1):N) {
             q[i,j] = 1 / (1 + squared_distance(y[i], y[j]));
             q[j,i] = q[i,j];
         }
     }
     for (i in 1:N) {
-        q[i] = q[i] / (sum(q[i]) - q[i,i]);
+        q[i] = q[i] / sum(q[i]);
     }
     // create p matrix
     p = exp(-dsq/(2*sigma_sq));
     for (i in 1:N) {
-        p[i] = p[i] / (sum(p[i]) - p[i,i]);
+        p[i,i] = 0.0;
+        p[i] = p[i] / sum(p[i]);
     }
     // compute the target
-    for (i in 1:N) {
-        dt = (-1) * sum(p[i] .* log(p[i] ./ q[i]));
-        target += dt;
+    for (i in 1:(N-1)) {
+        for (j in (i+1):N) {
+            target += (-1) * (p[i,j] .* log(p[i,j] ./ q[i,j]));
+            target += (-1) * (p[j,i] .* log(p[j,i] ./ q[j,i]));
+        }
     }
     sigma_sq ~ normal(0, 10);
 }'
@@ -116,6 +265,8 @@ model {
 tk <- 2
 tsne_model <- stan_model(model_code=tsne_block)
 ```
+
+## Run the model with `optimizing`
 
 ```{r run_tsne, cache=TRUE, dependson=c("stan_tsne", "sim_data")}
 runtime <- system.time(tsne_optim <- optimizing(tsne_model,
@@ -128,7 +279,7 @@ runtime
 
 ## It works!
 
-```{r plot_tsne, fig.width=4*fig.dim, fig.height=2*fig.dim}
+```{r plot_tsne, fig.width=4*fig.dim, fig.height=2*fig.dim, echo=FALSE}
 out_y <- do.call(cbind, lapply(1:tk, function (k) {
                                    tsne_optim$par[sprintf("y[%d,%d]", 1:nrow(xy), k)]
                            } ) )
@@ -143,18 +294,33 @@ plot(xy %*% t(ab), xlab='input 1', ylab='input 2', main="'truth'",
 
 # Another case
 
-This time let's apply the method to a high-dimensional random walk.
+## High-dimensional random walk
+
 
 ```{r sim_rw, cache=TRUE}
 n <- 40
 npts <- 1e2
-rw <- colCumsums(matrix(rnorm(n*npts), ncol=n))
+# rw <- colCumsums(matrix(rnorm(n*npts), ncol=n))
+rw <- matrix(rnorm(n*npts), ncol=n)
+for (i in 2:npts) {
+    rw[i,] <- sqrt(.9) * rw[i-1,] + sqrt(.1) * rw[i,]
+}
 ```
 
+-----------------
+
 Here's what the data look like:
-```{r plot_rw, fig.width=6*fig.dim, fig.height=6*fig.dim}
-pairs(rw, col=adjustcolor(rainbow(npts), 0.5), pch=20)
+```{r plot_rw, fig.width=6*fig.dim, fig.height=5*fig.dim, echo=FALSE}
+pairs(rw, col=rainbow(npts), pch=20)
 ```
+
+--------------------------
+
+```{r plot_rw_sub, fig.width=6*fig.dim, fig.height=5*fig.dim, echo=FALSE}
+pairs(rw[,1:10], col=rainbow(npts), pch=20)
+```
+
+-----------------
 
 Now let's build the distance matrix.
 
@@ -162,18 +328,22 @@ Now let's build the distance matrix.
 rw_dmat <- as.matrix(dist(rw)) 
 ```
 
+## Run again
+
 ```{r run_tsne_rw, cache=TRUE, dependson=c("stan_tsne", "sim_rw")}
-rw_runtime <- system.time(rw_tsne_optim <- optimizing(tsne_model,
+rw_runtime <- system.time(
+     rw_tsne_optim <- optimizing(tsne_model,
                                  data=list(N=nrow(rw),
                                            n=ncol(rw),
                                            k=tk,
-                                           dsq=(rw_dmat/max(rw_dmat))^2)))
+                                           dsq=(rw_dmat/max(rw_dmat))^2),
+                                 tol_rel_grad=1e5))
 rw_runtime
 ```
 
 ## It works!
 
-```{r plot_rw_tsne, fig.width=2*fig.dim, fig.height=2*fig.dim}
+```{r plot_rw_tsne, fig.width=2*fig.dim, fig.height=2*fig.dim, echo=FALSE}
 rw_y <- do.call(cbind, lapply(1:tk, function (k) {
                                    rw_tsne_optim$par[sprintf("y[%d,%d]", 1:nrow(xy), k)]
                            } ) )
@@ -181,4 +351,3 @@ plot(rw_y, xlab='t-sne 1', ylab='t-sne 2', main="t-SNE",
      pch=20, col=rainbow(nrow(rw)))
 
 ```
-
