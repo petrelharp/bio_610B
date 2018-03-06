@@ -88,8 +88,8 @@ t-SNE instead tries to measure how faithfully
 
 For each data point $x_i$, define 
 $$\begin{aligned}
-    p_{ij} = \frac{ e^{-d(x_i, x_j)^2 / \sigma^2} 
-                  }{ \sum_{\ell \neq i} e^{-d(x_i, x_\ell)^2 / \sigma^2} } ,
+    p_{ij} = \frac{ e^{-d(x_i, x_j)^2 / (2\sigma^2)} 
+                  }{ \sum_{\ell \neq i} e^{-d(x_i, x_\ell)^2 / (2 \sigma^2)} } ,
 \end{aligned}$$
 and $p_{ii} =  0$.
 

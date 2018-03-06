@@ -295,13 +295,16 @@ model {
 
 # An easy case
 
-Parameters:
+## Parameters:
+
 ```{r sim_data, cache=TRUE}
 ntypes <- 3
 ngenes <- 1000
 nsamples <- 1000
 ninf <- 0.6 * ngenes # number of informative genes
 ```
+
+-----------
 
 Determine expression profiles per cell type
 ```{r sim_data_2, cache=TRUE, dependson="sim_data"}
@@ -420,13 +423,15 @@ legend("topleft", pch=20, col=c("black", "red"),
 
 # A harder case
 
-Parameters:
+## Parameters:
 ```{r hsim_data, cache=TRUE}
 ntypes <- 5
 ngenes <- 1000
 nsamples <- 100
 ninf <- 0.1 * ngenes # number of informative genes
 ```
+
+---------
 
 Determine expression profiles per cell type
 ```{r hsim_data_2, cache=TRUE, dependson="hsim_data"}
