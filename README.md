@@ -30,4 +30,4 @@ Quick links:
 ### Rstudio
 
 * Strongly recommended global configuration: 
-![media/rstudio_config_1.png]
+![Never save or restore .RData](media/rstudio_config_1.png)
