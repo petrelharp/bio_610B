@@ -1,0 +1,625 @@
+---
+title: "Time series"
+author: "Peter Ralph"
+date: "8 March 2018 -- Advanced Biological Statistics"
+---
+
+```{r setup, include=FALSE}
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+library(lars)
+library(tidyverse)
+library(rstan)
+library(matrixStats)
+library(MASS)
+options(mc.cores = parallel::detectCores())
+```
+
+# Modeling time series
+
+## Time series
+
+A *time series* is a sequence of observations
+$$\begin{aligned}
+    (y_1, y_2, \ldots, y_N) ,
+\end{aligned}$$
+that were taken at some set of *times*
+$$\begin{aligned}
+    t_1 < t_2 < \cdots < t_N .
+\end{aligned}$$
+
+. . .
+
+In general, the goal is to understand how *what happens next*
+depends on the *previous history* and maybe some *predictor* variables
+$$\begin{aligned}
+    (x_1, x_2, \ldots, x_N) ,
+\end{aligned}$$
+taken at the same set of times.
+
+# A simple example
+
+## AR(1)
+
+The simplest time series model is purely phenomenological:
+$$\begin{aligned}
+    y_{k+1} &= \alpha + \beta y_k + \epsilon_k \\
+    \epsilon_k &\sim N(0, \sigma^2) .
+\end{aligned}$$
+
+This is "autoregressive, of order 1".
+
+---------------
+
+Rewriting this as
+$$\begin{aligned}
+    \left(y_{k+1} - \frac{\alpha}{1-\beta}\right)  &= \beta \left(y_k - \frac{\alpha}{1-\beta}\right) + \epsilon_k \\
+    \epsilon_k &\sim N(0, \sigma^2) ,
+\end{aligned}$$
+we see that if $|\beta| < 1$ then this oscillates stably about $\alpha / (1-\beta)$.
+
+
+## Simulation
+
+First, let's simulate some data.
+```{r sim_ar1}
+truth <- list(alpha=5, 
+              beta=0.2,
+              sigma=0.5)
+N <- 100
+y <- rep(0, N)
+y[1] <- rnorm(1, mean=5, sd=5)
+for (k in 1:(N-1)) {
+    y[k+1] <- (truth$alpha + truth$beta * y[k] 
+               + rnorm(1, mean=0, sd=truth$sigma))
+}
+```
+
+## Plotted as a time series
+
+```{r plot_ar1}
+plot(y, xlab='time', ylab=expression(y[t]), type='b')
+abline(h=truth$alpha/(1-truth$beta), col='red', lty=3)
+```
+
+## Plotted in phase space
+
+```{r plot_ar1_, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim}
+plot(y[-N], y[-1], xlab=expression(y[t]), ylab=expression(y[t+1]), type='l', col=adjustcolor("black", 0.8))
+points(x=truth$alpha/(1-truth$beta), y=truth$alpha/(1-truth$beta), col='red')
+```
+
+## A Stan model
+
+```{r ar1_stan_block, cache=TRUE}
+ar1_block <- "
+data {
+    int N;
+    vector[N] y;
+}
+parameters {
+    real alpha;
+    real beta;
+    real<lower=0> sigma;
+}
+model {
+    y[2:N] ~ normal(alpha + beta * y[1:(N - 1)], sigma);
+    alpha ~ normal(0, 20);
+    beta ~ normal(0, 1);
+    sigma ~ normal(0, 5);
+}
+"
+ar1_model <- stan_model(model_code=ar1_block)
+```
+
+----------------
+
+```{r run_ar1, cache=TRUE}
+ar1_fit <- sampling(ar1_model,
+                    iter=3000, chains=3,
+                    data=list(N=N,
+                              y=y))
+print(ar1_fit)
+```
+
+# A simple, multivariate model
+
+## Multivariate AR(1)
+
+Just like before:
+$$\begin{aligned}
+    y_{k+1} &= A + B y_k + \epsilon_k \\
+    \epsilon_k &\sim N(0, \Sigma) ,
+\end{aligned}$$
+
+except now
+
+- $y_n$ is a vector of lenth $n$
+- $A$ is a vector of lenth $n$
+- $B$ is a $n \times n$ matrix
+- $\epsilon_n$ is a vector of $n$ *possibly correlated* Gaussians
+- $\Sigma$ is a $n \times n$ *positive definite* matrix
+
+
+# Stochastic minute
+
+## The Multivariate Gaussian
+
+If a random vector $(\epsilon_1, \ldots, \epsilon_n)$ is
+*multivariate Gaussian* with mean vector $\mu$ and covariance matrix $\Sigma$
+then
+$$\begin{aligned}
+    \epsilon_k &\sim N(\mu_k, \Sigma_{kk}) ,
+\end{aligned}$$
+and
+$$\begin{aligned}
+    \cov[\epsilon_i, \epsilon_j] &= \Sigma_{ij} .
+\end{aligned}$$
+
+. . .
+
+Also (remarkably), for any vector $z$,
+$$\begin{aligned}
+    \sum_i z_i \epsilon_i &\sim N(\sum_i  z_i \mu_i, \sum_{ij} z_i \Sigma_{ij} z_j) ,\\
+    \text{i.e.,}\quad
+    z^T \epsilon &\sim N(z^T \mu, z^T \Sigma z) .
+\end{aligned}$$
+
+. . .
+
+In other words, a multivariate Gaussian vector is a distribution that looks Gaussian in *any direction*.
+
+## Are you positive definite?
+
+The matrix $\Sigma$ must be symmetric:
+$$\begin{aligned}
+    \Sigma_{ij} = \cov[\epsilon_i, \epsilon_j] = \cov[\epsilon_j, \epsilon_i] = \Sigma_{ji} .
+\end{aligned}$$
+
+Since variances are positive,
+$$\begin{aligned}
+    \var[z^T \epsilon] &= z^T \Sigma z > 0 , \qquad \text{for any $z$} .
+\end{aligned}$$
+
+These put constraints on $\Sigma$: 
+it must be *symmetric, positive definite*.
+
+. . .
+
+
+*Note:* actually, *nonnegative definite* would suffice,
+but Stan only deals with "full rank" multivariate Gaussians.
+
+## In Stan
+
+How to declare a covariance matrix:
+```
+    cov_matrix[K] Sigma;
+```
+
+. . .
+
+A useful prior:
+```
+    Sigma ~ wishart(nu, S);
+```
+
+## The Wishart distribution
+
+If $X$ is a $N \times K$ matrix, each row containing an independent sample
+from $\Normal(0, S)$,
+then
+$$\begin{aligned}
+    \cov[X] &\sim \Wishart(N, S) .
+\end{aligned}$$
+
+. . .
+
+*Challenge:* sample from the Wishart, 
+with `N=10` and 
+$$\begin{aligned}
+    S = \begin{bmatrix} 1 & 1/2 & 0 \\ 
+                        1/2 & 1 & 1/4 \\
+                        0 & 1/4 & 2 
+        \end{bmatrix} .
+\end{aligned}$$
+
+## Another useful note:
+
+Just as positive numbers have well-defined square roots,
+so symmetric, positive definite matrices do as well, called
+the **Choleky decomposition**:
+```{r chol}
+S <- cov(matrix(rnorm(400), ncol=4))
+S
+```
+
+---------------
+
+```{r show_chol}
+chol(S)
+t(chol(S)) %*% chol(S)
+```
+
+---------------
+
+*Fact:* to simulate from 
+
+$$\begin{aligned}
+    x \sim \Normal(0, \Sigma) \\
+\end{aligned}$$
+
+you can multiply independent Normals by the Cholesky decomposition of $\Sigma$:
+
+```{r sim_with_chol}
+x <- matrix(rnorm(4 * 1e6), ncol=4) %*% chol(S)
+cov(x)
+```
+
+
+# A simple, multivariate model
+
+## Multivariate AR(1)
+
+Just like before:
+$$\begin{aligned}
+    y_{k+1} &= A + B y_k + \epsilon_k \\
+    \epsilon_k &\sim N(0, \Sigma) ,
+\end{aligned}$$
+
+except now
+
+- $y_n$ is a vector of lenth $n$
+- $A$ is a vector of lenth $n$
+- $B$ is a $n \times n$ matrix
+- $\epsilon_n$ is a vector of $n$ *possibly correlated* Gaussians
+- $\Sigma$ is a $n \times n$ *positive definite* matrix
+
+
+## Simulation
+
+First, let's simulate some data, where
+$$\begin{aligned}
+    y_1(t+1) &= 1 + 0.8 y_1(t) + 0.2 (y_3(t) - y_2(t)) + \epsilon_1(t) \\
+    y_2(t+1) &= 2 + 0.9 y_2(t) + \epsilon_2(t) \\
+    y_3(t+1) &= 3 + 0.9 y_3(t) + \epsilon_3(t) 
+\end{aligned}$$
+and the noise is *correlated*:
+$$\begin{aligned}
+    \Sigma &= 
+        \begin{bmatrix} 1 & 0 & 0 \\
+                0 & 1 & 0.5 \\        
+                0 & 0.5 & 1 
+        \end{bmatrix}
+\end{aligned}$$
+i.e., $y_3$ and $y_2$ tend to go up and down *together*.
+
+-------------
+
+```{r sim_ar1_mv}
+library(mvtnorm)  # for rmvnorm
+n <- 3
+mv_truth <- list(A=1:3,
+                 B=matrix(c(0.8, 0.2, -0.2,
+                            0.0, 0.9, 0.0,
+                            0.0, 0.0, 0.9), ncol=3, byrow=TRUE),
+                 Sigma=matrix(c(1, 0, 0,
+                                0, 1, 0.5,
+                                0, 0.5, 1), ncol=3, byrow=TRUE))
+N <- 100
+mv_y <- matrix(0, nrow=N, ncol=n)
+mv_y[1,] <- rnorm(n, mean=c(5, 25, 25), sd=5)
+for (k in 1:(N-1)) {
+    mv_y[k+1,] <- (mv_truth$A + mv_y[k,] %*% mv_truth$B
+                   + rmvnorm(1, mean=rep(0,n), sigma=mv_truth$Sigma))
+}
+```
+
+## Plotted as a time series
+
+```{r plot_ar1_mv}
+matplot(mv_y, xlab='time', ylab=expression(mv_y[t]), type='b')
+```
+
+## Plotted in phase space
+
+```{r plot_ar1_mv_, fig.width=1.5*fig.dim, fig.height=1.5*fig.dim, echo=FALSE}
+pairs(mv_y, col=adjustcolor("black", 0.8),
+      panel=function(x,y,...){ points(x,y,...); 
+                               arrows(x0=x[-N], x1=x[-1], y0=y[-N], y1=y[-1], length=0.1, ...)} )
+```
+
+
+## Exercise
+
+Write a Stan block for the multivariate AR(1) model.
+
+
+# An oscillator
+
+## A discrete, noisy oscillator
+
+Suppose we have regular, noisy observations
+from a discrete, noisy oscillator.
+
+The system itself does
+$$\begin{aligned}
+    x_{t+1} - x_t &= \alpha y_t + \Normal(0, \sigma_{xy}) \\
+    y_{t+1} - y_t &= - \beta x_t + \Normal(0, \sigma_{xy}) 
+\end{aligned}$$
+but we only get to observe
+$$\begin{aligned}
+    X_t &= x_t + \Normal(0, \sigma_\epsilon) \\
+    Y_t &= y_t + \Normal(0, \sigma_\epsilon) .
+\end{aligned}$$
+
+-------------------
+
+Here's what this looks like.
+```{r sim_osc}
+true_osc <- list(alpha=.1,
+                 beta=.05,
+                 sigma_xy=.01,
+                 sigma_eps=.1)
+N <- 500
+xy <- matrix(nrow=N, ncol=2)
+xy[1,] <- c(3,0)
+for (k in 1:(N-1)) {
+    xy[k+1,] <- (xy[k,] 
+                + c(true_osc$alpha * xy[k,2],
+                    (-1) * true_osc$beta * xy[k,1])
+                + rnorm(2, 0, true_osc$sigma_xy))
+}
+XY <- xy + rnorm(N*2, 0, true_osc$sigma_eps)
+```
+
+-----------------
+
+```{r plot_osc, echo=FALSE, fig.height=1.5*fig.dim, fig.width=1.5*fig.dim}
+plot(xy, type='l', col='red', xlab='x', ylab='y')
+points(XY, col=rainbow(N))
+legend("topright", lty=c(1, NA), pch=c(NA,1), col=c("red","black"),
+       legend=c("xy", "XY"))
+```
+
+## A Stan block
+
+```{r osc_stan, cache=TRUE}
+osc_block <- "
+data {
+    int N;
+    vector[N] X;
+    vector[N] Y;
+}
+parameters {
+    real alpha;
+    real beta;
+    real<lower=0> sigma_xy;
+    real<lower=0> sigma_eps;
+    vector[N] x;
+    vector[N] y;
+}
+model {
+    x[2:N] ~ normal(x[1:(N-1)] + alpha * y[1:(N-1)], sigma_xy);
+    y[2:N] ~ normal(y[1:(N-1)] - beta * x[1:(N-1)], sigma_xy);
+    X ~ normal(x, sigma_eps);
+    Y ~ normal(y, sigma_eps);
+    alpha ~ normal(0, 1);
+    beta ~ normal(0, 1);
+    sigma_xy ~ normal(0, 1);
+    sigma_eps ~ normal(0, 1);
+}
+"
+osc_model <- stan_model(model_code=osc_block)
+```
+
+-------------------
+
+```{r run_osc, cache=TRUE, dependson="osc_block"}
+osc_fit <- sampling(osc_model,
+                    data=list(N,
+                              X=XY[,1],
+                              Y=XY[,2]),
+                    iter=1000, chains=3,
+                    control=list(max_treedepth=12))
+```
+
+## How'd we do?
+
+```{r summarize_osc}
+cbind(rstan::summary(osc_fit, pars=c("alpha", "beta", "sigma_xy", "sigma_eps"))$summary, 
+      truth=c(true_osc$alpha, true_osc$beta, true_osc$sigma_xy, true_osc$sigma_eps))
+```
+
+-------------------
+
+Here is a density plot of 100 estimated trajectories (of `x` and `y`) from the Stan fit.
+
+```{r show_osc_fit, echo=FALSE, fig.height=1.5*fig.dim, fig.width=1.5*fig.dim}
+osc_results <- extract(osc_fit)
+plot(xy, lwd=2, xlab='x', ylab='y', type='l')
+for (k in 1:100) {
+    lines(osc_results$x[k,], osc_results$y[k,],
+          col=adjustcolor('black', 0.2))
+}
+```
+
+# A noisier oscillator
+
+## More realism?
+
+Let's try that again, with more noise.
+
+Here's what this looks like.
+```{r sim_osc2}
+true_osc2 <- list(alpha=.1,
+                 beta=.05,
+                 sigma_xy=.05,
+                 sigma_eps=.5)
+xy2 <- matrix(nrow=N, ncol=2)
+xy2[1,] <- c(3,0)
+for (k in 1:(N-1)) {
+    xy2[k+1,] <- (xy2[k,] 
+                + c(true_osc2$alpha * xy2[k,2],
+                    (-1) * true_osc2$beta * xy2[k,1])
+                + rnorm(2, 0, true_osc2$sigma_xy))
+}
+XY2 <- xy2 + rnorm(N*2, 0, true_osc2$sigma_eps)
+```
+
+-----------------
+
+```{r plot_osc2, echo=FALSE, fig.height=1.5*fig.dim, fig.width=1.5*fig.dim}
+plot(xy2, type='l', col='red', xlab='x', ylab='y')
+points(XY2, col=rainbow(N))
+legend("topright", lty=c(1, NA), pch=c(NA,1), col=c("red","black"),
+       legend=c("xy", "XY"))
+```
+
+-------------------
+
+```{r run_osc2, cache=TRUE, dependson="osc_block"}
+osc_fit2 <- sampling(osc_model,
+                    data=list(N,
+                              X=XY2[,1],
+                              Y=XY2[,2]),
+                    iter=1000, chains=3,
+                    control=list(max_treedepth=12))
+```
+
+## How'd we do?
+
+```{r summarize_osc2}
+cbind(rstan::summary(osc_fit2, pars=c("alpha", "beta", "sigma_xy", "sigma_eps"))$summary, 
+      truth=c(true_osc2$alpha, true_osc2$beta, true_osc2$sigma_xy, true_osc2$sigma_eps))
+```
+
+-------------------
+
+Here is a density plot of 100 estimated trajectories (of `x` and `y`) from the Stan fit.
+
+```{r show_osc_fit2, echo=FALSE, fig.height=1.5*fig.dim, fig.width=1.5*fig.dim}
+osc_results2 <- extract(osc_fit2)
+plot(xy2, lwd=2, xlab='x', ylab='y', type='l')
+for (k in 1:100) {
+    lines(osc_results2$x[k,], osc_results2$y[k,],
+          col=adjustcolor('black', 0.2))
+}
+```
+
+# Missing data
+
+## Even more realism?
+
+Now what if we actually *don't observe* most of the $Y$ values?
+
+Here's what this looks like.
+```{r sim_osc3}
+true_osc3 <- list(alpha=.1,
+                 beta=.05,
+                 sigma_xy=.05,
+                 sigma_eps=.5)
+xy3 <- matrix(nrow=N, ncol=2)
+xy3[1,] <- c(3,0)
+for (k in 1:(N-1)) {
+    xy3[k+1,] <- (xy3[k,] 
+                + c(true_osc3$alpha * xy3[k,2],
+                    (-1) * true_osc3$beta * xy3[k,1])
+                + rnorm(2, 0, true_osc3$sigma_xy))
+}
+XY3 <- xy3 + rnorm(N*2, 0, true_osc3$sigma_eps)
+obs_y <- floor(seq(1, N, length.out=5))
+XY3[setdiff(1:N, obs_y), 2] <- NA
+```
+
+-----------------
+
+```{r plot_osc3, echo=FALSE}
+matplot(xy3, xlab='time', ylab='x and y', type='l')
+matpoints(XY3)
+```
+
+## A new Stan block
+
+```{r osc_stan3, cache=TRUE}
+osc_block_missing <- "
+data {
+    int N;
+    vector[N] X;
+    int k; // number of observed Y
+    int obs_y[k]; // which Y values are observed
+    vector[k] Y;
+}
+parameters {
+    real alpha;
+    real beta;
+    real<lower=0> sigma_xy;
+    real<lower=0> sigma_eps;
+    vector[N] x;
+    vector[N] y;
+}
+model {
+    x[2:N] ~ normal(x[1:(N-1)] + alpha * y[1:(N-1)], sigma_xy);
+    y[2:N] ~ normal(y[1:(N-1)] - beta * x[1:(N-1)], sigma_xy);
+    X ~ normal(x, sigma_eps);
+    Y ~ normal(y[obs_y], sigma_eps);
+    alpha ~ normal(0, 1);
+    beta ~ normal(0, 1);
+    sigma_xy ~ normal(0, 1);
+    sigma_eps ~ normal(0, 1);
+}
+"
+osc_model_missing <- stan_model(model_code=osc_block_missing)
+```
+
+-------------------
+
+```{r run_osc3, cache=TRUE, dependson="osc_block"}
+osc_fit3 <- sampling(osc_model_missing,
+                    data=list(N,
+                              X=XY3[,1],
+                              k=length(obs_y),
+                              obs_y=obs_y,
+                              Y=XY3[obs_y,2]),
+                    iter=1000, chains=3,
+                    control=list(max_treedepth=12))
+```
+
+## How'd we do?
+
+```{r summarize_osc3}
+cbind(rstan::summary(osc_fit3, pars=c("alpha", "beta", "sigma_xy", "sigma_eps"))$summary, 
+      truth=c(true_osc3$alpha, true_osc3$beta, true_osc3$sigma_xy, true_osc3$sigma_eps))
+```
+
+-------------------
+
+Here is a density plot of 100 estimated trajectories (of `x` and `y`) from the Stan fit.
+
+```{r show_osc_fit3, echo=FALSE, fig.height=1.5*fig.dim, fig.width=1.5*fig.dim}
+osc_results3 <- extract(osc_fit3)
+plot(xy3, lwd=2, xlab='x', ylab='y', type='l')
+for (k in 1:100) {
+    lines(osc_results3$x[k,], osc_results3$y[k,],
+          col=adjustcolor('black', 0.2))
+}
+```
+
+# Summary
+
+## Time series:
+
+1. Autoregressive models: like linear regression.
+
+2. Multivariate: covariance matrix prior
+
+3. Oscillator: like an AR(1) but explicitly modeling the underlying, *unobserved* process.
+
+    - *note:* this was a type of Hidden Markov Model (HMM)
+
+4. Missing data: the inference worked well even *without observing* most of one entire dimension
+
+    - our strong idea about the underlying process made inference possible.

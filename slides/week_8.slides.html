@@ -1635,6 +1635,7 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   \DeclareMathOperator{\logistic}{logistic}
   \DeclareMathOperator{\sd}{sd}
   \DeclareMathOperator{\var}{var}
+  \DeclareMathOperator{\cov}{cov}
   \DeclareMathOperator{\Normal}{Normal}
   \DeclareMathOperator{\Poisson}{Poisson}
   \DeclareMathOperator{\Beta}{Beta}
@@ -1644,7 +1645,6 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
   \DeclareMathOperator{\Cauchy}{Cauchy}
   \DeclareMathOperator{\Unif}{Unif}
   \DeclareMathOperator{\Dirichlet}{Dirichlet}
-  
   
   \newcommand{\given}{\;\vert\;}
   \]
@@ -1780,8 +1780,8 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 <pre><code>## 
 ## SAMPLING FOR MODEL '027c9a0b92082dc735bfb6350861f7ee' NOW (CHAIN 1).
 ## 
-## Gradient evaluation took 5.5e-05 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 0.55 seconds.
+## Gradient evaluation took 5.4e-05 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0.54 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
@@ -1806,9 +1806,9 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 ## Iteration: 90 / 100 [ 90%]  (Sampling)
 ## Iteration: 100 / 100 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 0.836492 seconds (Warm-up)
-##                1.2547 seconds (Sampling)
-##                2.09119 seconds (Total)</code></pre>
+##  Elapsed Time: 0.832321 seconds (Warm-up)
+##                1.24025 seconds (Sampling)
+##                2.07257 seconds (Total)</code></pre>
 <pre><code>## Warning: There were 39 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. See
 ## http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded</code></pre>
 <pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
@@ -1907,7 +1907,7 @@ transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
 ## d_alpha     27.86    45 1.03
 ## lp__     18260.60    11 0.98
 ## 
-## Samples were drawn using NUTS(diag_e) at Tue Mar  6 11:35:10 2018.
+## Samples were drawn using NUTS(diag_e) at Wed Mar  7 10:44:56 2018.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
