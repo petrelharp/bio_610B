@@ -71,7 +71,7 @@ Week 8 *(2/27)*
 
 Week 9 *(3/6)*
 
-: Time series: modeling local dependency, smoothing. Conditional independence.
+: [(slides)](slides/week_9.slides.html) Time series: modeling local dependency, smoothing. Conditional independence.
 
 
 Week 10 *(3/13)*
