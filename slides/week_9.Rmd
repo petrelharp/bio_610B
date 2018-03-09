@@ -282,10 +282,10 @@ $$\begin{aligned}
 
 except now
 
-- $y_n$ is a vector of lenth $n$
-- $A$ is a vector of lenth $n$
+- $y_k$ is a vector of length $n$
+- $A$ is a vector of length $n$
 - $B$ is a $n \times n$ matrix
-- $\epsilon_n$ is a vector of $n$ *possibly correlated* Gaussians
+- $\epsilon_k$ is a vector of $n$ *possibly correlated* Gaussians
 - $\Sigma$ is a $n \times n$ *positive definite* matrix
 
 
@@ -347,6 +347,54 @@ pairs(mv_y, col=adjustcolor("black", 0.8),
 
 Write a Stan block for the multivariate AR(1) model.
 
+----------------
+
+```{r mv_block, cache=TRUE}
+mv_ar1_block <- "
+data {
+    int N; // number of observations
+    int n; // the dimension
+    matrix[N,n] y;
+    cov_matrix[n] S;
+}
+parameters {
+    row_vector[n] A;
+    matrix[n,n] B;
+    cov_matrix[n] Sigma;
+}
+model {
+    for (k in 1:(N-1)) {
+        y[k+1,] ~ multi_normal(A + y[k,] * B, Sigma);
+    }
+    A ~ normal(0, 20);
+    for (k in 1:n) {
+        B[k,] ~ normal(0, 3);
+    }
+    // uninformative prior on Sigma
+    Sigma ~ wishart(3, S);
+}
+"
+mv_ar1_model <- stan_model(model_code=mv_ar1_block)
+```
+
+-----------------
+
+```{r fit_mv, cache=TRUE, dependson="mv_block"}
+mv_ar1_fit <- sampling(mv_ar1_model,
+                       data=list(N=N,
+                                 n=n,
+                                 y=mv_y,
+                                 S=diag(n)),
+                       iter=1000, chains=2)
+```
+
+---------------
+
+Hm, the result looks noisy.
+
+```{r show_fit_mv}
+summary(mv_ar1_fit)$summary
+```
 
 # An oscillator
 
