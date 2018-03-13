@@ -76,7 +76,7 @@ Week 9 *(3/6)*
 
 Week 10 *(3/13)*
 
-: Spatial and network covariance: sharing power between related locations.
+: [(slides)](slides/week_10.slides.html) Spatial and network covariance: sharing power between related locations.
     Priors to constrain visualization (e.g., regularized PCA).
 
 

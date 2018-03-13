@@ -1,0 +1,194 @@
+---
+title: "Spatial, and network models"
+author: "Peter Ralph"
+date: "12 March 2018 -- Advanced Biological Statistics"
+---
+
+```{r setup, include=FALSE}
+fig.dim <- 4
+knitr::opts_chunk$set(fig.width=2*fig.dim,
+                      fig.height=fig.dim,
+                      fig.align='center')
+set.seed(23)
+library(lars)
+library(tidyverse)
+library(rstan)
+library(matrixStats)
+library(MASS)
+options(mc.cores = parallel::detectCores())
+```
+
+# Spatial models
+
+## A simple scenario
+
+Suppose we have estimates of abundance of a soil microbe
+from a number of samples across our study area:
+
+```{r show_study, echo=FALSE}
+
+library(mvtnorm)
+N <- 50
+xy <- data.frame(x=runif(N), y=runif(N))
+dxy <- as.matrix(dist(xy))
+ut <- upper.tri(dxy, diag=TRUE)
+truth <- list(rho=.6,
+              nugget=.1,
+              delta=5,
+              mu=5)
+truth$covmat <- (truth$nugget * diag(N) 
+                 + truth$delta * exp(-(dxy/truth$rho)^2))
+xy$z <- as.vector(rmvnorm(1, mean=rep(truth$mu,N), sigma=truth$covmat))
+
+layout(t(1:2))
+plot(xy$x, xy$y, xlab='eastings', ylab='northings', pch=21,
+     cex=xy$z/4,
+     bg=colorRampPalette(c('blue', 'red'))(10)[cut(xy$z, breaks=10)],
+     main='size, color = abundance', asp=1)
+plot(dxy[ut], abs(xy$z[row(dxy)[ut]] - xy$z[col(dxy)[ut]]),
+     pch=20, cex=0.5,
+     xlab='distance apart',
+     ylab='|difference in abundance|')
+
+```
+
+## The data
+
+`(x,y)` : spatial coords; `z` : abundance
+
+```{r show_data}
+xy
+```
+
+----------------------
+
+**Goals:** 
+
+1. (descriptive) What spatial scale does abundance vary over?
+
+2. (predictive) What are the likely (range of) abundances at new locations?
+
+
+# Spatial covariance
+
+## Tobler's First Law of Geography:
+
+> Everything is related to everything else, but near things are more related than distant things.
+
+. . .
+
+*Modeler:* Great, covariance is a decreasing function of distance.
+
+
+## A decreasing function of distance.
+
+A convenient choice: the covariance between two points distance $d$ apart is
+$$\begin{aligned}
+    \alpha^2 \exp\left(- \frac{1}{2}\left(\frac{d}{\rho}\right)^2 \right) .
+\end{aligned}$$
+
+- $\alpha$ controls the overall variance (amount of noise)
+
+- $\rho$ is the spatial scale that covariance decays over
+
+
+
+## In Stan
+
+![cov_exp_quad() documentation](cov_exp_quad.png)
+
+------------
+
+Here's an `R` function that takes a set of locations (`xy`),
+a variance scaling `alpha`, and a spatial scale `rho`:
+```{r cov_exp_quad}
+cov_exp_quad <- function (xy, alpha, rho) {
+    # return the 'quadratic exponential' covariance matrix
+    # for spatial positions xy
+    dxy <- as.matrix(xy)
+    return( alpha^2 * exp( - (1/2) * dxy^2 / rho^2 ) )
+
+}
+```
+
+. . .
+
+**Challenge:** simulate spatially autocorrelated random Gaussian values,
+and plot them, in space. Pick parameters so you can tell they are autocorrelated.
+
+. . .
+
+*to color points by a continuous value:*
+```
+     colorRampPalette(c('blue', 'red'))(24)[cut(xy$z, breaks=24)]
+```
+
+# Back to the data
+
+## Goals
+
+
+1. (descriptive) What spatial scale does abundance vary over?
+
+    $\Rightarrow$ What is $\rho$?
+
+2. (predictive) What are the likely (range of) abundances at new locations?
+
+    $\Rightarrow$ Add unobserved abundances as *parameters*.
+
+
+## A basic Stan block
+
+::: {.columns}
+:::::::::: {.column width="50%"}
+
+
+:::
+:::::::::: {.column width="50%"}
+
+```{r spstan, cache=TRUE}
+sp_block <- "
+data {
+    int N; // number of obs
+    vector[2] xy[N]; // spatial pos
+    vector[N] z;
+}
+parameters {
+    real<lower=0> alpha;
+    real<lower=0> rho;
+}
+model {
+    matrix[N, N] K;
+    K = cov_exp_quad(xy, alpha, rho);
+
+    z ~ multi_normal(rep_vector(0.0, N), K);
+    alpha ~ normal(0, 5);
+    rho ~ normal(0, 5);
+}
+"
+```
+
+:::
+::::::::::
+
+-------------------
+
+```{r check_model, cache=TRUE, dependson="spstan"}
+sp_model <- stan_model(model_code=sp_block)
+sampling(sp_model,
+         data=list(N=5,
+                   xy=cbind(runif(5), runif(5)),
+                   z=rnorm(5)),
+         iter=100, chains=1)
+```
+
+-------------------
+
+**Challenge:** we would like to estimate the abundance
+at the `k` locations `new_xy`. Add this feature to the Stan block.
+
+```
+```{r show_spstan, echo=FALSE, results='asis'}
+cat(sp_block)
+```
+```
