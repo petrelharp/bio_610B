@@ -105,9 +105,8 @@ a variance scaling `alpha`, and a spatial scale `rho`:
 cov_exp_quad <- function (xy, alpha, rho) {
     # return the 'quadratic exponential' covariance matrix
     # for spatial positions xy
-    dxy <- as.matrix(xy)
+    dxy <- as.matrix(dist(xy))
     return( alpha^2 * exp( - (1/2) * dxy^2 / rho^2 ) )
-
 }
 ```
 
@@ -121,6 +120,50 @@ and plot them, in space. Pick parameters so you can tell they are autocorrelated
 *to color points by a continuous value:*
 ```
      colorRampPalette(c('blue', 'red'))(24)[cut(xy$z, breaks=24)]
+```
+
+## Simulation
+
+```{r sim_sp_pts}
+library(mvtnorm)
+N <- 100
+# spatial extent of order 1
+xy <- data.frame(x=runif(N),
+                 y=rnorm(N))
+rho <- .25
+alpha <- 1.0
+# compute covariance matrix
+K <- cov_exp_quad(xy, alpha, rho)
+# simulate z's
+xy$z <- as.vector(rmvnorm(1, mean=rep(0,N),
+                          sigma=K))
+
+plot(xy$x, xy$y, xlab='x spatial coord', 
+     ylab='y spatial coord', pch=20, 
+     cex=as.numeric(cut(xy$z, breaks=10))/2,
+     col=colorRampPalette(c('blue', 'red'))(24)[cut(xy$z, breaks=24)])
+```
+
+## Simulation number 2
+
+```{r sim_sp_pts2}
+library(mvtnorm)
+N <- 1000
+# spatial extent of order 1
+xy <- data.frame(x=runif(N),
+                 y=rnorm(N))
+rho <- .05
+alpha <- 1.0
+# compute covariance matrix
+K <- cov_exp_quad(xy, alpha, rho)
+# simulate z's
+xy$z <- as.vector(rmvnorm(1, mean=rep(0,N),
+                          sigma=K))
+
+plot(xy$x, xy$y, xlab='x spatial coord', 
+     ylab='y spatial coord', pch=20, 
+     cex=as.numeric(cut(xy$z, breaks=10))/2,
+     col=colorRampPalette(c('blue', 'red'))(24)[cut(xy$z, breaks=24)])
 ```
 
 # Back to the data
@@ -192,3 +235,40 @@ at the `k` locations `new_xy`. Add this feature to the Stan block.
 cat(sp_block)
 ```
 ```
+
+------------------
+
+```{r new_spstan, cache=TRUE}
+sp_block <- "
+data {
+    int N; // number of obs
+    vector[2] old_xy[N]; // spatial pos
+    vector[N] old_z;
+    int n;
+    vector[2] new_xy[n]; // new locs
+}
+transformed data {
+    vector[2] xy[N+n];
+    xy = append_rows(old_xy, new_xy);
+}
+parameters {
+    real<lower=0> alpha;
+    real<lower=0> rho;
+    vector[n] new_z;
+}
+model {
+    matrix[N, N] K;
+    vector[N+n] z;
+
+    K = cov_exp_quad(xy, alpha, rho);
+    z[1:N] = old_z;
+    z[(N+1):(N+n)] = new_z;
+
+    z ~ multi_normal(rep_vector(0.0, N), K);
+    alpha ~ normal(0, 5);
+    rho ~ normal(0, 5);
+}
+"
+new_sp <- stan_model(model_code=sp_block)
+```
+

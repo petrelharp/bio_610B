@@ -67,7 +67,7 @@ Week 7 *(2/20)*
 
 Week 8 *(2/27)*
 
-: [(slides)](slides/week_8.slides.html) Clustering and categorization: softmax regression; applied example.  Also: [t-SNE in Stan](slides/t-sne.slides.html).
+: [(slides)](slides/week_8.slides.html) Clustering and categorization: nonnegative matrix factorization.  Also: [t-SNE in Stan](slides/t-sne.slides.html).
 
 Week 9 *(3/6)*
 
@@ -79,4 +79,5 @@ Week 10 *(3/13)*
 : [(slides)](slides/week_10.slides.html) Spatial and network covariance: sharing power between related locations.
     Priors to constrain visualization (e.g., regularized PCA).
 
+And, finally: a [review](slides/review.slides.html).
 
