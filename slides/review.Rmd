@@ -1,0 +1,131 @@
+---
+title: "Review :: statistics!!"
+author: "Peter Ralph"
+date: "12 March 2018 -- Advanced Biological Statistics"
+---
+
+
+## Overview
+
+- Big-picture methods
+- (Bayesian) statistics :: concepts
+- Estimation :: using Stan
+- Types of model
+- Probability distributions
+- Model evaluation tools
+
+
+## Big-picture methods
+
+1. Hierarchical models (random effects)
+
+2. Shrinkage (towards a group mean) // sharing power
+
+3. Sparsifying priors (the horseshoe)
+
+4. Robustness to outliers, and the importance of properly modeling noise
+
+
+## (Bayesian) statistics :: concepts
+
+1. Likelihood
+
+2. Posterior = prior $\times$ likelihood
+
+3. Strong versus weak/uninformative priors
+
+4. Credible intervals
+
+
+
+## Estimation :: using Stan
+
+1. Markov chain Monte Carlo (random walk)
+
+2. Convergence, and mixing
+
+3. Multiple optima
+
+4. Reparameterization to improve the posterior
+
+5. Optimization (hill-climbing)
+
+
+## Types of model
+
+1. Binary data: coin flips, where the probability depends on something
+
+    * beta-binomial
+    * logistic regression
+
+2. Count data: where the mean depends on something
+
+    * Poisson regression
+
+3. Metric data in groups: group means relate to each other
+
+    * Robust ANOVA
+    * shrinkage of group means
+
+4. Metric data with metric predictors: regression and relatives
+
+    * Robust regression
+    * many predictors: sparsifying prior on coefficients
+
+## More types of model
+
+5. Mixture models: deconvolution
+
+    * nonnegative matrix factorization
+
+6. Dimension reduction: visualization
+
+    * t-SNE
+
+7. Time series
+
+    * autoregressive
+    * latent (unobserved) process
+
+8. Spatial statistics
+
+    * spatial autocovariance
+
+
+## Probability distributions
+
+1. Beta, and Dirichlet (renormalized Exponentials)
+
+2. Beta-binomial
+
+3. Gamma (and Exponential)
+
+4. Poisson: many rare events
+
+5. Cauchy: has outliers
+
+6. Student's $t$
+
+7. Scale mixtures of Normal ($\sigma$ is random)
+
+8. Multivariate Normal (/Gaussian)
+
+
+## Model evaluation tools
+
+1. Model debugging by simulation
+
+2. Model prediction by simulation (posterior predictive sampling)
+
+3. Goodness-of-fit:
+
+    * by simulation
+    * by crossvalidation
+
+4. Model selection by crossvalidation
+
+
+----------------
+
+
+**thanks!!**
