@@ -367,6 +367,64 @@ We could do the *same thing* in a **network** model,
 calculating "nearby" and "distance" with the network.
 
 
+## Example
+
+A network:
+```{r plot_network}
+A <- (dxy < rowQuantiles(dxy, probs=0.2))
+diag(A) <- FALSE
+
+plot(xy[,1:2])
+segments(x0=xy[row(A)[A],1], x1=xy[col(A)[A],1],
+         y0=xy[row(A)[A],2], y1=xy[col(A)[A],2])
+```
+
+----------
+
+Here is the *adjacency matrix* of the network:
+```{r show_adj}
+A
+```
+
+----------
+
+Our **model** has random variates at each node of the network,
+correlated with neighbors.
+
+. . .
+
+Suppose that
+
+1. Every node has mean $\mu$ and variance $\alpha^2$.
+
+2. Neighboring nodes have covariance $\alpha^2 \times \rho$.
+
+Then, the covariance matrix is
+
+```{r compute_covmat}
+truth <- list(
+              alpha = 2.5,
+              rho = 0.6)
+truth$covmat <- truth$alpha^2 * (diag(nrow(A)) + truth$rho * A)
+```
+
+---------------
+
+Now we can simulate values on the network:
+
+```{r sim_network_vals}
+xy$z <- as.vector(rmvnorm(1, mean=rep(truth$mu,N), sigma=truth$covmat))
+```
+
+## Analysis options
+
+1. Suppose the network is *unknown*, and infer it.
+
+2. Suppose the network is *known*, and use it as a *smoothing prior*
+   to help infer noisy or unobserved values at some of the nodes.
+
+
+
 # Summary
 
 ## We can now
